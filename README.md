@@ -1,1 +1,3 @@
 # ClinicaDelCalzado-BackEnd
+
+ENDPOINTS LIST
