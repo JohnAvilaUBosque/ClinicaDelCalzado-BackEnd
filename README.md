@@ -2,3 +2,4 @@
 
 ENDPOINTS LIST
 -Login
+-Register
