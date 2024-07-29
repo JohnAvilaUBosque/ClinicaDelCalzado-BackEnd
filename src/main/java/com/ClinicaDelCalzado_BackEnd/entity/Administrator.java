@@ -1,5 +1,6 @@
 package com.ClinicaDelCalzado_BackEnd.entity;
 
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
@@ -36,9 +37,9 @@ public class Administrator {
     @Column(name = "role", length = 50)
     private String role;
 
-    @OneToMany(mappedBy = "administrator")
+    @OneToMany(cascade = CascadeType.ALL, mappedBy = "administrator")
     private List<Answer> answersList;
 
-    @OneToMany(mappedBy = "attendedBy")
+    @OneToMany(cascade = CascadeType.ALL, mappedBy = "attendedBy")
     private List<WorkOrder> workOrdersList;
 }

@@ -1,5 +1,6 @@
 package com.ClinicaDelCalzado_BackEnd.entity;
 
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -75,9 +76,9 @@ public class WorkOrder {
     @Column(name = "balance")
     private Double balance;
 
-    @OneToMany(mappedBy = "workOrder")
+    @OneToMany(cascade = CascadeType.ALL, mappedBy = "workOrder")
     private List<Service> servicesList;
 
-    @OneToMany(mappedBy = "workOrder")
+    @OneToMany(cascade = CascadeType.ALL, mappedBy = "workOrder")
     private List<Comment> commentsList;
 }

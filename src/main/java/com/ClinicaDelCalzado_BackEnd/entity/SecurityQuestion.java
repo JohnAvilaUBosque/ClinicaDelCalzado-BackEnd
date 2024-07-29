@@ -1,5 +1,6 @@
 package com.ClinicaDelCalzado_BackEnd.entity;
 
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -30,6 +31,6 @@ public class SecurityQuestion {
     @Column(name = "question", nullable = false)
     private String question;
 
-    @OneToMany(mappedBy = "securityQuestion")
+    @OneToMany(cascade = CascadeType.ALL, mappedBy = "securityQuestion")
     private List<Answer> answersList;
 }
