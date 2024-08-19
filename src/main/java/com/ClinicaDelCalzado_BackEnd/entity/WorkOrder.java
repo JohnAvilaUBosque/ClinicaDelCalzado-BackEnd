@@ -23,17 +23,16 @@ import java.util.List;
 @AllArgsConstructor
 @NoArgsConstructor
 @Entity
-@Table(name = "WorkOrder")
+@Table(name = "work_order")
 public class WorkOrder {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "order_number")
-    private Integer orderNumber;
+    @Column(name = "order_number", length = 20)
+    private String orderNumber;
 
     @ManyToOne
     @JoinColumn(name = "id_company")
-    private Company company;
+    private Company idCompany;
 
     @Column(name = "creation_date", nullable = false)
     private LocalDate creationDate;
@@ -41,13 +40,10 @@ public class WorkOrder {
     @Column(name = "delivery_date")
     private LocalDate deliveryDate;
 
-    @Column(name = "work_status", length = 50)
-    private String workStatus;
-
-    @Column(name = "order_status", length = 50)
+    @Column(name = "order_status", length = 10)
     private String orderStatus;
 
-    @Column(name = "payment_status", length = 50)
+    @Column(name = "payment_status", length = 10)
     private String paymentStatus;
 
     @ManyToOne
@@ -56,16 +52,7 @@ public class WorkOrder {
 
     @ManyToOne
     @JoinColumn(name = "id_client")
-    private Client client;
-
-    @Column(name = "client_name", length = 100)
-    private String clientName;
-
-    @Column(name = "client_phone_number", length = 20)
-    private String clientPhoneNumber;
-
-    @Column(name = "product_list", columnDefinition = "TEXT")
-    private String productList;
+    private Client idClient;
 
     @Column(name = "deposit")
     private Double deposit;
@@ -76,9 +63,12 @@ public class WorkOrder {
     @Column(name = "balance")
     private Double balance;
 
-    @OneToMany(cascade = CascadeType.ALL, mappedBy = "workOrder")
+    @Column(name = "general_comment")
+    private String generalComment;
+
+    @OneToMany(cascade = CascadeType.ALL, mappedBy = "idOrderSer")
     private List<Service> servicesList;
 
-    @OneToMany(cascade = CascadeType.ALL, mappedBy = "workOrder")
+    @OneToMany(cascade = CascadeType.ALL, mappedBy = "idOrderCom")
     private List<Comment> commentsList;
 }

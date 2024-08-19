@@ -20,12 +20,12 @@ import java.util.List;
 @AllArgsConstructor
 @NoArgsConstructor
 @Entity
-@Table(name = "SecurityQuestion")
+@Table(name = "security_question")
 public class SecurityQuestion {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "id_securityQuestion")
+    @Column(name = "id_securityQuestion", length = 20)
     private Integer idSecurityQuestion;
 
     @Column(name = "question", nullable = false)

@@ -18,18 +18,18 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 @Entity
-@Table(name = "Comment")
+@Table(name = "comment")
 public class Comment {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "id_comment")
+    @Column(name = "id_comment", length = 20)
     private Integer idComment;
 
     @ManyToOne
     @JoinColumn(name = "id_order")
-    private WorkOrder workOrder;
+    private WorkOrder idOrderCom;
 
-    @Column(name = "administrator_comment", columnDefinition = "TEXT")
+    @Column(name = "admin_comment")
     private String adminComment;
 }

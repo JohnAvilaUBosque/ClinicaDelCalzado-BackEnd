@@ -20,12 +20,12 @@ import java.util.List;
 @AllArgsConstructor
 @NoArgsConstructor
 @Entity
-@Table(name = "Company")
+@Table(name = "company")
 public class Company {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "id_company")
+    @Column(name = "id_company", length = 20)
     private Integer idCompany;
 
     @Column(name = "name", nullable = false, length = 100)
@@ -40,6 +40,6 @@ public class Company {
     @Column(name = "phones", length = 100)
     private String phones;
 
-    @OneToMany(cascade = CascadeType.ALL, mappedBy = "company")
+    @OneToMany(cascade = CascadeType.ALL, mappedBy = "idCompany")
     private List<WorkOrder> workOrdersList;
 }

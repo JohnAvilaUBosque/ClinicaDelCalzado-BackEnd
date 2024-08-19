@@ -18,26 +18,29 @@ import java.util.List;
 @AllArgsConstructor
 @NoArgsConstructor
 @Entity
-@Table(name = "Administrator")
+@Table(name = "administrator")
 public class Administrator {
 
     @Id
     @Column(name = "id_administrator", length = 20)
     private Integer idAdministrator;
 
-    @Column(name = "name", nullable = false, length = 100)
-    private String name;
+    @Column(name = "admin_name", nullable = false, length = 100)
+    private String adminName;
 
     @Column(name = "password", nullable = false, length = 100)
     private String password;
 
-    @Column(name = "phone_number", length = 20)
-    private String phoneNumber;
+    @Column(name = "adm_phone_number", length = 20)
+    private String admPhoneNumber;
 
     @Column(name = "role", length = 50)
     private String role;
 
-    @OneToMany(cascade = CascadeType.ALL, mappedBy = "administrator")
+    @Column(name = "admin_status", length = 20)
+    private String AdminStatus;
+
+    @OneToMany(cascade = CascadeType.ALL, mappedBy = "idAdministrator")
     private List<Answer> answersList;
 
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "attendedBy")

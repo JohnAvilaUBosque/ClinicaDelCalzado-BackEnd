@@ -18,12 +18,16 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 @Entity
-@Table(name = "Answers")
+@Table(name = "answers")
 public class Answer {
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "id_answers")
+    @Column(name = "id_answers", length = 20)
     private Integer idAnswers;
+
+    @Column(name = "answer")
+    private String answer;
 
     @ManyToOne
     @JoinColumn(name = "id_question")
@@ -31,9 +35,5 @@ public class Answer {
 
     @ManyToOne
     @JoinColumn(name = "id_administrator")
-    private Administrator administrator;
-
-    @Column(name = "answer")
-    private String answer;
-
+    private Administrator idAdministrator;
 }

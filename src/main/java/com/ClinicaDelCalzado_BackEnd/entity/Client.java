@@ -18,19 +18,19 @@ import java.util.List;
 @AllArgsConstructor
 @NoArgsConstructor
 @Entity
-@Table(name = "Client")
+@Table(name = "client")
 public class Client {
 
     @Id
     @Column(name = "id_client", length = 20)
     private Integer idClient;
 
-    @Column(name = "name", nullable = false, length = 100)
-    private String name;
+    @Column(name = "client_name", nullable = false, length = 100)
+    private String clientName;
 
-    @Column(name = "phone_number", length = 20)
-    private String phoneNumber;
+    @Column(name = "cli_phone_number", length = 20)
+    private String cliPhoneNumber;
 
-    @OneToMany(cascade = CascadeType.ALL, mappedBy = "client")
+    @OneToMany(cascade = CascadeType.ALL, mappedBy = "idClient")
     private List<WorkOrder> workOrdersList;
 }

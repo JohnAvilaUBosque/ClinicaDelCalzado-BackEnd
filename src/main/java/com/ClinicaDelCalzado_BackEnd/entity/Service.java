@@ -18,23 +18,23 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 @Entity
-@Table(name = "Service")
+@Table(name = "service")
 public class Service {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "id_service")
+    @Column(name = "id_service", length = 20)
     private Integer idService;
 
     @ManyToOne
     @JoinColumn(name = "id_order")
-    private WorkOrder workOrder;
+    private WorkOrder idOrderSer;
 
     @Column(name = "service")
     private String service;
 
-    @Column(name = "work_status", length = 50)
-    private String workStatus;
+    @Column(name = "service_status", length = 10)
+    private String serviceStatus;
 
     @Column(name = "unit_value")
     private Double unitValue;
