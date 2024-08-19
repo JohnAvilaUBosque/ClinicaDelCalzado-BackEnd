@@ -61,9 +61,6 @@ public class WorkOrder {
     @Column(name = "balance")
     private Double balance;
 
-    @Column(name = "general_comment")
-    private String generalComment;
-
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "idOrderSer")
     private List<Service> servicesList;
 
