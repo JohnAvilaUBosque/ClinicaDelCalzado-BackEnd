@@ -3,11 +3,11 @@
 # Database configuration
 spring:
   datasource:
-    db: railway
+    db: ${SCHEMA_NAME}
     driver-class-name: com.mysql.cj.jdbc.Driver
-    username: root
-    password: gaPXrBnoEQRzwvmZgCaSJwThDSJVgFfL
-    url: junction.proxy.rlwy.net:21367
+    username: ${DB_USER}
+    password: ${DB_PASS}
+    url: ${DB_HOST}
   jpa:
     show-sql: true
     generate-ddl: true

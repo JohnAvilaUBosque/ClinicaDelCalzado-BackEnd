@@ -7,11 +7,14 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
+import java.util.Optional;
+
 @Repository
 public interface ICompanyRepository extends JpaRepository<Company, Integer> {
 
     Company findByNit(String nit);
 
-    @Query(value = "SELECT * FROM ", nativeQuery = true)
-    Company findUserByCompanyIdAndNit(@Param("user_id") Integer userId, @Param("rol_name") String rolName) throws RepositoryException;
+    @Query(value = "SELECT * FROM company c WHERE c.id_company = :id_company AND UPPER(c.nit) = UPPER(:nit)", nativeQuery = true)
+    Company findCompanyByIdCompanyAndNit(@Param("id_company") Integer idCompany, @Param("nit") String nit) throws RepositoryException;
+
 }

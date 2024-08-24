@@ -14,19 +14,17 @@ public class CompanyServiceImpl implements ICompanyService {
     private final ICompanyRepository companyRepository;
 
     @Autowired
-    public CompanyServiceImpl (ICompanyRepository companyRepository){
+    public CompanyServiceImpl (ICompanyRepository companyRepository) {
         this.companyRepository = companyRepository;
     }
 
     @Override
-    public Optional<Company> getCompany(Integer companyId, String nit){
-        return Optional.ofNullable(companyRepository.findUserByCompanyIdAndNit(companyId, nit));
+    public Optional<Company> getCompany(Integer idCompany,String nit) {
+        return Optional.ofNullable(companyRepository.findCompanyByIdCompanyAndNit(idCompany, nit));
     }
 
-    @Override
-    public Company findByNit(String nit){
-        return null;
+    public Company findCompanyByNit(String nit) {
+        return companyRepository.findByNit(nit);
     }
-
 
 }

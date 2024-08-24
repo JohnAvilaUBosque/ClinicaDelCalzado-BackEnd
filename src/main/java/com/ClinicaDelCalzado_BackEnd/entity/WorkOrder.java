@@ -62,7 +62,7 @@ public class WorkOrder {
     private Double balance;
 
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "idOrderSer")
-    private List<Service> servicesList;
+    private List<ServicesEnt> servicesList;
 
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "idOrderCom")
     private List<Comment> commentsList;

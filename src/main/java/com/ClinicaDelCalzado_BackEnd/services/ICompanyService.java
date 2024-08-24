@@ -6,6 +6,6 @@ import java.util.Optional;
 
 public interface ICompanyService {
 
-    Optional<Company> getCompany(Integer companyId, String nit);
-    Company findByNit(String nit);
+    Optional<Company> getCompany(Integer idCompany,String nit);
+    Company findCompanyByNit(String nit);
 }
