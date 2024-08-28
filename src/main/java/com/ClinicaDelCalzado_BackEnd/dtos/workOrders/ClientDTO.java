@@ -16,7 +16,7 @@ import java.util.List;
 @JsonNaming(PropertyNamingStrategy.SnakeCaseStrategy.class)
 public class ClientDTO {
 
-    private Integer identification;
+    private Long identification;
     private String name;
     private String cellphone;
 }

@@ -38,4 +38,7 @@ public class ServicesEnt {
 
     @Column(name = "unit_value")
     private Double unitValue;
+
+    public ServicesEnt(String name, Double price, String orderStatus, WorkOrder workOrder) {
+    }
 }

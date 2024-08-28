@@ -5,5 +5,5 @@ import com.ClinicaDelCalzado_BackEnd.dtos.Response.WorkOrderDTOResponse;
 
 public interface IWorkOrderService {
 
-    WorkOrderDTOResponse createWorkOrder(WorkOrderDTORequest workOrderDTO);
+    WorkOrderDTOResponse createWorkOrder(WorkOrderDTORequest workOrderDTORequest);
 }

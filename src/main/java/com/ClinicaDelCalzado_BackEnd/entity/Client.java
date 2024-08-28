@@ -6,14 +6,12 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 import java.util.List;
 
-@Data
+@Getter
+@Setter
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
@@ -23,7 +21,7 @@ public class Client {
 
     @Id
     @Column(name = "id_client", length = 20)
-    private Integer idClient;
+    private Long idClient;
 
     @Column(name = "client_name", nullable = false, length = 100)
     private String clientName;
@@ -33,4 +31,5 @@ public class Client {
 
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "idClient")
     private List<WorkOrder> workOrdersList;
+
 }

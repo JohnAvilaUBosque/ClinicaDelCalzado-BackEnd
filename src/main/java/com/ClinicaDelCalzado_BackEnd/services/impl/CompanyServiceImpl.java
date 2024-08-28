@@ -23,8 +23,13 @@ public class CompanyServiceImpl implements ICompanyService {
         return Optional.ofNullable(companyRepository.findCompanyByIdCompanyAndNit(idCompany, nit));
     }
 
-    public Company findCompanyByNit(String nit) {
+    public Optional<Company> findCompanyByNit(String nit) {
         return companyRepository.findByNit(nit);
+    }
+
+    @Override
+    public Company save(Company company) {
+        return companyRepository.save(company);
     }
 
 }

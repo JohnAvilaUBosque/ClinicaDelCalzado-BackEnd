@@ -14,6 +14,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Data
@@ -33,7 +34,7 @@ public class WorkOrder {
     private Company idCompany;
 
     @Column(name = "creation_date", nullable = false)
-    private LocalDate creationDate;
+    private LocalDateTime creationDate;
 
     @Column(name = "delivery_date")
     private LocalDate deliveryDate;
@@ -66,4 +67,7 @@ public class WorkOrder {
 
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "idOrderCom")
     private List<Comment> commentsList;
+
+    public WorkOrder(String orderNumber, LocalDate parse, LocalDate parse1, String orderStatus, String paymentStatus, Administrator attendedBy, Client client, Company company, Double downPayment, Object o, Object o1, Object o2) {
+    }
 }
