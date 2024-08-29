@@ -13,7 +13,7 @@ import javax.sql.DataSource;
 @Configuration
 public class DataSourceConfig {
 
-    private static final String DATA_SOURCE_URL = "jdbc:mysql://%s/%s?useSSL=false&serverTimezone=UTC&characterEncoding=UTF-8";
+    private static final String DATA_SOURCE_URL = "jdbc:mysql://%s/%s?allowPublicKeyRetrieval=true&useSSL=false&serverTimezone=UTC&characterEncoding=UTF-8";
 
     @SneakyThrows
     @Bean

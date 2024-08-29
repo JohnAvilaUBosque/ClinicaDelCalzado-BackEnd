@@ -1,6 +1,6 @@
-package com.ClinicaDelCalzado_BackEnd.dtos.userAdmin;
+package com.ClinicaDelCalzado_BackEnd.dtos.Request;
 
-import com.fasterxml.jackson.databind.PropertyNamingStrategy;
+import com.fasterxml.jackson.databind.PropertyNamingStrategies;
 import com.fasterxml.jackson.databind.annotation.JsonNaming;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -11,11 +11,12 @@ import lombok.NoArgsConstructor;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-@JsonNaming(PropertyNamingStrategy.SnakeCaseStrategy.class)
-public class AdminDTO {
+@JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
+public class AdminDTORequest {
 
-    private Long identification;
     private String adminType;
+    private Long identification;
     private String name;
+    private String password;
     private String cellphone;
 }

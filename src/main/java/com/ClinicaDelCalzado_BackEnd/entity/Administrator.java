@@ -23,7 +23,7 @@ public class Administrator {
 
     @Id
     @Column(name = "id_administrator", length = 20)
-    private Integer idAdministrator;
+    private Long idAdministrator;
 
     @Column(name = "admin_name", nullable = false, length = 100)
     private String adminName;
