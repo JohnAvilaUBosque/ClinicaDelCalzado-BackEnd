@@ -2,12 +2,11 @@ package com.ClinicaDelCalzado_BackEnd.services.impl;
 
 import com.ClinicaDelCalzado_BackEnd.dtos.Request.AdminDTORequest;
 import com.ClinicaDelCalzado_BackEnd.dtos.Response.AdminDTOResponse;
-import com.ClinicaDelCalzado_BackEnd.dtos.enums.AdminStatus;
+import com.ClinicaDelCalzado_BackEnd.dtos.enums.AdminStatusEnum;
 import com.ClinicaDelCalzado_BackEnd.dtos.enums.AdminTypeEnum;
 import com.ClinicaDelCalzado_BackEnd.dtos.userAdmin.AdminDTO;
 import com.ClinicaDelCalzado_BackEnd.entity.Administrator;
 import com.ClinicaDelCalzado_BackEnd.exceptions.AlreadyExistsException;
-import com.ClinicaDelCalzado_BackEnd.exceptions.RepositoryException;
 import com.ClinicaDelCalzado_BackEnd.repository.userAdmin.IAdministratorRepository;
 import com.ClinicaDelCalzado_BackEnd.services.IAdminService;
 import com.ClinicaDelCalzado_BackEnd.util.Encrypt;
@@ -46,7 +45,7 @@ public class AdminServiceImpl implements IAdminService {
         Administrator administrator = Administrator.builder()
                 .idAdministrator(idAdministrator)
                 .adminName(adminDTO.getName())
-                .AdminStatus(AdminStatus.ACTIVE.name())
+                .AdminStatus(AdminStatusEnum.ACTIVE.name())
                 .admPhoneNumber(adminDTO.getCellphone())
                 .role(AdminTypeEnum.getValue(adminDTO.getAdminType()))
                 .password(Encrypt.encode(adminDTO.getPassword()))

@@ -1,6 +1,6 @@
 package com.ClinicaDelCalzado_BackEnd.dtos.enums;
 
-import com.ClinicaDelCalzado_BackEnd.services.impl.BadRequestException;
+import com.ClinicaDelCalzado_BackEnd.exceptions.BadRequestException;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 

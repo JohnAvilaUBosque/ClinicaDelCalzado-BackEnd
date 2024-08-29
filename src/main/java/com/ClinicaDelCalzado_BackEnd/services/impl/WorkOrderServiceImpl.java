@@ -51,7 +51,6 @@ public class WorkOrderServiceImpl implements IWorkOrderService {
 
         validateRequest(workOrderDTORequest);
 
-        // Buscar o crear la empresa
         Company company = companyService.findCompanyByNit(workOrderDTORequest.getCompany().getNit())
                 .orElseGet(() -> companyService.save(
                         Company.builder()
@@ -62,7 +61,6 @@ public class WorkOrderServiceImpl implements IWorkOrderService {
                                 .build())
                 );
 
-        // Buscar o crear el cliente
         Client client = clientService.findClientByIdClient(workOrderDTORequest.getClient().getIdentification())
                 .orElseGet(() -> clientService.saveClient(
                          Client.builder()
@@ -72,12 +70,10 @@ public class WorkOrderServiceImpl implements IWorkOrderService {
                                  .build())
                 );
 
-        // Buscar el administrador y lanzar excepción si no se encuentra
         Administrator attendedBy = adminService.findAdministratorById(workOrderDTORequest.getAttendedById())
                 .orElseThrow(() -> new NotFoundException(String.format("Administrator %s not found", workOrderDTORequest.getAttendedById())));
 
-/*        // Crear la orden de trabajo
-        WorkOrder workOrder = workOrderRepository.save(
+/*      WorkOrder workOrder = workOrderRepository.save(
                 new WorkOrder(
                         workOrderDTORequest.getOrderNumber(),
                         LocalDate.parse(workOrderDTORequest.getCreateDate().toString()),
@@ -94,14 +90,12 @@ public class WorkOrderServiceImpl implements IWorkOrderService {
                 )
         );
 
-        // Calcular el total y saldo
         double totalValue = workOrderDTORequest.getServices().stream()
                 .mapToDouble(ServicesDTO::getPrice)
                 .sum();
         workOrder.setTotalValue(totalValue);
         workOrder.setBalance(totalValue - workOrderDTORequest.getDownPayment());
 
-        // Guardar los servicios y mapear a DTOs
         List<ServicesDTO> services = workOrderDTORequest.getServices().stream()
                 .map(serviceDTO -> {
                     ServicesEnt service = new ServicesEnt(
@@ -115,7 +109,6 @@ public class WorkOrderServiceImpl implements IWorkOrderService {
                 })
                 .collect(Collectors.toList());
 
-        // Crear el DTO de respuesta
         ClientDTO clientResponseDTO = new ClientDTO(client.getIdClient(), client.getClientName(), client.getCliPhoneNumber());
         WorkOrderDTORes orderResponseDTO = new WorkOrderDTORes(
                 company,
@@ -141,12 +134,10 @@ public class WorkOrderServiceImpl implements IWorkOrderService {
         String nit = workOrderDTORequest.getCompany().getNit();
         Long idClient = workOrderDTORequest.getClient().getIdentification();
 
-        //Validar si la compañia esta registrada
         if (nit.isEmpty()) {
             throw new NotFoundException(String.format("La compañía con nit %s no esta registrada!!", nit));
         }
 
-        //Validar que la identificación del Cliente no sea vacía
         if (ObjectUtils.isEmpty(idClient)) {
             throw new NotFoundException("Se requiere identificación del cliente!!");
         }

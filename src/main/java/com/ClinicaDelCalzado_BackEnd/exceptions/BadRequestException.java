@@ -1,6 +1,5 @@
-package com.ClinicaDelCalzado_BackEnd.services.impl;
+package com.ClinicaDelCalzado_BackEnd.exceptions;
 
-import com.ClinicaDelCalzado_BackEnd.exceptions.ApiException;
 import org.springframework.http.HttpStatus;
 
 public class BadRequestException extends ApiException {

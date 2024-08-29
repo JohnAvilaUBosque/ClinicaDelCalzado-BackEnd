@@ -8,18 +8,18 @@ import java.util.Arrays;
 
 @Getter
 @RequiredArgsConstructor
-public enum AdminStatus {
-    ACTIVE("ACTIVO"),
-    INACTIVE("INACTIVO");
+public enum PaymentStatusEnum {
+    PENDING("PENDIENTE"),
+    PAID("PAGADO");
 
     final String value;
 
     public static String getValue(String keyName) {
-        return Arrays.stream(AdminStatus.values())
+        return Arrays.stream(PaymentStatusEnum.values())
                 .filter(x -> x.name()
                         .equalsIgnoreCase(keyName))
                 .findFirst()
-                .map(AdminStatus::getValue)
+                .map(PaymentStatusEnum::getValue)
                 .orElse(StringUtils.EMPTY);
     }
 }
