@@ -24,7 +24,7 @@ import java.util.List;
 public class WorkOrderDTORequest {
 
     private CompanyDTO company;
-    private Integer attendedById;
+    private Long attendedById;
     private String orderNumber;
     private String orderStatus;
     @JsonFormat (shape = JsonFormat.Shape.STRING, pattern = "dd-MM-yyyy")

@@ -4,49 +4,46 @@ import com.ClinicaDelCalzado_BackEnd.dtos.Request.WorkOrderDTORequest;
 import com.ClinicaDelCalzado_BackEnd.dtos.Response.WorkOrderDTOResponse;
 import com.ClinicaDelCalzado_BackEnd.dtos.workOrders.*;
 import com.ClinicaDelCalzado_BackEnd.entity.*;
-import com.ClinicaDelCalzado_BackEnd.repository.userAdmin.IAdministratorRepository;
-import com.ClinicaDelCalzado_BackEnd.repository.workOrders.IClientRepository;
-import com.ClinicaDelCalzado_BackEnd.repository.workOrders.ICompanyRepository;
 import com.ClinicaDelCalzado_BackEnd.repository.workOrders.IServicesRepository;
 import com.ClinicaDelCalzado_BackEnd.repository.workOrders.IWorkOrderRepository;
+import com.ClinicaDelCalzado_BackEnd.services.IAdminService;
+import com.ClinicaDelCalzado_BackEnd.services.IClientService;
 import com.ClinicaDelCalzado_BackEnd.services.ICompanyService;
 import com.ClinicaDelCalzado_BackEnd.services.IWorkOrderService;
-import org.modelmapper.ModelMapper;
+import org.apache.commons.lang3.ObjectUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.webjars.NotFoundException;
 
-import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
-import java.util.stream.Collectors;
+
 
 @Service
 public class WorkOrderServiceImpl implements IWorkOrderService {
 
-    private IWorkOrderRepository workOrderRepository;
+    private final IWorkOrderRepository workOrderRepository;
 
-    private ICompanyService companyService;
+    private final ICompanyService companyService;
 
-    private IClientRepository clientRepository;
+    private final IClientService clientService;
 
-    private IServicesRepository serviceRepository;
+    private final IServicesRepository serviceRepository;
 
-    private IAdministratorRepository administratorRepository;
+    private final IAdminService adminService;
 
     //private Optional<Company> company;
     private final List<OrderErrorDTO> orderErrors = new ArrayList<>();
 
     @Autowired
     public WorkOrderServiceImpl(IWorkOrderRepository workOrderRepository, ICompanyService companyService,
-                                IClientRepository clientRepository, IServicesRepository serviceRepository,
-                                IAdministratorRepository administratorRepository) {
+                                IClientService clientService, IServicesRepository serviceRepository,
+                                IAdminService adminService) {
         this.workOrderRepository = workOrderRepository;
         this.companyService = companyService;
-        this.clientRepository = clientRepository;
+        this.clientService = clientService;
         this.serviceRepository = serviceRepository;
-        this.administratorRepository = administratorRepository;
+        this.adminService = adminService;
     }
 
     @Override
@@ -64,21 +61,22 @@ public class WorkOrderServiceImpl implements IWorkOrderService {
                                 .phones(String.join(",", workOrderDTORequest.getCompany().getPhones()))
                                 .build())
                 );
-/*
-        // Buscar o crear el cliente utilizando orElseGet con lambda
-        Client client = clientRepository.findByIdentification(workOrderDTORequest.getClient().getIdentification())
-                .orElseGet(() -> clientRepository.save(
-                        new Client(
-                                workOrderDTORequest.getClient().getName(),
-                                workOrderDTORequest.getClient().getCellphone()
-                        )
-                ));
+
+        // Buscar o crear el cliente
+        Client client = clientService.findClientByIdClient(workOrderDTORequest.getClient().getIdentification())
+                .orElseGet(() -> clientService.saveClient(
+                         Client.builder()
+                                 .idClient(workOrderDTORequest.getClient().getIdentification())
+                                 .clientName(workOrderDTORequest.getClient().getName())
+                                 .cliPhoneNumber(workOrderDTORequest.getClient().getCellphone())
+                                 .build())
+                );
 
         // Buscar el administrador y lanzar excepción si no se encuentra
-        Administrator attendedBy = administratorRepository.findById(workOrderDTORequest.getAttendedById())
-                .orElseThrow(() -> new RuntimeException("Administrator not found"));
+        Administrator attendedBy = adminService.findAdministratorById(workOrderDTORequest.getAttendedById())
+                .orElseThrow(() -> new NotFoundException(String.format("Administrator %s not found", workOrderDTORequest.getAttendedById())));
 
-        // Crear la orden de trabajo
+/*        // Crear la orden de trabajo
         WorkOrder workOrder = workOrderRepository.save(
                 new WorkOrder(
                         workOrderDTORequest.getOrderNumber(),
@@ -141,10 +139,16 @@ public class WorkOrderServiceImpl implements IWorkOrderService {
 
     private void validateRequest(WorkOrderDTORequest workOrderDTORequest) {
         String nit = workOrderDTORequest.getCompany().getNit();
+        Long idClient = workOrderDTORequest.getClient().getIdentification();
 
         //Validar si la compañia esta registrada
         if (nit.isEmpty()) {
             throw new NotFoundException(String.format("La compañía con nit %s no esta registrada!!", nit));
+        }
+
+        //Validar que la identificación del Cliente no sea vacía
+        if (ObjectUtils.isEmpty(idClient)) {
+            throw new NotFoundException("Se requiere identificación del cliente!!");
         }
     }
 }

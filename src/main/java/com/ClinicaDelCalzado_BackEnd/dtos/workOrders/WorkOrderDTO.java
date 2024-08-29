@@ -9,7 +9,6 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 import java.time.LocalDate;
-import java.time.LocalDateTime;
 import java.util.List;
 
 @Getter
@@ -21,13 +20,10 @@ public class WorkOrderDTO {
 
     private CompanyDTO company;
     private Integer attendedById;
-    private String orderNumber;
-    private String orderStatus;
     @JsonFormat (shape = JsonFormat.Shape.STRING, pattern = "dd-MM-yyyy")
     private LocalDate deliveryDate;
     private ClientDTO client;
     private List<ServicesDTO> services;
     private String generalComment;
     private Double downPayment;
-    private String paymentStatus;
 }
