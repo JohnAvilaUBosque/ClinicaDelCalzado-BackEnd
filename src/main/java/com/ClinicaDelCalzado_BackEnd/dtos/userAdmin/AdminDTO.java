@@ -18,4 +18,5 @@ public class AdminDTO {
     private String adminType;
     private String name;
     private String cellphone;
+    private String status;
 }

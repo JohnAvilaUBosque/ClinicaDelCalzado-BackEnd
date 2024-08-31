@@ -10,7 +10,7 @@ import java.util.Arrays;
 @RequiredArgsConstructor
 public enum AdminTypeEnum {
     PRINCIPAL("PRINCIPAL", "PRINCIPAL"),
-    SECONDARY("SECUNDARIO", "SECONDARY");
+    SECONDARY("SECONDARY", "SECUNDARIO");
 
     final String keyName;
     final String value;
@@ -22,5 +22,14 @@ public enum AdminTypeEnum {
                 .findFirst()
                 .map(AdminTypeEnum::getValue)
                 .orElseThrow(() -> new BadRequestException(String.format("Administrator role type %s is invalid", keyName)));
+    }
+
+    public static String getName(String value) {
+        return Arrays.stream(AdminTypeEnum.values())
+                .filter(x -> x.getValue()
+                        .equalsIgnoreCase(value))
+                .findFirst()
+                .map(AdminTypeEnum::getKeyName)
+                .orElseThrow(() -> new BadRequestException(String.format("Administrator role type %s is invalid", value)));
     }
 }

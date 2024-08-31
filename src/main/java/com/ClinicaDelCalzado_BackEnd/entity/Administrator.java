@@ -38,7 +38,7 @@ public class Administrator {
     private String role;
 
     @Column(name = "admin_status", length = 20)
-    private String AdminStatus;
+    private String adminStatus;
 
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "idAdministrator")
     private List<Answer> answersList;

@@ -9,17 +9,28 @@ import java.util.Arrays;
 @Getter
 @RequiredArgsConstructor
 public enum AdminStatusEnum {
-    ACTIVE("ACTIVO"),
-    INACTIVE("INACTIVO");
+    ACTIVE("ACTIVE", "ACTIVO"),
+    INACTIVE("INACTIVE","INACTIVO");
 
+
+    final String keyName;
     final String value;
 
     public static String getValue(String keyName) {
         return Arrays.stream(AdminStatusEnum.values())
-                .filter(x -> x.name()
+                .filter(x -> x.getKeyName()
                         .equalsIgnoreCase(keyName))
                 .findFirst()
                 .map(AdminStatusEnum::getValue)
+                .orElse(StringUtils.EMPTY);
+    }
+
+    public static String getName(String keyValue) {
+        return Arrays.stream(AdminStatusEnum.values())
+                .filter(x -> x.getValue()
+                        .equalsIgnoreCase(keyValue))
+                .findFirst()
+                .map(AdminStatusEnum::getKeyName)
                 .orElse(StringUtils.EMPTY);
     }
 }
