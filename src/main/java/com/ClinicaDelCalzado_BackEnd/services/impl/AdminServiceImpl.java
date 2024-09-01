@@ -1,6 +1,7 @@
 package com.ClinicaDelCalzado_BackEnd.services.impl;
 
 import com.ClinicaDelCalzado_BackEnd.dtos.Request.AdminDTORequest;
+import com.ClinicaDelCalzado_BackEnd.dtos.Request.UpdateAdminDTORequest;
 import com.ClinicaDelCalzado_BackEnd.dtos.Response.AdminDTOResponse;
 import com.ClinicaDelCalzado_BackEnd.dtos.Response.AdminListDTOResponse;
 import com.ClinicaDelCalzado_BackEnd.dtos.enums.AdminStatusEnum;
@@ -9,6 +10,7 @@ import com.ClinicaDelCalzado_BackEnd.dtos.userAdmin.AdminDTO;
 import com.ClinicaDelCalzado_BackEnd.entity.Administrator;
 import com.ClinicaDelCalzado_BackEnd.exceptions.AlreadyExistsException;
 import com.ClinicaDelCalzado_BackEnd.exceptions.BadRequestException;
+import com.ClinicaDelCalzado_BackEnd.exceptions.ForbiddenException;
 import com.ClinicaDelCalzado_BackEnd.repository.userAdmin.IAdministratorRepository;
 import com.ClinicaDelCalzado_BackEnd.services.IAdminService;
 import com.ClinicaDelCalzado_BackEnd.util.Encrypt;
@@ -100,23 +102,53 @@ public class AdminServiceImpl implements IAdminService {
 
         validateInputData(adminDTO, false);
 
-        Optional<Administrator> administratorById = findAdministratorById(adminId);
-
-        if (administratorById.isEmpty()) {
-            throw new NotFoundException(String.format("El administrador con identificación %s no existe", adminId));
-        }
+        Administrator administratorById = validateIfAdminIdExists(adminId, "El administrador con identificación %s no existe");
 
         Administrator administrator = buildAdministrator(
                 adminId,
                 adminDTO.getName(),
                 adminDTO.getCellphone(),
-                administratorById.get().getAdminStatus(),
-                administratorById.get().getRole(),
-                administratorById.get().getPassword());
+                administratorById.getAdminStatus(),
+                AdminTypeEnum.getName(adminDTO.getAdminType()),
+                administratorById.getPassword());
 
         saveAdmin(administrator);
 
         return adminDTOResponse("Administrador actualizado exitosamente.", administrator);
+    }
+
+    @Override
+    public AdminDTOResponse updateStatus(Long adminId, UpdateAdminDTORequest adminDTO) {
+
+        validateIdentification(adminDTO.getIdentification());
+        validateIdentification(adminId);
+
+        Administrator administratorPrincipalById = validateIfAdminIdExists(adminDTO.getIdentification(), "El administrador con identificación %s no existe");
+        Administrator administratorSecondaryById = validateIfAdminIdExists(adminId, "El administrador con identificación %s no existe");
+
+        if (!administratorPrincipalById.getRole().equalsIgnoreCase(AdminTypeEnum.PRINCIPAL.name())) {
+            throw new ForbiddenException(String.format("El administrador con identificación %s no tiene el rol principal para actualizar el estado", adminDTO.getIdentification()));
+        }
+
+        if (administratorPrincipalById.getIdAdministrator().equals(administratorSecondaryById.getIdAdministrator())) {
+            throw new ForbiddenException("No tiene permiso para cambiar el estado del administrador.");
+        }
+
+        if (!validateAccessAdmin(administratorPrincipalById, adminDTO.getIdentification(), adminDTO.getPassword())) {
+            throw new ForbiddenException("No tiene permiso para cambiar el estado del administrador.");
+        }
+
+        Administrator administrator = buildAdministrator(
+                administratorSecondaryById.getIdAdministrator(),
+                administratorSecondaryById.getAdminName(),
+                administratorSecondaryById.getAdmPhoneNumber(),
+                AdminStatusEnum.getName(adminDTO.getStatus()),
+                administratorSecondaryById.getRole(),
+                administratorSecondaryById.getPassword());
+
+        saveAdmin(administrator);
+
+        return adminDTOResponse("Cambio de estado del Administrador exitosamente.", administrator);
     }
 
     private Administrator buildAdministrator(Long adminId, String adminName, String adminPhoneNumber,
@@ -168,9 +200,22 @@ public class AdminServiceImpl implements IAdminService {
         }
     }
 
+    private Administrator validateIfAdminIdExists(Long id, String msg) {
+        Optional<Administrator> administratorById = findAdministratorById(id);
+
+        if (administratorById.isEmpty()) {
+            throw new NotFoundException(String.format(msg, id));
+        }
+        return administratorById.get();
+    }
+
     private void validateIdentification(Long id) {
         if (ObjectUtils.isEmpty(id)) {
             throw new BadRequestException("La identificación es un campo obligatorio, no puede ser vacio");
         }
+    }
+
+    public Boolean validateAccessAdmin(Administrator administrator, Long adminId, String password) {
+        return adminId.equals(administrator.getIdAdministrator()) && password.equals(Encrypt.decode(administrator.getPassword()));
     }
 }

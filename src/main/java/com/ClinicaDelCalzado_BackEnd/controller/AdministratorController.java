@@ -1,6 +1,7 @@
 package com.ClinicaDelCalzado_BackEnd.controller;
 
 import com.ClinicaDelCalzado_BackEnd.dtos.Request.AdminDTORequest;
+import com.ClinicaDelCalzado_BackEnd.dtos.Request.UpdateAdminDTORequest;
 import com.ClinicaDelCalzado_BackEnd.dtos.Response.AdminDTOResponse;
 import com.ClinicaDelCalzado_BackEnd.dtos.Response.AdminListDTOResponse;
 import com.ClinicaDelCalzado_BackEnd.services.IAdminService;
@@ -46,6 +47,15 @@ public class AdministratorController {
     public ResponseEntity<AdminDTOResponse> getAdministratorById(@PathVariable Long adminId) {
 
         AdminDTOResponse responseDTO = adminService.findAdministratorByIdAdmin(adminId);
+        return new ResponseEntity<>(responseDTO, HttpStatus.OK);
+    }
+
+    @PutMapping("/status/{adminId}")
+    public ResponseEntity<AdminDTOResponse> updateStatusAdministrator(
+            @PathVariable Long adminId,
+            @RequestBody UpdateAdminDTORequest adminDTORequest) {
+
+        AdminDTOResponse responseDTO = adminService.updateStatus(adminId, adminDTORequest);
         return new ResponseEntity<>(responseDTO, HttpStatus.OK);
     }
 

@@ -1,6 +1,7 @@
 package com.ClinicaDelCalzado_BackEnd.services;
 
 import com.ClinicaDelCalzado_BackEnd.dtos.Request.AdminDTORequest;
+import com.ClinicaDelCalzado_BackEnd.dtos.Request.UpdateAdminDTORequest;
 import com.ClinicaDelCalzado_BackEnd.dtos.Response.AdminDTOResponse;
 import com.ClinicaDelCalzado_BackEnd.dtos.Response.AdminListDTOResponse;
 import com.ClinicaDelCalzado_BackEnd.entity.Administrator;
@@ -18,5 +19,8 @@ public interface IAdminService {
     AdminDTOResponse create(AdminDTORequest adminDTO);
 
     AdminDTOResponse update(Long adminId, AdminDTORequest adminDTO);
+
+
+    AdminDTOResponse updateStatus(Long adminId, UpdateAdminDTORequest adminDTO);
 
 }

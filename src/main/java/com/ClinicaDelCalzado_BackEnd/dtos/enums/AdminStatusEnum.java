@@ -1,5 +1,6 @@
 package com.ClinicaDelCalzado_BackEnd.dtos.enums;
 
+import com.ClinicaDelCalzado_BackEnd.exceptions.BadRequestException;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import org.apache.commons.lang3.StringUtils;
@@ -31,6 +32,6 @@ public enum AdminStatusEnum {
                         .equalsIgnoreCase(keyValue))
                 .findFirst()
                 .map(AdminStatusEnum::getKeyName)
-                .orElse(StringUtils.EMPTY);
+                .orElseThrow(() -> new BadRequestException(String.format("Administrator status %s is invalid", keyValue)));
     }
 }
