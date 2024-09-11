@@ -39,7 +39,6 @@ El objetivo de este proyecto final es implementar un aplicativo web para automat
 
 ### Diagrama ER
 Falta incluir el diagramas 
-![der_sprint3_frescos.png](der_sprint3_frescos.png)
 
 ### JWT security
 
