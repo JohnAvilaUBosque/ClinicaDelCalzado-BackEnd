@@ -13,7 +13,6 @@ public enum AdminStatusEnum {
     ACTIVE("ACTIVE", "ACTIVO"),
     INACTIVE("INACTIVE","INACTIVO");
 
-
     final String keyName;
     final String value;
 
