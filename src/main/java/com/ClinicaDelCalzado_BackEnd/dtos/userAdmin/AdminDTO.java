@@ -19,4 +19,5 @@ public class AdminDTO {
     private String name;
     private String cellphone;
     private String status;
+    private Boolean hasTemporaryPassword;
 }

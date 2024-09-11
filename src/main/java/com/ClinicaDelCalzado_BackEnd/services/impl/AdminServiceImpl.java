@@ -51,7 +51,7 @@ public class AdminServiceImpl implements IAdminService {
         adminDTOResponse.setMessage("Detalles del administrador recuperados exitosamente.");
         adminDTOResponse.setAdmin(administrator.map(p ->
                 new AdminDTO(p.getIdAdministrator(), AdminTypeEnum.getValue(p.getRole()), p.getAdminName(),
-                        p.getAdmPhoneNumber(), AdminStatusEnum.getValue(p.getAdminStatus()))).get());
+                        p.getAdmPhoneNumber(), AdminStatusEnum.getValue(p.getAdminStatus()), p.getHasTemporaryPassword())).get());
 
         return adminDTOResponse;
 
@@ -65,7 +65,7 @@ public class AdminServiceImpl implements IAdminService {
         AdminListDTOResponse adminListDTOResponse = new AdminListDTOResponse();
         adminListDTOResponse.setAdmins(administratorList.stream().map(p ->
                 new AdminDTO(p.getIdAdministrator(), AdminTypeEnum.getValue(p.getRole()), p.getAdminName(),
-                        p.getAdmPhoneNumber(), AdminStatusEnum.getValue(p.getAdminStatus()))).toList());
+                        p.getAdmPhoneNumber(), AdminStatusEnum.getValue(p.getAdminStatus()), p.getHasTemporaryPassword())).toList());
 
         return adminListDTOResponse;
     }
@@ -88,7 +88,8 @@ public class AdminServiceImpl implements IAdminService {
                 adminDTO.getCellphone(),
                 AdminStatusEnum.ACTIVE.getKeyName(),
                 AdminTypeEnum.getName(adminDTO.getAdminType()),
-                Encrypt.encode(adminDTO.getPassword()));
+                Encrypt.encode(adminDTO.getPassword()),
+                true);
 
         saveAdmin(administrator);
 
@@ -110,7 +111,8 @@ public class AdminServiceImpl implements IAdminService {
                 adminDTO.getCellphone(),
                 administratorById.getAdminStatus(),
                 AdminTypeEnum.getName(adminDTO.getAdminType()),
-                administratorById.getPassword());
+                administratorById.getPassword(),
+                administratorById.getHasTemporaryPassword());
 
         saveAdmin(administrator);
 
@@ -120,21 +122,21 @@ public class AdminServiceImpl implements IAdminService {
     @Override
     public AdminDTOResponse updateStatus(Long adminId, UpdateAdminDTORequest adminDTO) {
 
-        validateIdentification(adminDTO.getIdentification());
+        validateIdentification(adminDTO.getAdminId());
         validateIdentification(adminId);
 
-        Administrator administratorPrincipalById = validateIfAdminIdExists(adminDTO.getIdentification(), "El administrador con identificación %s no existe");
+        Administrator administratorPrincipalById = validateIfAdminIdExists(adminDTO.getAdminId(), "El administrador con identificación %s no existe");
         Administrator administratorSecondaryById = validateIfAdminIdExists(adminId, "El administrador con identificación %s no existe");
 
         if (!administratorPrincipalById.getRole().equalsIgnoreCase(AdminTypeEnum.PRINCIPAL.name())) {
-            throw new ForbiddenException(String.format("El administrador con identificación %s no tiene el rol principal para actualizar el estado", adminDTO.getIdentification()));
+            throw new ForbiddenException(String.format("El administrador con identificación %s no tiene el rol principal para actualizar el estado", adminDTO.getAdminId()));
         }
 
         if (administratorPrincipalById.getIdAdministrator().equals(administratorSecondaryById.getIdAdministrator())) {
             throw new ForbiddenException("No tiene permiso para cambiar el estado del administrador.");
         }
 
-        if (!validateAccessAdmin(administratorPrincipalById, adminDTO.getIdentification(), adminDTO.getPassword())) {
+        if (!validateAccessAdmin(administratorPrincipalById, adminDTO.getAdminId(), adminDTO.getPassword())) {
             throw new ForbiddenException("No tiene permiso para cambiar el estado del administrador.");
         }
 
@@ -142,9 +144,10 @@ public class AdminServiceImpl implements IAdminService {
                 administratorSecondaryById.getIdAdministrator(),
                 administratorSecondaryById.getAdminName(),
                 administratorSecondaryById.getAdmPhoneNumber(),
-                AdminStatusEnum.getName(adminDTO.getStatus()),
+                AdminStatusEnum.getName(adminDTO.getAdminStatus()),
                 administratorSecondaryById.getRole(),
-                administratorSecondaryById.getPassword());
+                administratorSecondaryById.getPassword(),
+                administratorSecondaryById.getHasTemporaryPassword());
 
         saveAdmin(administrator);
 
@@ -152,7 +155,8 @@ public class AdminServiceImpl implements IAdminService {
     }
 
     private Administrator buildAdministrator(Long adminId, String adminName, String adminPhoneNumber,
-                                             String adminStatus, String role, String password) {
+                                             String adminStatus, String role, String password,
+                                             Boolean hasTemporaryPwd) {
         return Administrator.builder()
                 .idAdministrator(adminId)
                 .adminName(adminName)
@@ -160,6 +164,7 @@ public class AdminServiceImpl implements IAdminService {
                 .adminStatus(adminStatus)
                 .role(role)
                 .password(password)
+                .hasTemporaryPassword(hasTemporaryPwd)
                 .build();
     }
 
@@ -176,6 +181,7 @@ public class AdminServiceImpl implements IAdminService {
                         .status(AdminStatusEnum.getValue(administrator.getAdminStatus()))
                         .name(administrator.getAdminName())
                         .cellphone(administrator.getAdmPhoneNumber())
+                        .hasTemporaryPassword(administrator.getHasTemporaryPassword())
                         .build())
                 .build();
     }

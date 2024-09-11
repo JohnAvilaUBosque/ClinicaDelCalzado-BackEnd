@@ -40,6 +40,9 @@ public class Administrator {
     @Column(name = "admin_status", length = 20)
     private String adminStatus;
 
+    @Column(name = "temporary_pwd", nullable = false)
+    private Boolean hasTemporaryPassword;
+
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "idAdministrator")
     private List<Answer> answersList;
 

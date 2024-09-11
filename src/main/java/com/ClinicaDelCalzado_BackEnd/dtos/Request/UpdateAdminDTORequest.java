@@ -12,7 +12,7 @@ import lombok.*;
 @JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
 public class UpdateAdminDTORequest {
 
-    private Long identification;
+    private Long adminId;
     private String password;
-    private String status;
+    private String adminStatus;
 }
