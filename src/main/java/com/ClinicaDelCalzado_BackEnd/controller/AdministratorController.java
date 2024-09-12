@@ -27,7 +27,7 @@ public class AdministratorController {
         return new ResponseEntity<>(responseDTO, HttpStatus.CREATED);
     }
 
-    @PutMapping("/{adminId}")
+    @PutMapping("/updated/{adminId}")
     public ResponseEntity<AdminDTOResponse> updateAdministrator(
             @PathVariable Long adminId,
             @RequestBody AdminDTORequest adminDTORequest) {
@@ -50,7 +50,7 @@ public class AdministratorController {
         return new ResponseEntity<>(responseDTO, HttpStatus.OK);
     }
 
-    @PutMapping("/status/{adminId}")
+    @PutMapping("/updated/status/{adminId}")
     public ResponseEntity<AdminDTOResponse> updateStatusAdministrator(
             @PathVariable Long adminId,
             @RequestBody UpdateAdminDTORequest adminDTORequest) {
