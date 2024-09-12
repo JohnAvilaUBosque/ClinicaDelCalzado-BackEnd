@@ -13,9 +13,9 @@ import com.ClinicaDelCalzado_BackEnd.exceptions.BadRequestException;
 import com.ClinicaDelCalzado_BackEnd.exceptions.ForbiddenException;
 import com.ClinicaDelCalzado_BackEnd.repository.userAdmin.IAdministratorRepository;
 import com.ClinicaDelCalzado_BackEnd.services.IAdminService;
-import com.ClinicaDelCalzado_BackEnd.util.Encrypt;
 import org.apache.commons.lang3.ObjectUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.webjars.NotFoundException;
 
@@ -26,10 +26,12 @@ import java.util.Optional;
 public class AdminServiceImpl implements IAdminService {
 
     private final IAdministratorRepository administratorRepository;
+    private final PasswordEncoder passwordEncoder;
 
     @Autowired
-    public AdminServiceImpl(IAdministratorRepository administratorRepository) {
+    public AdminServiceImpl(IAdministratorRepository administratorRepository, PasswordEncoder passwordEncoder) {
         this.administratorRepository = administratorRepository;
+        this.passwordEncoder = passwordEncoder;
     }
 
     @Override
@@ -88,7 +90,7 @@ public class AdminServiceImpl implements IAdminService {
                 adminDTO.getCellphone(),
                 AdminStatusEnum.ACTIVE.getKeyName(),
                 AdminTypeEnum.getName(adminDTO.getAdminType()),
-                Encrypt.encode(adminDTO.getPassword()),
+                passwordEncoder.encode(adminDTO.getPassword()),
                 true);
 
         saveAdmin(administrator);
@@ -133,10 +135,6 @@ public class AdminServiceImpl implements IAdminService {
         }
 
         if (administratorPrincipalById.getIdAdministrator().equals(administratorSecondaryById.getIdAdministrator())) {
-            throw new ForbiddenException("No tiene permiso para cambiar el estado del administrador.");
-        }
-
-        if (!validateAccessAdmin(administratorPrincipalById, adminDTO.getAdminId(), adminDTO.getPassword())) {
             throw new ForbiddenException("No tiene permiso para cambiar el estado del administrador.");
         }
 
@@ -221,7 +219,4 @@ public class AdminServiceImpl implements IAdminService {
         }
     }
 
-    public Boolean validateAccessAdmin(Administrator administrator, Long adminId, String password) {
-        return adminId.equals(administrator.getIdAdministrator()) && password.equals(Encrypt.decode(administrator.getPassword()));
-    }
 }
