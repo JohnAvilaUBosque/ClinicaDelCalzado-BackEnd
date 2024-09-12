@@ -1,9 +1,9 @@
 package com.ClinicaDelCalzado_BackEnd.services.impl;
 
-import com.ClinicaDelCalzado_BackEnd.dtos.Request.AdminDTORequest;
-import com.ClinicaDelCalzado_BackEnd.dtos.Request.UpdateAdminDTORequest;
-import com.ClinicaDelCalzado_BackEnd.dtos.Response.AdminDTOResponse;
-import com.ClinicaDelCalzado_BackEnd.dtos.Response.AdminListDTOResponse;
+import com.ClinicaDelCalzado_BackEnd.dtos.request.AdminDTORequest;
+import com.ClinicaDelCalzado_BackEnd.dtos.request.UpdateAdminDTORequest;
+import com.ClinicaDelCalzado_BackEnd.dtos.response.AdminDTOResponse;
+import com.ClinicaDelCalzado_BackEnd.dtos.response.AdminListDTOResponse;
 import com.ClinicaDelCalzado_BackEnd.dtos.enums.AdminStatusEnum;
 import com.ClinicaDelCalzado_BackEnd.dtos.enums.AdminTypeEnum;
 import com.ClinicaDelCalzado_BackEnd.dtos.userAdmin.AdminDTO;

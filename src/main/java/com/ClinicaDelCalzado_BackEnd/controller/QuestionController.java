@@ -1,6 +1,6 @@
 package com.ClinicaDelCalzado_BackEnd.controller;
 
-import com.ClinicaDelCalzado_BackEnd.dtos.Response.QuestionListDTOResponse;
+import com.ClinicaDelCalzado_BackEnd.dtos.response.QuestionListDTOResponse;
 import com.ClinicaDelCalzado_BackEnd.services.IQuestionService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;

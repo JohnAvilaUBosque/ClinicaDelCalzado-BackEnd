@@ -1,4 +1,4 @@
-package com.ClinicaDelCalzado_BackEnd.dtos.Request;
+package com.ClinicaDelCalzado_BackEnd.dtos.login;
 
 import com.fasterxml.jackson.databind.PropertyNamingStrategies;
 import com.fasterxml.jackson.databind.annotation.JsonNaming;
@@ -10,9 +10,8 @@ import lombok.*;
 @NoArgsConstructor
 @AllArgsConstructor
 @JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
-public class UpdateAdminDTORequest {
+public class LoginDTO {
 
-    private Long adminId;
+    private Long identification;
     private String password;
-    private String adminStatus;
 }

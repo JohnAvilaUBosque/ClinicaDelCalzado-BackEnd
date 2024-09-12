@@ -1,5 +1,6 @@
 package com.ClinicaDelCalzado_BackEnd.securty;
 
+import com.ClinicaDelCalzado_BackEnd.dtos.enums.AdminTypeEnum;
 import com.ClinicaDelCalzado_BackEnd.services.impl.JWTCustomUserDetailsServiceImpl;
 import com.ClinicaDelCalzado_BackEnd.util.JWTUtil;
 import com.ClinicaDelCalzado_BackEnd.util.SecurityConstants;
@@ -29,6 +30,12 @@ public class JWTAuthenticationFilter extends OncePerRequestFilter {
 
     /**
      * Filtro para solicitar validación por token
+     *
+     * @param request petition of client
+     * @param response response for client
+     * @param filterChain filter chain
+     * @throws ServletException throws server exception
+     * @throws IOException throws IO exception
      */
     @Override
     protected void doFilterInternal (HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
@@ -38,7 +45,8 @@ public class JWTAuthenticationFilter extends OncePerRequestFilter {
             UserDetails userDetails = customUserDetailsService.loadUserByUsername(userName);
             List<String> userRoles = userDetails.getAuthorities().stream().map(GrantedAuthority::getAuthority).toList();
 
-            if(userRoles.contains("PRINCIPAL") || userRoles.contains("SECUNDARIO")) {
+            if(userRoles.contains(AdminTypeEnum.getValue(String.valueOf(AdminTypeEnum.PRINCIPAL)))
+                    || userRoles.contains(AdminTypeEnum.getValue(String.valueOf(AdminTypeEnum.SECONDARY)))) {
 
                 UsernamePasswordAuthenticationToken authenticationToken = new UsernamePasswordAuthenticationToken(userDetails,
                         null, userDetails.getAuthorities());
@@ -63,6 +71,4 @@ public class JWTAuthenticationFilter extends OncePerRequestFilter {
         }
         return null;
     }
-
-
 }

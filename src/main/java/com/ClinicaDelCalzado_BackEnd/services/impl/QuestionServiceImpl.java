@@ -1,6 +1,6 @@
 package com.ClinicaDelCalzado_BackEnd.services.impl;
 
-import com.ClinicaDelCalzado_BackEnd.dtos.Response.QuestionListDTOResponse;
+import com.ClinicaDelCalzado_BackEnd.dtos.response.QuestionListDTOResponse;
 import com.ClinicaDelCalzado_BackEnd.dtos.questions.QuestionDTO;
 import com.ClinicaDelCalzado_BackEnd.entity.SecurityQuestion;
 import com.ClinicaDelCalzado_BackEnd.repository.userAdmin.ISecurityQuestionRepository;

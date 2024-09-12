@@ -1,6 +1,5 @@
 package com.ClinicaDelCalzado_BackEnd.util;
 
-import java.io.UnsupportedEncodingException;
 import java.nio.charset.StandardCharsets;
 import java.util.Base64;
 

@@ -42,7 +42,7 @@ public class WebSecurityConfig {
         httpSecurity.csrf(AbstractHttpConfigurer::disable)
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers(HttpMethod.GET,"/ping").denyAll()
-                        .requestMatchers(HttpMethod.POST,"/api/auth/**").permitAll()
+                        .requestMatchers(HttpMethod.POST,"/api/v1/auth/**").permitAll()
                         .requestMatchers(HttpMethod.POST,"/api/v1/admins/created").hasRole(AdminTypeEnum.PRINCIPAL.getValue())
                         .requestMatchers(HttpMethod.GET,"/api/v1/admins/{adminId}").hasRole(AdminTypeEnum.PRINCIPAL.getValue())
                         .requestMatchers(HttpMethod.PUT,"/api/v1/admins/updated/{adminId}").hasRole(AdminTypeEnum.PRINCIPAL.getValue())

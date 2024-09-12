@@ -1,6 +1,6 @@
 package com.ClinicaDelCalzado_BackEnd.services;
 
-import com.ClinicaDelCalzado_BackEnd.dtos.Response.QuestionListDTOResponse;
+import com.ClinicaDelCalzado_BackEnd.dtos.response.QuestionListDTOResponse;
 
 public interface IQuestionService {
 

@@ -1,4 +1,4 @@
-package com.ClinicaDelCalzado_BackEnd.dtos.Request;
+package com.ClinicaDelCalzado_BackEnd.dtos.request;
 
 import com.ClinicaDelCalzado_BackEnd.dtos.workOrders.ClientDTO;
 import com.ClinicaDelCalzado_BackEnd.dtos.workOrders.CompanyDTO;
