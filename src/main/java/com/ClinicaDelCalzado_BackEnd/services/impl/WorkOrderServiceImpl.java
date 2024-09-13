@@ -20,6 +20,7 @@ import org.webjars.NotFoundException;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 
 @Service
@@ -130,15 +131,20 @@ public class WorkOrderServiceImpl implements IWorkOrderService {
 
     private Client findClientWorkOrder(WorkOrderDTORequest workOrderDTORequest) {
 
-        return clientService.findClientByIdClient(workOrderDTORequest.getClient().getIdentification())
-                .orElseGet(() -> clientService.saveClient(
-                        Client.builder()
-                                .idClient(workOrderDTORequest.getClient().getIdentification())
-                                .clientName(workOrderDTORequest.getClient().getName())
-                                .cliPhoneNumber(workOrderDTORequest.getClient().getCellphone())
-                                .build())
-                );
+        Optional<Client> clientByIdClient = clientService.findClientByIdClient(workOrderDTORequest.getClient().getIdentification());
+        Client client = Client.builder()
+                .idClient(workOrderDTORequest.getClient().getIdentification())
+                .clientName(workOrderDTORequest.getClient().getName())
+                .cliPhoneNumber(workOrderDTORequest.getClient().getCellphone())
+                .build();
+
+        if (clientByIdClient.isEmpty() || !clientService.validateDifferenceData(clientByIdClient.get(), client)) {
+            return clientService.saveClient(client);
+        }
+
+        return clientByIdClient.get();
     }
+
 
     /*private void save() {
         WorkOrder workOrder = workOrderRepository.save(

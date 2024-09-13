@@ -48,7 +48,7 @@ public class WebSecurityConfig {
     SecurityFilterChain filterChain(HttpSecurity httpSecurity) throws Exception {
         httpSecurity.csrf(AbstractHttpConfigurer::disable)
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers(HttpMethod.GET,"/ping").denyAll()
+                        .requestMatchers(HttpMethod.GET,"/ping").permitAll()
                         .requestMatchers(HttpMethod.POST,"/api/v1/auth/**").permitAll()
                         .requestMatchers(HttpMethod.POST,"/api/v1/admins/created").hasRole(AdminTypeEnum.PRINCIPAL.getValue())
                         .requestMatchers(HttpMethod.GET,"/api/v1/admins/{adminId}").hasRole(AdminTypeEnum.PRINCIPAL.getValue())
