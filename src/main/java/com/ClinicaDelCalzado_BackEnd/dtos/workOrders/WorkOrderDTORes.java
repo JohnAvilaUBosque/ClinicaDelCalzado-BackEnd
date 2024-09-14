@@ -1,11 +1,12 @@
 package com.ClinicaDelCalzado_BackEnd.dtos.workOrders;
 
-import com.ClinicaDelCalzado_BackEnd.entity.Company;
+import com.ClinicaDelCalzado_BackEnd.dtos.userAdmin.AdminDTO;
 import com.fasterxml.jackson.databind.PropertyNamingStrategies;
 import com.fasterxml.jackson.databind.annotation.JsonNaming;
 import lombok.*;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Getter
@@ -16,10 +17,10 @@ import java.util.List;
 @JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
 public class WorkOrderDTORes {
 
-    private Company company;
-    /*private String orderNumber;
-    private String attendedBy;
-    private LocalDate createDate;
+    private CompanyDTO company;
+    private String orderNumber;
+    private AdminDTO attendedBy;
+    private LocalDateTime createDate;
     private String orderStatus;
     private LocalDate deliveryDate;
     private ClientDTO client;
@@ -28,5 +29,5 @@ public class WorkOrderDTORes {
     private Double downPayment;
     private Double totalValue;
     private Double balance;
-    private String paymentStatus;*/
+    private String paymentStatus;
 }

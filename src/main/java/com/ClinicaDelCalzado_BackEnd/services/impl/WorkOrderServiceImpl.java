@@ -1,16 +1,15 @@
 package com.ClinicaDelCalzado_BackEnd.services.impl;
 
+import com.ClinicaDelCalzado_BackEnd.dtos.enums.OrderStatusEnum;
+import com.ClinicaDelCalzado_BackEnd.dtos.enums.PaymentStatusEnum;
+import com.ClinicaDelCalzado_BackEnd.dtos.enums.ServicesStatusEnum;
 import com.ClinicaDelCalzado_BackEnd.dtos.request.WorkOrderDTORequest;
 import com.ClinicaDelCalzado_BackEnd.dtos.response.WorkOrderDTOResponse;
 import com.ClinicaDelCalzado_BackEnd.dtos.workOrders.*;
 import com.ClinicaDelCalzado_BackEnd.entity.*;
 import com.ClinicaDelCalzado_BackEnd.exceptions.BadRequestException;
-import com.ClinicaDelCalzado_BackEnd.repository.workOrders.IServicesRepository;
 import com.ClinicaDelCalzado_BackEnd.repository.workOrders.IWorkOrderRepository;
-import com.ClinicaDelCalzado_BackEnd.services.IAdminService;
-import com.ClinicaDelCalzado_BackEnd.services.IClientService;
-import com.ClinicaDelCalzado_BackEnd.services.ICompanyService;
-import com.ClinicaDelCalzado_BackEnd.services.IWorkOrderService;
+import com.ClinicaDelCalzado_BackEnd.services.*;
 import org.apache.commons.lang3.ObjectUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -18,9 +17,11 @@ import org.springframework.util.CollectionUtils;
 import org.webjars.NotFoundException;
 
 import java.time.LocalDate;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
+import java.time.LocalDateTime;
+import java.util.*;
+import java.util.stream.Collectors;
+
+import static com.ClinicaDelCalzado_BackEnd.util.Constants.*;
 
 
 @Service
@@ -32,22 +33,25 @@ public class WorkOrderServiceImpl implements IWorkOrderService {
 
     private final IClientService clientService;
 
-    private final IServicesRepository serviceRepository;
+    private final IProductService productService;
 
     private final IAdminService adminService;
+
+    private final ICommentService commentService;
 
     //private Optional<Company> company;
     private final List<OrderErrorDTO> orderErrors = new ArrayList<>();
 
     @Autowired
     public WorkOrderServiceImpl(IWorkOrderRepository workOrderRepository, ICompanyService companyService,
-                                IClientService clientService, IServicesRepository serviceRepository,
-                                IAdminService adminService) {
+                                IClientService clientService, IProductService productService,
+                                IAdminService adminService, ICommentService commentService) {
         this.workOrderRepository = workOrderRepository;
         this.companyService = companyService;
         this.clientService = clientService;
-        this.serviceRepository = serviceRepository;
+        this.productService = productService;
         this.adminService = adminService;
+        this.commentService = commentService;
     }
 
     @Override
@@ -62,58 +66,26 @@ public class WorkOrderServiceImpl implements IWorkOrderService {
                 .orElseThrow(() -> new NotFoundException(String.format("Administrator %s not found", workOrderDTORequest.getAttendedById())));
 
         double totalPriceOrder = totalPrice(workOrderDTORequest.getServices());
-/*
-     WorkOrder workOrder = workOrderRepository.save(
-                new WorkOrder(
-                        workOrderDTORequest.getOrderNumber(),
-                        LocalDate.parse(workOrderDTORequest.getCreateDate().toString()),
-                        LocalDate.parse(workOrderDTORequest.getDeliveryDate().toString()),
-                        workOrderDTORequest.getOrderStatus(),
-                        workOrderDTORequest.getPaymentStatus(),
-                        attendedBy,
-                        client,
-                        company,
-                        workOrderDTORequest.getDownPayment(),
-                        totalPriceOrder,
-                        totalPriceOrder - workOrderDTORequest.getDownPayment(),
-                        null   // General comment (if needed)
-                )
-        );
 
-        workOrder.setTotalValue(totalValue);
-        workOrder.setBalance(totalValue - workOrderDTORequest.getDownPayment());
-     List<ServicesDTO> services = workOrderDTORequest.getServices().stream()
-                .map(serviceDTO -> {
-                    ServicesEnt service = new ServicesEnt(
-                            serviceDTO.getName(),
-                            serviceDTO.getPrice(),
-                            workOrderDTORequest.getOrderStatus(),
-                            workOrder
-                    );
-                    serviceRepository.save(service);
-                    return new ServicesDTO(service.getService(), service.getUnitValue(), service.getServiceStatus());
-                })
-                .collect(Collectors.toList());
+        WorkOrder workOrder = saveWorkOrder(
+                WorkOrder.builder()
+                        .orderNumber(String.format("%s-%s-%d",ORDER_ABR,LocalDate.now().getYear(), generateRandomValueOrder()))
+                        .idCompany(company)
+                        .creationDate(LocalDateTime.now())
+                        .deliveryDate(LocalDate.parse(workOrderDTORequest.getDeliveryDate().toString()))
+                        .orderStatus(OrderStatusEnum.VALID.getKeyName())
+                        .paymentStatus(totalPriceOrder == 0 ? PaymentStatusEnum.PAID.getKeyName() : PaymentStatusEnum.PENDING.getKeyName())
+                        .attendedBy(attendedBy)
+                        .idClient(client)
+                        .deposit(workOrderDTORequest.getDownPayment())
+                        .totalValue(totalPriceOrder)
+                        .balance(totalPriceOrder - workOrderDTORequest.getDownPayment())
+                        .build());
 
-        ClientDTO clientResponseDTO = new ClientDTO(client.getIdClient(), client.getClientName(), client.getCliPhoneNumber());
-        WorkOrderDTORes orderResponseDTO = new WorkOrderDTORes(
-                company,
-                workOrder.getOrderNumber(),
-                attendedBy.getAdminName(),
-                workOrder.getCreationDate(),
-                workOrder.getOrderStatus(),
-                workOrder.getDeliveryDate(),
-                clientResponseDTO,
-                services,
-                workOrder.getCommentsList().toString(), // Si hay comentarios
-                workOrder.getDeposit(),
-                workOrder.getTotalValue(),
-                workOrder.getBalance(),
-                workOrder.getPaymentStatus()
-        );
+        saveCommentOrder(workOrderDTORequest, workOrder);
+        saveServicesWorkOrder(workOrderDTORequest, workOrder);
 
-        return new WorkOrderDTOResponse("Orden de trabajo creada exitosamente!", orderResponseDTO);*/
-        return null;
+        return new WorkOrderDTOResponse("Orden de trabajo creada exitosamente!", workOrder.getOrderNumber());
     }
 
     private Company findCompanyWorkOrder(WorkOrderDTORequest workOrderDTORequest) {
@@ -127,6 +99,28 @@ public class WorkOrderServiceImpl implements IWorkOrderService {
                                 .phones(String.join(",", workOrderDTORequest.getCompany().getPhones()))
                                 .build())
                 );
+    }
+
+    private List<ServicesDTO> saveServicesWorkOrder(WorkOrderDTORequest workOrderDTORequest, WorkOrder orderNumber) {
+
+        return  workOrderDTORequest.getServices().stream()
+                .map(serviceDTO -> {
+                    ServicesEnt service = ServicesEnt.builder()
+                            .idOrderSer(orderNumber)
+                            .service(serviceDTO.getName())
+                            .unitValue(serviceDTO.getPrice())
+                            .serviceStatus(ServicesStatusEnum.RECEIVED.getKeyName())
+                            .build();
+                    productService.save(service);
+                    return new ServicesDTO(service.getService(), service.getUnitValue(), service.getServiceStatus());
+                }).collect(Collectors.toList());
+    }
+
+    private Comment saveCommentOrder(WorkOrderDTORequest workOrderDTORequest, WorkOrder orderNumber) {
+        return commentService.save(Comment.builder()
+                .idOrderCom(WorkOrder.builder().orderNumber(orderNumber.getOrderNumber()).build())
+                .adminComment(workOrderDTORequest.getGeneralComment())
+                .build());
     }
 
     private Client findClientWorkOrder(WorkOrderDTORequest workOrderDTORequest) {
@@ -145,28 +139,17 @@ public class WorkOrderServiceImpl implements IWorkOrderService {
         return clientByIdClient.get();
     }
 
-
-    /*private void save() {
-        WorkOrder workOrder = workOrderRepository.save(
-                new WorkOrder(
-                        workOrderDTORequest.getOrderNumber(),
-                        LocalDate.parse(workOrderDTORequest.getCreateDate().toString()),
-                        LocalDate.parse(workOrderDTORequest.getDeliveryDate().toString()),
-                        workOrderDTORequest.getOrderStatus(),
-                        workOrderDTORequest.getPaymentStatus(),
-                        attendedBy,
-                        client,
-                        company,
-                        workOrderDTORequest.getDownPayment(),
-                        null,  // Total value (calculated next)
-                        null,  // Balance (calculated next)
-                        null   // General comment (if needed)
-                )
-        );
-    }*/
+    private WorkOrder saveWorkOrder(WorkOrder workOrder) {
+        return workOrderRepository.save(workOrder);
+    }
 
     private Double totalPrice(List<ServicesDTO> servicesDTO) {
         return servicesDTO.stream().mapToDouble(ServicesDTO::getPrice).sum();
+    }
+
+    private Integer generateRandomValueOrder() {
+        Random random = new Random();
+        return RANDOM_MIN + random.nextInt(RANDOM_MAX - RANDOM_MIN + 1);
     }
 
     private void validateRequest(WorkOrderDTORequest workOrderDTORequest) {

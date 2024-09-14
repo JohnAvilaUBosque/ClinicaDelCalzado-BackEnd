@@ -67,7 +67,4 @@ public class WorkOrder {
 
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "idOrderCom")
     private List<Comment> commentsList;
-
-    public WorkOrder(String orderNumber, LocalDate parse, LocalDate parse1, String orderStatus, String paymentStatus, Administrator attendedBy, Client client, Company company, Double downPayment, Object o, Object o1, Object o2) {
-    }
 }

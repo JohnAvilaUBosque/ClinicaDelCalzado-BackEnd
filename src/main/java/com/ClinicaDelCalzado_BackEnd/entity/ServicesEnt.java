@@ -1,5 +1,6 @@
 package com.ClinicaDelCalzado_BackEnd.entity;
 
+import com.ClinicaDelCalzado_BackEnd.dtos.enums.ServicesStatusEnum;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -38,7 +39,4 @@ public class ServicesEnt {
 
     @Column(name = "unit_value")
     private Double unitValue;
-
-    public ServicesEnt(String name, Double price, String orderStatus, WorkOrder workOrder) {
-    }
 }

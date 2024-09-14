@@ -1,6 +1,5 @@
 package com.ClinicaDelCalzado_BackEnd.dtos.response;
 
-import com.ClinicaDelCalzado_BackEnd.dtos.workOrders.WorkOrderDTORes;
 import com.fasterxml.jackson.databind.PropertyNamingStrategies;
 import com.fasterxml.jackson.databind.annotation.JsonNaming;
 import lombok.AllArgsConstructor;
@@ -16,5 +15,5 @@ import lombok.NoArgsConstructor;
 public class WorkOrderDTOResponse {
 
     private String message;
-    private WorkOrderDTORes order;
+    private String orderNumber;
 }
