@@ -4,10 +4,12 @@ import com.ClinicaDelCalzado_BackEnd.dtos.enums.OrderStatusEnum;
 import com.ClinicaDelCalzado_BackEnd.dtos.enums.PaymentStatusEnum;
 import com.ClinicaDelCalzado_BackEnd.dtos.enums.ServicesStatusEnum;
 import com.ClinicaDelCalzado_BackEnd.dtos.request.WorkOrderDTORequest;
+import com.ClinicaDelCalzado_BackEnd.dtos.response.OrderByIdNumberDTOResponse;
 import com.ClinicaDelCalzado_BackEnd.dtos.response.WorkOrderDTOResponse;
 import com.ClinicaDelCalzado_BackEnd.dtos.workOrders.*;
 import com.ClinicaDelCalzado_BackEnd.entity.*;
 import com.ClinicaDelCalzado_BackEnd.exceptions.BadRequestException;
+import com.ClinicaDelCalzado_BackEnd.exceptions.RepositoryException;
 import com.ClinicaDelCalzado_BackEnd.repository.workOrders.IWorkOrderRepository;
 import com.ClinicaDelCalzado_BackEnd.services.*;
 import org.apache.commons.lang3.ObjectUtils;
@@ -88,6 +90,32 @@ public class WorkOrderServiceImpl implements IWorkOrderService {
 
         return new WorkOrderDTOResponse("Orden de trabajo creada exitosamente!", workOrder.getOrderNumber());
     }
+
+    @Override
+    public OrderByIdNumberDTOResponse getWorkOrderByOrderNumber(String orderNumber) {
+
+        try {
+            WorkOrderDTOResponse workOrder = getOrder(orderNumber);
+            List<ServicesDTO> servicesList = productService.getServicesOrder(orderNumber);
+
+            return null;
+        } catch (RepositoryException ex) {
+            throw ex;
+        }
+    }
+
+    private WorkOrderDTOResponse getOrder(String orderNumber) {
+        Optional<WorkOrder> workOrder = workOrderRepository.findById(orderNumber);
+
+        if (workOrder.isEmpty()) {
+            throw new NotFoundException(String.format("La orden %s no esta registrada!!", orderNumber));
+        }
+
+        return WorkOrderDTOResponse.builder()
+                .orderNumber(workOrder.get().getOrderNumber()).build();
+    }
+
+
 
     private Company findCompanyWorkOrder(WorkOrderDTORequest workOrderDTORequest) {
 
