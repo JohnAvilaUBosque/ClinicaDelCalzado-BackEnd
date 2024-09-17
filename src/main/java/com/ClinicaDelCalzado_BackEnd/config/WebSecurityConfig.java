@@ -57,6 +57,7 @@ public class WebSecurityConfig {
                         .requestMatchers(HttpMethod.PUT,"/api/v1/admins/updated/status/{adminId}").hasRole(AdminTypeEnum.PRINCIPAL.getValue())
                         .requestMatchers(HttpMethod.GET,"/api/v1/questions/list").permitAll()
                         .requestMatchers(HttpMethod.POST,"/api/v1/work-orders/created").permitAll()
+                        .requestMatchers(HttpMethod.GET, "/api/v1/company/**").permitAll()
                         .anyRequest().authenticated())
                 .httpBasic(AbstractHttpConfigurer::disable);
 

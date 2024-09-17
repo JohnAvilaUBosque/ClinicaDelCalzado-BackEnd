@@ -32,7 +32,7 @@ public class AuthServiceImpl implements IAuthService {
         SecurityContextHolder.getContext().setAuthentication(authentication);
         String token = jwtGenerator.generateToken(authentication);
 
-        return new AuthDTOResponse(token);
+        return new AuthDTOResponse("Inicio de sesión exitoso!", token);
 
     }
 

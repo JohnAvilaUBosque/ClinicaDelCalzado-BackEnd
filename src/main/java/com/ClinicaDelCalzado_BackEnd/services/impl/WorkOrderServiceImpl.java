@@ -18,6 +18,7 @@ import org.webjars.NotFoundException;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -69,7 +70,7 @@ public class WorkOrderServiceImpl implements IWorkOrderService {
 
         WorkOrder workOrder = saveWorkOrder(
                 WorkOrder.builder()
-                        .orderNumber(String.format("%s-%s-%d",ORDER_ABR,LocalDate.now().getYear(), generateRandomValueOrder()))
+                        .orderNumber(String.format("%s-%s-%d",ORDER_ABR,LocalDate.now().format(DateTimeFormatter.ofPattern("yyyyMMdd")), generateRandomValueOrder()))
                         .idCompany(company)
                         .creationDate(LocalDateTime.now())
                         .deliveryDate(LocalDate.parse(workOrderDTORequest.getDeliveryDate().toString()))
