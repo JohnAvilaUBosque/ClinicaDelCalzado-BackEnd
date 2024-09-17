@@ -2,8 +2,10 @@ package com.ClinicaDelCalzado_BackEnd.controller;
 
 import com.ClinicaDelCalzado_BackEnd.dtos.request.AdminDTORequest;
 import com.ClinicaDelCalzado_BackEnd.dtos.request.UpdateAdminDTORequest;
+import com.ClinicaDelCalzado_BackEnd.dtos.request.UpdateAdminPasswordDTO;
 import com.ClinicaDelCalzado_BackEnd.dtos.response.AdminDTOResponse;
 import com.ClinicaDelCalzado_BackEnd.dtos.response.AdminListDTOResponse;
+import com.ClinicaDelCalzado_BackEnd.dtos.response.UpdateAdminPasswordDTOResponse;
 import com.ClinicaDelCalzado_BackEnd.services.IAdminService;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -30,7 +32,7 @@ public class AdministratorController {
     @PutMapping("/updated/{adminId}")
     public ResponseEntity<AdminDTOResponse> updateAdministrator(
             @PathVariable Long adminId,
-            @RequestBody AdminDTORequest adminDTORequest) {
+            @RequestBody UpdateAdminDTORequest adminDTORequest) {
 
         AdminDTOResponse responseDTO = adminService.update(adminId, adminDTORequest);
         return new ResponseEntity<>(responseDTO, HttpStatus.OK);
@@ -50,12 +52,12 @@ public class AdministratorController {
         return new ResponseEntity<>(responseDTO, HttpStatus.OK);
     }
 
-    @PutMapping("/updated/status/{adminId}")
-    public ResponseEntity<AdminDTOResponse> updateStatusAdministrator(
+    @PutMapping("/password/{adminId}")
+    public ResponseEntity<UpdateAdminPasswordDTOResponse> updatePasswordAdministrator(
             @PathVariable Long adminId,
-            @RequestBody UpdateAdminDTORequest adminDTORequest) {
+            @RequestBody UpdateAdminPasswordDTO adminDTORequest) {
 
-        AdminDTOResponse responseDTO = adminService.updateStatus(adminId, adminDTORequest);
+        UpdateAdminPasswordDTOResponse responseDTO = adminService.updatePassword(adminId, adminDTORequest);
         return new ResponseEntity<>(responseDTO, HttpStatus.OK);
     }
 

@@ -2,15 +2,17 @@ package com.ClinicaDelCalzado_BackEnd.services.impl;
 
 import com.ClinicaDelCalzado_BackEnd.dtos.request.AdminDTORequest;
 import com.ClinicaDelCalzado_BackEnd.dtos.request.UpdateAdminDTORequest;
+import com.ClinicaDelCalzado_BackEnd.dtos.request.UpdateAdminPasswordDTO;
 import com.ClinicaDelCalzado_BackEnd.dtos.response.AdminDTOResponse;
 import com.ClinicaDelCalzado_BackEnd.dtos.response.AdminListDTOResponse;
 import com.ClinicaDelCalzado_BackEnd.dtos.enums.AdminStatusEnum;
 import com.ClinicaDelCalzado_BackEnd.dtos.enums.AdminTypeEnum;
+import com.ClinicaDelCalzado_BackEnd.dtos.response.UpdateAdminPasswordDTOResponse;
 import com.ClinicaDelCalzado_BackEnd.dtos.userAdmin.AdminDTO;
 import com.ClinicaDelCalzado_BackEnd.entity.Administrator;
 import com.ClinicaDelCalzado_BackEnd.exceptions.AlreadyExistsException;
 import com.ClinicaDelCalzado_BackEnd.exceptions.BadRequestException;
-import com.ClinicaDelCalzado_BackEnd.exceptions.ForbiddenException;
+import com.ClinicaDelCalzado_BackEnd.exceptions.UnauthorizedException;
 import com.ClinicaDelCalzado_BackEnd.repository.userAdmin.IAdministratorRepository;
 import com.ClinicaDelCalzado_BackEnd.services.IAdminService;
 import org.apache.commons.lang3.ObjectUtils;
@@ -20,6 +22,7 @@ import org.springframework.stereotype.Service;
 import org.webjars.NotFoundException;
 
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 
 @Service
@@ -99,22 +102,13 @@ public class AdminServiceImpl implements IAdminService {
     }
 
     @Override
-    public AdminDTOResponse update(Long adminId, AdminDTORequest adminDTO) {
+    public AdminDTOResponse update(Long adminId, UpdateAdminDTORequest adminDTO) {
 
-        adminDTO.setIdentification(adminId);
+        validateInputData(AdminDTORequest.builder()
+                .identification(adminId)
+                .build(), false);
 
-        validateInputData(adminDTO, false);
-
-        Administrator administratorById = validateIfAdminIdExists(adminId, "El administrador con identificación %s no existe");
-
-        Administrator administrator = buildAdministrator(
-                adminId,
-                adminDTO.getName(),
-                adminDTO.getCellphone(),
-                administratorById.getAdminStatus(),
-                AdminTypeEnum.getName(adminDTO.getAdminType()),
-                administratorById.getPassword(),
-                administratorById.getHasTemporaryPassword());
+        Administrator administrator = matchDifferencesAdmin(validateIfAdminIdExists(adminId), adminDTO);
 
         saveAdmin(administrator);
 
@@ -122,34 +116,36 @@ public class AdminServiceImpl implements IAdminService {
     }
 
     @Override
-    public AdminDTOResponse updateStatus(Long adminId, UpdateAdminDTORequest adminDTO) {
+    public UpdateAdminPasswordDTOResponse updatePassword(Long adminId, UpdateAdminPasswordDTO adminDTO) {
 
-        validateIdentification(adminDTO.getAdminId());
         validateIdentification(adminId);
 
-        Administrator administratorPrincipalById = validateIfAdminIdExists(adminDTO.getAdminId(), "El administrador con identificación %s no existe");
-        Administrator administratorSecondaryById = validateIfAdminIdExists(adminId, "El administrador con identificación %s no existe");
+        Administrator administrator = validateIfAdminIdExists(adminId);
 
-        if (!administratorPrincipalById.getRole().equalsIgnoreCase(AdminTypeEnum.PRINCIPAL.name())) {
-            throw new ForbiddenException(String.format("El administrador con identificación %s no tiene el rol principal para actualizar el estado", adminDTO.getAdminId()));
+        String pwdNewEncode = passwordEncoder.encode(adminDTO.getNewPassword());
+
+        validatePassword(adminDTO.getOldPassword(), adminDTO.getNewPassword(), adminDTO.getConfirmNewPassword());
+
+        if (!passwordEncoder.matches(adminDTO.getOldPassword(), administrator.getPassword())) {
+            throw new UnauthorizedException("Clave anterior es incorrecta.");
         }
 
-        if (administratorPrincipalById.getIdAdministrator().equals(administratorSecondaryById.getIdAdministrator())) {
-            throw new ForbiddenException("No tiene permiso para cambiar el estado del administrador.");
+        if (!adminDTO.getNewPassword().equals(adminDTO.getConfirmNewPassword())) {
+            throw new BadRequestException("Datos proporcionados son inválidos o las claves nuevas no coinciden.");
         }
 
-        Administrator administrator = buildAdministrator(
-                administratorSecondaryById.getIdAdministrator(),
-                administratorSecondaryById.getAdminName(),
-                administratorSecondaryById.getAdmPhoneNumber(),
-                AdminStatusEnum.getName(adminDTO.getAdminStatus()),
-                administratorSecondaryById.getRole(),
-                administratorSecondaryById.getPassword(),
-                administratorSecondaryById.getHasTemporaryPassword());
+        if (adminDTO.getOldPassword().equals(adminDTO.getNewPassword())) {
+            throw new BadRequestException("La clave anterior y la nueva no pueden ser iguales.");
+        }
+
+        administrator.setPassword(pwdNewEncode);
+        administrator.setHasTemporaryPassword(false);
 
         saveAdmin(administrator);
 
-        return adminDTOResponse("Cambio de estado del Administrador exitosamente.", administrator);
+        return UpdateAdminPasswordDTOResponse.builder()
+                .message("Clave cambiada exitosamente.")
+                .build();
     }
 
     private Administrator buildAdministrator(Long adminId, String adminName, String adminPhoneNumber,
@@ -184,31 +180,32 @@ public class AdminServiceImpl implements IAdminService {
                 .build();
     }
 
-    private void validateInputData(AdminDTORequest adminDTO, Boolean validatePassword) {
+    private void validateInputData(AdminDTORequest adminDTO, Boolean validateAllFields) {
+
         validateIdentification(adminDTO.getIdentification());
 
-        if (ObjectUtils.isEmpty(adminDTO.getName())) {
+        if (ObjectUtils.isEmpty(adminDTO.getName()) && validateAllFields) {
             throw new BadRequestException("El nombre es un campo obligatorio, no puede ser vacío");
         }
 
-        if (ObjectUtils.isEmpty(adminDTO.getAdminType())) {
+        if (ObjectUtils.isEmpty(adminDTO.getAdminType()) && validateAllFields) {
             throw new BadRequestException("El tipo de administrador es un campo obligatorio, no puede ser vacío");
         }
 
-        if (ObjectUtils.isEmpty(adminDTO.getCellphone())) {
+        if (ObjectUtils.isEmpty(adminDTO.getCellphone()) && validateAllFields) {
             throw new BadRequestException("El telefono es un campo obligatorio, no puede ser vacío");
         }
 
-        if (ObjectUtils.isEmpty(adminDTO.getPassword()) && validatePassword) {
+        if (ObjectUtils.isEmpty(adminDTO.getPassword()) && validateAllFields) {
             throw new BadRequestException("La contraseña es un campo obligatorio, no puede ser vacío");
         }
     }
 
-    private Administrator validateIfAdminIdExists(Long id, String msg) {
+    private Administrator validateIfAdminIdExists(Long id) {
         Optional<Administrator> administratorById = findAdministratorById(id);
 
         if (administratorById.isEmpty()) {
-            throw new NotFoundException(String.format(msg, id));
+            throw new NotFoundException(String.format("El administrador con identificación %s no existe", id));
         }
         return administratorById.get();
     }
@@ -217,6 +214,39 @@ public class AdminServiceImpl implements IAdminService {
         if (ObjectUtils.isEmpty(id)) {
             throw new BadRequestException("La identificación es un campo obligatorio, no puede ser vacio");
         }
+    }
+
+    private void validatePassword(String oldPassword, String newPassword, String confirmNewPassword) {
+        if (ObjectUtils.isEmpty(oldPassword)) {
+            throw new BadRequestException("La contraseña actual no puede ser vacia");
+        }
+
+        if (ObjectUtils.isEmpty(newPassword)) {
+            throw new BadRequestException("La nueva contraseña no puede ser vacia");
+        }
+
+        if (ObjectUtils.isEmpty(confirmNewPassword)) {
+            throw new BadRequestException("La confirmación de la nueva contraseña no puede ser vacia");
+        }
+    }
+
+    private Administrator matchDifferencesAdmin(Administrator currentDataAdmin, UpdateAdminDTORequest newDataAdmin) {
+        return buildAdministrator(
+                currentDataAdmin.getIdAdministrator(),
+                ObjectUtils.isEmpty(newDataAdmin.getName()) || Objects.equals(currentDataAdmin.getAdminName(), newDataAdmin.getName()) ?
+                        currentDataAdmin.getAdminName() :
+                        newDataAdmin.getName(),
+                ObjectUtils.isEmpty(newDataAdmin.getCellphone()) || Objects.equals(currentDataAdmin.getAdmPhoneNumber(), newDataAdmin.getCellphone()) ?
+                        currentDataAdmin.getAdmPhoneNumber() :
+                        newDataAdmin.getCellphone(),
+                ObjectUtils.isEmpty(newDataAdmin.getAdminStatus()) || Objects.equals(AdminStatusEnum.getValue(currentDataAdmin.getAdminStatus()), newDataAdmin.getAdminStatus()) ?
+                        currentDataAdmin.getAdminStatus() :
+                        AdminStatusEnum.getName(newDataAdmin.getAdminStatus()),
+                ObjectUtils.isEmpty(newDataAdmin.getAdminType()) || Objects.equals(AdminTypeEnum.getValue(currentDataAdmin.getRole()), newDataAdmin.getAdminType()) ?
+                        currentDataAdmin.getRole() :
+                        AdminTypeEnum.getName(newDataAdmin.getAdminType()),
+                currentDataAdmin.getPassword(),
+                currentDataAdmin.getHasTemporaryPassword());
     }
 
 }

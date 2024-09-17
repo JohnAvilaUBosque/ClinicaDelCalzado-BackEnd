@@ -10,11 +10,9 @@ import lombok.*;
 @NoArgsConstructor
 @AllArgsConstructor
 @JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
-public class UpdateAdminDTORequest {
+public class UpdateAdminPasswordDTO {
 
-    private String adminType;
-    private Long identification;
-    private String name;
-    private String cellphone;
-    private String adminStatus;
+    private String oldPassword;
+    private String newPassword;
+    private String confirmNewPassword;
 }
