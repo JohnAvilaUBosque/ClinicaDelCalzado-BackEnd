@@ -1,4 +1,4 @@
-package com.ClinicaDelCalzado_BackEnd.securty;
+package com.ClinicaDelCalzado_BackEnd.security;
 
 import com.ClinicaDelCalzado_BackEnd.dtos.enums.AdminTypeEnum;
 import com.ClinicaDelCalzado_BackEnd.services.impl.JWTCustomUserDetailsServiceImpl;

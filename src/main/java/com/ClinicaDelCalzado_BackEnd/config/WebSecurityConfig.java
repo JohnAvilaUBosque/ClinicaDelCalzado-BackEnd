@@ -2,7 +2,7 @@ package com.ClinicaDelCalzado_BackEnd.config;
 
 import com.ClinicaDelCalzado_BackEnd.dtos.enums.AdminTypeEnum;
 import com.ClinicaDelCalzado_BackEnd.exceptions.JWTAuthorizationException;
-import com.ClinicaDelCalzado_BackEnd.securty.JWTAuthenticationFilter;
+import com.ClinicaDelCalzado_BackEnd.security.JWTAuthenticationFilter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;

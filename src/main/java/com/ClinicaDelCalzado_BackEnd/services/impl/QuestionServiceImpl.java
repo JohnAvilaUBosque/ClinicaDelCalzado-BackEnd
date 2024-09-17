@@ -20,7 +20,6 @@ public class QuestionServiceImpl implements IQuestionService {
         this.questionRepository = questionRepository;
     }
 
-
     @Override
     public QuestionListDTOResponse findAllQuestions() {
         List<SecurityQuestion> questionList = questionRepository.findAll();

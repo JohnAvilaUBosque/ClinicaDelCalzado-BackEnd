@@ -1,20 +1,26 @@
 package com.ClinicaDelCalzado_BackEnd.services.impl;
 
+import com.ClinicaDelCalzado_BackEnd.dtos.questions.AnswerDTO;
 import com.ClinicaDelCalzado_BackEnd.dtos.request.AdminDTORequest;
 import com.ClinicaDelCalzado_BackEnd.dtos.request.UpdateAdminDTORequest;
 import com.ClinicaDelCalzado_BackEnd.dtos.request.UpdateAdminPasswordDTO;
+import com.ClinicaDelCalzado_BackEnd.dtos.request.UpdateAdminQuestionDTO;
 import com.ClinicaDelCalzado_BackEnd.dtos.response.AdminDTOResponse;
 import com.ClinicaDelCalzado_BackEnd.dtos.response.AdminListDTOResponse;
 import com.ClinicaDelCalzado_BackEnd.dtos.enums.AdminStatusEnum;
 import com.ClinicaDelCalzado_BackEnd.dtos.enums.AdminTypeEnum;
 import com.ClinicaDelCalzado_BackEnd.dtos.response.UpdateAdminPasswordDTOResponse;
+import com.ClinicaDelCalzado_BackEnd.dtos.response.UpdateAdminQuestionDTOResponse;
 import com.ClinicaDelCalzado_BackEnd.dtos.userAdmin.AdminDTO;
 import com.ClinicaDelCalzado_BackEnd.entity.Administrator;
+import com.ClinicaDelCalzado_BackEnd.entity.Answer;
 import com.ClinicaDelCalzado_BackEnd.exceptions.AlreadyExistsException;
 import com.ClinicaDelCalzado_BackEnd.exceptions.BadRequestException;
 import com.ClinicaDelCalzado_BackEnd.exceptions.UnauthorizedException;
 import com.ClinicaDelCalzado_BackEnd.repository.userAdmin.IAdministratorRepository;
+import com.ClinicaDelCalzado_BackEnd.repository.userAdmin.IAnswerRepository;
 import com.ClinicaDelCalzado_BackEnd.services.IAdminService;
+import com.ClinicaDelCalzado_BackEnd.services.IAnswerService;
 import org.apache.commons.lang3.ObjectUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -30,11 +36,13 @@ public class AdminServiceImpl implements IAdminService {
 
     private final IAdministratorRepository administratorRepository;
     private final PasswordEncoder passwordEncoder;
+    private final IAnswerService answerService;
 
     @Autowired
-    public AdminServiceImpl(IAdministratorRepository administratorRepository, PasswordEncoder passwordEncoder) {
+    public AdminServiceImpl(IAdministratorRepository administratorRepository, PasswordEncoder passwordEncoder, IAnswerService answerService) {
         this.administratorRepository = administratorRepository;
         this.passwordEncoder = passwordEncoder;
+        this.answerService = answerService;
     }
 
     @Override
@@ -145,6 +153,31 @@ public class AdminServiceImpl implements IAdminService {
 
         return UpdateAdminPasswordDTOResponse.builder()
                 .message("Clave cambiada exitosamente.")
+                .build();
+    }
+
+    @Override
+    public UpdateAdminQuestionDTOResponse updateAnswer(Long adminId, UpdateAdminQuestionDTO adminDTO) {
+
+        AdminDTOResponse update = update(adminId, UpdateAdminDTORequest.builder()
+                .name(adminDTO.getName())
+                .cellphone(adminDTO.getPhone())
+                .build());
+
+        List<Answer> currentAnswer = answerService.findAnswerAllByAdminId(adminId);
+
+        currentAnswer.stream().map(answer -> adminDTO.getSecurityQuestions().stream()
+                .map(AnswerDTO::getIdQuestion).filter(p -> p.equals(answer.getSecurityQuestion().getIdSecurityQuestion())))
+                .toList();
+
+
+        return UpdateAdminQuestionDTOResponse.builder()
+                .message("Información personal editada exitosamente.")
+                .admin(UpdateAdminQuestionDTO.builder()
+                        .name(update.getAdmin().getName())
+                        .phone(update.getAdmin().getCellphone())
+                        .securityQuestions(adminDTO.getSecurityQuestions())
+                        .build())
                 .build();
     }
 

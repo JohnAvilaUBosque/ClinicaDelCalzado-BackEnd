@@ -3,9 +3,11 @@ package com.ClinicaDelCalzado_BackEnd.controller;
 import com.ClinicaDelCalzado_BackEnd.dtos.request.AdminDTORequest;
 import com.ClinicaDelCalzado_BackEnd.dtos.request.UpdateAdminDTORequest;
 import com.ClinicaDelCalzado_BackEnd.dtos.request.UpdateAdminPasswordDTO;
+import com.ClinicaDelCalzado_BackEnd.dtos.request.UpdateAdminQuestionDTO;
 import com.ClinicaDelCalzado_BackEnd.dtos.response.AdminDTOResponse;
 import com.ClinicaDelCalzado_BackEnd.dtos.response.AdminListDTOResponse;
 import com.ClinicaDelCalzado_BackEnd.dtos.response.UpdateAdminPasswordDTOResponse;
+import com.ClinicaDelCalzado_BackEnd.dtos.response.UpdateAdminQuestionDTOResponse;
 import com.ClinicaDelCalzado_BackEnd.services.IAdminService;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -58,6 +60,15 @@ public class AdministratorController {
             @RequestBody UpdateAdminPasswordDTO adminDTORequest) {
 
         UpdateAdminPasswordDTOResponse responseDTO = adminService.updatePassword(adminId, adminDTORequest);
+        return new ResponseEntity<>(responseDTO, HttpStatus.OK);
+    }
+
+    @PutMapping("/edit-personal-information/{adminId}")
+    public ResponseEntity<UpdateAdminQuestionDTOResponse> updatePersonalInformation(
+            @PathVariable Long adminId,
+            @RequestBody UpdateAdminQuestionDTO adminDTORequest) {
+
+        UpdateAdminQuestionDTOResponse responseDTO = adminService.updateAnswer(adminId, adminDTORequest);
         return new ResponseEntity<>(responseDTO, HttpStatus.OK);
     }
 
