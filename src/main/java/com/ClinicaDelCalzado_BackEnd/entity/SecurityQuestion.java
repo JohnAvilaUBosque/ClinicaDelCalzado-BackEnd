@@ -26,7 +26,7 @@ public class SecurityQuestion {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id_securityQuestion", length = 20)
-    private Long idSecurityQuestion;
+    private Integer idSecurityQuestion;
 
     @Column(name = "question", nullable = false)
     private String question;

@@ -1,5 +1,6 @@
 package com.ClinicaDelCalzado_BackEnd.services;
 
+import com.ClinicaDelCalzado_BackEnd.dtos.request.WorkOrderDTORequest;
 import com.ClinicaDelCalzado_BackEnd.dtos.response.ClientDTOResponse;
 import com.ClinicaDelCalzado_BackEnd.dtos.response.ClientListDTOResponse;
 import com.ClinicaDelCalzado_BackEnd.entity.Client;
@@ -12,5 +13,6 @@ public interface IClientService {
     ClientDTOResponse findClientByClientId(Long idClient);
     ClientListDTOResponse findClientAll();
     Boolean validateDifferenceData(Client currentClient, Client client);
+    Client findClientWorkOrder(WorkOrderDTORequest workOrderDTORequest);
 }
 

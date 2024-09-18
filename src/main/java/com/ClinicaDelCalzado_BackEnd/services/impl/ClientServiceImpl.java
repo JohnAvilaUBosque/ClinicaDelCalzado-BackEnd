@@ -1,5 +1,6 @@
 package com.ClinicaDelCalzado_BackEnd.services.impl;
 
+import com.ClinicaDelCalzado_BackEnd.dtos.request.WorkOrderDTORequest;
 import com.ClinicaDelCalzado_BackEnd.dtos.response.ClientDTOResponse;
 import com.ClinicaDelCalzado_BackEnd.dtos.response.ClientListDTOResponse;
 import com.ClinicaDelCalzado_BackEnd.dtos.userClient.ClientDTO;
@@ -72,10 +73,26 @@ public class ClientServiceImpl implements IClientService {
                 currentClient.getCliPhoneNumber().equals(client.getCliPhoneNumber());
     }
 
+    @Override
+    public Client findClientWorkOrder(WorkOrderDTORequest workOrderDTORequest) {
+
+        Optional<Client> clientByIdClient = findClientByIdClient(workOrderDTORequest.getClient().getIdentification());
+        Client client = Client.builder()
+                .idClient(workOrderDTORequest.getClient().getIdentification())
+                .clientName(workOrderDTORequest.getClient().getName())
+                .cliPhoneNumber(workOrderDTORequest.getClient().getCellphone())
+                .build();
+
+        if (clientByIdClient.isEmpty() || !validateDifferenceData(clientByIdClient.get(), client)) {
+            return saveClient(client);
+        }
+
+        return clientByIdClient.get();
+    }
+
     private void validateIdentification(Long idClient) {
         if (ObjectUtils.isEmpty(idClient)) {
             throw new BadRequestException("La identificación es un campo obligatorio, no puede ser vacio");
         }
     }
-
 }

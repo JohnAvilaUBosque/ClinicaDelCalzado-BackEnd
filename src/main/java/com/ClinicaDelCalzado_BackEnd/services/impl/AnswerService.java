@@ -20,6 +20,6 @@ public class AnswerService implements IAnswerService {
 
     @Override
     public List<Answer> findAnswerAllByAdminId(Long adminId) {
-        return answerRepository.findAnswerByIdAdministrator(adminId);
+        return null;
     }
 }

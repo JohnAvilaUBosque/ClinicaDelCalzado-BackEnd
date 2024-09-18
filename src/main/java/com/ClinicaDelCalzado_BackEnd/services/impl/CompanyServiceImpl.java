@@ -1,5 +1,6 @@
 package com.ClinicaDelCalzado_BackEnd.services.impl;
 
+import com.ClinicaDelCalzado_BackEnd.dtos.request.WorkOrderDTORequest;
 import com.ClinicaDelCalzado_BackEnd.dtos.response.CompanyDTOResponse;
 import com.ClinicaDelCalzado_BackEnd.dtos.response.CompanyListDTOResponse;
 import com.ClinicaDelCalzado_BackEnd.dtos.workOrders.CompanyDTO;
@@ -61,5 +62,19 @@ public class CompanyServiceImpl implements ICompanyService {
                 new CompanyDTO(p.getName(), p.getNit(), p.getAddress(), Collections.singletonList(p.getPhones()))).get());
 
         return companyDTOResponse;
+    }
+
+    @Override
+    public Company findCompanyWorkOrder(WorkOrderDTORequest workOrderDTORequest) {
+
+        return findCompanyByNit(workOrderDTORequest.getCompany().getNit())
+                .orElseGet(() -> save(
+                        Company.builder()
+                                .nit(workOrderDTORequest.getCompany().getNit())
+                                .name(workOrderDTORequest.getCompany().getName())
+                                .address(workOrderDTORequest.getCompany().getAddress())
+                                .phones(String.join(",", workOrderDTORequest.getCompany().getPhones()))
+                                .build())
+                );
     }
 }

@@ -56,8 +56,9 @@ public class WebSecurityConfig {
                         .requestMatchers(HttpMethod.GET,"/api/v1/admins/list").permitAll()
                         .requestMatchers(HttpMethod.PUT,"/api/v1/admins/password/{adminId}").permitAll()
                         .requestMatchers(HttpMethod.GET,"/api/v1/questions/list").permitAll()
-                        .requestMatchers(HttpMethod.POST,"/api/v1/work-orders/created").permitAll()
+                        .requestMatchers(HttpMethod.POST,"/api/v1/work-orders/**").permitAll()
                         .requestMatchers(HttpMethod.GET, "/api/v1/company/**").permitAll()
+                        .requestMatchers(HttpMethod.GET,"/api/v1/work-orders/**").hasAnyAuthority(AdminTypeEnum.PRINCIPAL.getKeyName(), AdminTypeEnum.SECONDARY.getKeyName())
                         .anyRequest().authenticated())
                 .httpBasic(AbstractHttpConfigurer::disable);
 

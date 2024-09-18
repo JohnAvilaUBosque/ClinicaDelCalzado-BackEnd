@@ -14,7 +14,7 @@ import java.util.List;
 @NoArgsConstructor
 @AllArgsConstructor
 @JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
-public class WorkOrderListDTOResponse {
+public class OrderListDTOResponse {
 
     private List<OrderDTOResponse> orders;
 }

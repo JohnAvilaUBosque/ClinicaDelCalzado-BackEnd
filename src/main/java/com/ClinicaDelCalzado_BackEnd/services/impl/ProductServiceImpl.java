@@ -12,12 +12,12 @@ import org.webjars.NotFoundException;
 import java.util.List;
 
 @Service
-public class IProductServiceImpl implements IProductService {
+public class ProductServiceImpl implements IProductService {
 
     private IServicesRepository servicesRepository;
 
     @Autowired
-    public IProductServiceImpl(IServicesRepository servicesRepository) {
+    public ProductServiceImpl(IServicesRepository servicesRepository) {
         this.servicesRepository = servicesRepository;
     }
 
@@ -37,8 +37,8 @@ public class IProductServiceImpl implements IProductService {
         return servicesList.stream()
                 .map(serv -> ServicesDTO.builder()
                         .name(serv.getService())
-                        .price(serv.getUnitValue())
-                        .serviceStatus(serv.getServiceStatus())
+                        .price(serv.getUnitValue().longValue())
+                        .serviceStatus(ServicesStatusEnum.getValue(serv.getServiceStatus()))
                         .build())
                 .toList();
     }

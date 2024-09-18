@@ -1,6 +1,5 @@
 package com.ClinicaDelCalzado_BackEnd.services.impl;
 
-import com.ClinicaDelCalzado_BackEnd.dtos.enums.AdminTypeEnum;
 import com.ClinicaDelCalzado_BackEnd.entity.Administrator;
 import com.ClinicaDelCalzado_BackEnd.services.IAdminService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -35,6 +34,6 @@ public class JWTCustomUserDetailsServiceImpl implements UserDetailsService {
 
         Administrator administrator = adminService.findAdministratorById(Long.valueOf(username))
                 .orElseThrow(() -> new UsernameNotFoundException("El administrador no existe"));
-        return new User(administrator.getIdAdministrator().toString(), administrator.getPassword(), mapToAuthorities(List.of(AdminTypeEnum.getValue(administrator.getRole()))));
+        return new User(administrator.getIdAdministrator().toString(), administrator.getPassword(), mapToAuthorities(List.of(administrator.getRole())));
     }
 }
