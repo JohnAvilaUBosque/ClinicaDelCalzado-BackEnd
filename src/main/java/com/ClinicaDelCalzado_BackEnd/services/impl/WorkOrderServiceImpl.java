@@ -16,9 +16,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
 import org.webjars.NotFoundException;
 
-import java.math.BigDecimal;
 import java.sql.Timestamp;
-import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -209,7 +207,7 @@ public class WorkOrderServiceImpl implements IWorkOrderService {
 
     private List<ServicesDTO> saveServicesWorkOrder(WorkOrderDTORequest workOrderDTORequest, WorkOrder orderNumber) {
 
-        return  workOrderDTORequest.getServices().stream()
+        return workOrderDTORequest.getServices().stream()
                 .map(serviceDTO -> {
                     ServicesEnt service = ServicesEnt.builder()
                             .idOrderSer(orderNumber)

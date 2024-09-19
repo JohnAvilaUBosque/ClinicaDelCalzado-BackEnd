@@ -29,6 +29,9 @@ public class Answer {
     @Column(name = "answer")
     private String answer;
 
+    @Column(name = "status")
+    private Boolean status;
+
     @ManyToOne
     @JoinColumn(name = "id_question")
     private SecurityQuestion securityQuestion;

@@ -1,6 +1,7 @@
 package com.ClinicaDelCalzado_BackEnd.services.impl;
 
 import com.ClinicaDelCalzado_BackEnd.dtos.questions.AnswerDTO;
+import com.ClinicaDelCalzado_BackEnd.dtos.questions.QuestionDTO;
 import com.ClinicaDelCalzado_BackEnd.dtos.request.AdminDTORequest;
 import com.ClinicaDelCalzado_BackEnd.dtos.request.UpdateAdminDTORequest;
 import com.ClinicaDelCalzado_BackEnd.dtos.request.UpdateAdminPasswordDTO;
@@ -14,13 +15,14 @@ import com.ClinicaDelCalzado_BackEnd.dtos.response.UpdateAdminQuestionDTORespons
 import com.ClinicaDelCalzado_BackEnd.dtos.userAdmin.AdminDTO;
 import com.ClinicaDelCalzado_BackEnd.entity.Administrator;
 import com.ClinicaDelCalzado_BackEnd.entity.Answer;
+import com.ClinicaDelCalzado_BackEnd.entity.SecurityQuestion;
 import com.ClinicaDelCalzado_BackEnd.exceptions.AlreadyExistsException;
 import com.ClinicaDelCalzado_BackEnd.exceptions.BadRequestException;
 import com.ClinicaDelCalzado_BackEnd.exceptions.UnauthorizedException;
 import com.ClinicaDelCalzado_BackEnd.repository.userAdmin.IAdministratorRepository;
-import com.ClinicaDelCalzado_BackEnd.repository.userAdmin.IAnswerRepository;
 import com.ClinicaDelCalzado_BackEnd.services.IAdminService;
 import com.ClinicaDelCalzado_BackEnd.services.IAnswerService;
+import com.ClinicaDelCalzado_BackEnd.services.IQuestionService;
 import org.apache.commons.lang3.ObjectUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -37,12 +39,14 @@ public class AdminServiceImpl implements IAdminService {
     private final IAdministratorRepository administratorRepository;
     private final PasswordEncoder passwordEncoder;
     private final IAnswerService answerService;
+    private final IQuestionService questionService;
 
     @Autowired
-    public AdminServiceImpl(IAdministratorRepository administratorRepository, PasswordEncoder passwordEncoder, IAnswerService answerService) {
+    public AdminServiceImpl(IAdministratorRepository administratorRepository, PasswordEncoder passwordEncoder, IAnswerService answerService, IQuestionService questionService) {
         this.administratorRepository = administratorRepository;
         this.passwordEncoder = passwordEncoder;
         this.answerService = answerService;
+        this.questionService = questionService;
     }
 
     @Override
@@ -164,21 +168,61 @@ public class AdminServiceImpl implements IAdminService {
                 .cellphone(adminDTO.getPhone())
                 .build());
 
+        if (adminDTO.getSecurityQuestions().isEmpty()) {
+            throw new BadRequestException("El listado de preguntas y respuestas no puede ser vacío");
+        }
+
+        if (adminDTO.getSecurityQuestions().stream().map(AnswerDTO::getIdQuestion).distinct().count() == 1) {
+            throw new BadRequestException("Hay preguntas que se repiten por lo que debe seleccionar diferentes tipos de preguntas");
+        }
+
         List<Answer> currentAnswer = answerService.findAnswerAllByAdminId(adminId);
 
-        currentAnswer.stream().map(answer -> adminDTO.getSecurityQuestions().stream()
-                .map(AnswerDTO::getIdQuestion).filter(p -> p.equals(answer.getSecurityQuestion().getIdSecurityQuestion())))
-                .toList();
+        //Actualizar todos los estados a false
+        if (!currentAnswer.isEmpty()) {
+            currentAnswer.forEach(
+                    p -> {
+                        answerService.saveAnswer(Answer.builder()
+                                .idAnswers(p.getIdAnswers())
+                                .securityQuestion(SecurityQuestion.builder().idSecurityQuestion(p.getSecurityQuestion().getIdSecurityQuestion()).build())
+                                .answer(p.getAnswer())
+                                .idAdministrator(Administrator.builder().idAdministrator(adminId).build())
+                                .status(false)
+                                .build());
+                    }
+            );
+        }
 
+        adminDTO.getSecurityQuestions().forEach(p -> {
+                    Answer newAnswer = new Answer();
+                    currentAnswer.stream()
+                            .filter(answer ->
+                                    answer.getSecurityQuestion().getIdSecurityQuestion().longValue() == p.getIdQuestion())
+                            .map(Answer::getIdAnswers)
+                            .forEach(newAnswer::setIdAnswers);
+                    newAnswer.setSecurityQuestion(SecurityQuestion.builder().idSecurityQuestion(p.getIdQuestion().intValue()).build());
+                    newAnswer.setAnswer(p.getAnswer());
+                    newAnswer.setIdAdministrator(Administrator.builder().idAdministrator(adminId).build());
+                    newAnswer.setStatus(true);
+                    answerService.saveAnswer(newAnswer);
+                }
+        );
+
+        List<QuestionDTO> questionDTOList = questionService.findAllQuestions().getQuestions();
+
+        List<AnswerDTO> securityQuestions = adminDTO.getSecurityQuestions().stream()
+                .map(s -> createAnswerDTO(s, questionDTOList))
+                .toList();
 
         return UpdateAdminQuestionDTOResponse.builder()
                 .message("Información personal editada exitosamente.")
                 .admin(UpdateAdminQuestionDTO.builder()
                         .name(update.getAdmin().getName())
                         .phone(update.getAdmin().getCellphone())
-                        .securityQuestions(adminDTO.getSecurityQuestions())
+                        .securityQuestions(securityQuestions)
                         .build())
                 .build();
+
     }
 
     private Administrator buildAdministrator(Long adminId, String adminName, String adminPhoneNumber,
@@ -280,6 +324,20 @@ public class AdminServiceImpl implements IAdminService {
                         AdminTypeEnum.getName(newDataAdmin.getAdminType()),
                 currentDataAdmin.getPassword(),
                 currentDataAdmin.getHasTemporaryPassword());
+    }
+
+    private AnswerDTO createAnswerDTO(AnswerDTO s, List<QuestionDTO> questionDTOList) {
+        String questionText = questionDTOList.stream()
+                .filter(f -> s.getIdQuestion().equals(f.getIdQuestion()))
+                .map(QuestionDTO::getQuestion)
+                .findFirst()
+                .orElse(""); // Devuelve una cadena vacía si no se encuentra la pregunta
+
+        return AnswerDTO.builder()
+                .idQuestion(s.getIdQuestion())
+                .question(questionText)
+                .answer(s.getAnswer())
+                .build();
     }
 
 }

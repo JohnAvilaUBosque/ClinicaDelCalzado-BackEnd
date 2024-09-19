@@ -1,5 +1,6 @@
 package com.ClinicaDelCalzado_BackEnd.services.impl;
 
+import com.ClinicaDelCalzado_BackEnd.entity.Administrator;
 import com.ClinicaDelCalzado_BackEnd.entity.Answer;
 import com.ClinicaDelCalzado_BackEnd.repository.userAdmin.IAnswerRepository;
 import com.ClinicaDelCalzado_BackEnd.services.IAnswerService;
@@ -20,6 +21,13 @@ public class AnswerService implements IAnswerService {
 
     @Override
     public List<Answer> findAnswerAllByAdminId(Long adminId) {
-        return null;
+        return answerRepository.findAnswerByIdAdministrator(Administrator.builder().idAdministrator(adminId).build());
     }
+
+    @Override
+    public void saveAnswer(Answer answer) {
+        answerRepository.save(answer);
+    }
+
+
 }

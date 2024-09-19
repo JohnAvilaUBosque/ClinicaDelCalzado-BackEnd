@@ -13,8 +13,8 @@ spring:
     database-platform: org.hibernate.dialect.MySQL8Dialect
     hibernate:
       ddl-auto: update
-  sql:
-    init:
-      data-locations:
-        - classpath:load_sql/initial_queries.sql
-      mode: always
+  #sql:
+    #init:
+      #data-locations:
+        #- classpath:load_sql/initial_queries.sql
+      #mode: always

@@ -2,11 +2,13 @@ package com.ClinicaDelCalzado_BackEnd.config;
 
 import com.ClinicaDelCalzado_BackEnd.exceptions.ApiError;
 import com.ClinicaDelCalzado_BackEnd.exceptions.ApiException;
+import com.ClinicaDelCalzado_BackEnd.exceptions.BadRequestException;
 import com.newrelic.api.agent.NewRelic;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.webjars.NotFoundException;
@@ -61,5 +63,11 @@ public class ControllerExceptionHandler {
     public ResponseEntity<?> notFound(NotFoundException e) {
         ApiError error = new ApiError(HttpStatus.NOT_FOUND.name(), e.getMessage(), HttpStatus.NOT_FOUND.value());
         return new ResponseEntity<>(error, HttpStatus.NOT_FOUND);
+    }
+
+    @ExceptionHandler({BadRequestException.class, BadCredentialsException.class})
+    public ResponseEntity<?> badRequest(BadRequestException e) {
+        ApiError error = new ApiError(HttpStatus.BAD_REQUEST.name(), e.getMessage(), HttpStatus.BAD_REQUEST.value());
+        return new ResponseEntity<>(error, HttpStatus.BAD_REQUEST);
     }
 }

@@ -69,7 +69,7 @@ public class AdministratorController {
             @RequestBody UpdateAdminQuestionDTO adminDTORequest) {
 
         UpdateAdminQuestionDTOResponse responseDTO = adminService.updateAnswer(adminId, adminDTORequest);
-        return new ResponseEntity<>(responseDTO, HttpStatus.OK);
+        return new ResponseEntity<>(responseDTO, HttpStatus.CREATED);
     }
 
 }

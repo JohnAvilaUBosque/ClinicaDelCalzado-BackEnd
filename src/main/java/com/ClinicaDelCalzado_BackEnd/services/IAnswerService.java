@@ -7,4 +7,6 @@ import java.util.List;
 public interface IAnswerService {
 
     List<Answer> findAnswerAllByAdminId(Long adminId);
+
+    void saveAnswer(Answer answer);
 }
