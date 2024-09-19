@@ -120,7 +120,7 @@ public class AdminServiceImpl implements IAdminService {
                 .identification(adminId)
                 .build(), false);
 
-        Administrator administrator = matchDifferencesAdmin(validateIfAdminIdExists(adminId), adminDTO);
+        Administrator administrator = matchDifferencesAdmin(validateAdminIdExists(adminId), adminDTO);
 
         saveAdmin(administrator);
 
@@ -132,9 +132,9 @@ public class AdminServiceImpl implements IAdminService {
 
         validateIdentification(adminId);
 
-        Administrator administrator = validateIfAdminIdExists(adminId);
+        Administrator administrator = validateAdminIdExists(adminId);
 
-        String pwdNewEncode = passwordEncoder.encode(adminDTO.getNewPassword());
+        String pwdNewEncode = passwordEncode(adminDTO.getNewPassword());
 
         validatePassword(adminDTO.getOldPassword(), adminDTO.getNewPassword(), adminDTO.getConfirmNewPassword());
 
@@ -239,8 +239,14 @@ public class AdminServiceImpl implements IAdminService {
                 .build();
     }
 
-    private void saveAdmin(Administrator administrator) {
+    @Override
+    public void saveAdmin(Administrator administrator) {
         administratorRepository.save(administrator);
+    }
+
+    @Override
+    public String passwordEncode(String password) {
+        return passwordEncoder.encode(password);
     }
 
     private AdminDTOResponse adminDTOResponse(String message, Administrator administrator) {
@@ -278,7 +284,8 @@ public class AdminServiceImpl implements IAdminService {
         }
     }
 
-    private Administrator validateIfAdminIdExists(Long id) {
+    @Override
+    public Administrator validateAdminIdExists(Long id) {
         Optional<Administrator> administratorById = findAdministratorById(id);
 
         if (administratorById.isEmpty()) {
@@ -339,5 +346,6 @@ public class AdminServiceImpl implements IAdminService {
                 .answer(s.getAnswer())
                 .build();
     }
+
 
 }

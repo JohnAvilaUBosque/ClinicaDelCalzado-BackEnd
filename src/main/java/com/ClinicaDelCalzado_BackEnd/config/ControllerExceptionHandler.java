@@ -65,7 +65,7 @@ public class ControllerExceptionHandler {
         return new ResponseEntity<>(error, HttpStatus.NOT_FOUND);
     }
 
-    @ExceptionHandler({BadRequestException.class, BadCredentialsException.class})
+    @ExceptionHandler(BadCredentialsException.class)
     public ResponseEntity<?> badRequest(BadRequestException e) {
         ApiError error = new ApiError(HttpStatus.BAD_REQUEST.name(), e.getMessage(), HttpStatus.BAD_REQUEST.value());
         return new ResponseEntity<>(error, HttpStatus.BAD_REQUEST);

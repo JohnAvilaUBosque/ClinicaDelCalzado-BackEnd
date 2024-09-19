@@ -28,4 +28,10 @@ public interface IAdminService {
 
     UpdateAdminQuestionDTOResponse updateAnswer(Long adminId, UpdateAdminQuestionDTO adminDTO);
 
+    Administrator validateAdminIdExists(Long id);
+
+    void saveAdmin(Administrator administrator);
+
+    String passwordEncode(String password);
+
 }
