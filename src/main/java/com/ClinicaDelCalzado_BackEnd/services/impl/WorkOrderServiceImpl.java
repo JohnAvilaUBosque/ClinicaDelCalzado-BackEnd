@@ -26,7 +26,6 @@ import java.util.stream.Collectors;
 
 import static com.ClinicaDelCalzado_BackEnd.util.Constants.*;
 
-
 @Service
 public class WorkOrderServiceImpl implements IWorkOrderService {
 
@@ -72,7 +71,7 @@ public class WorkOrderServiceImpl implements IWorkOrderService {
 
         WorkOrder workOrder = saveWorkOrder(
                 WorkOrder.builder()
-                        .orderNumber(String.format("%s-%s-%d",ORDER_ABR,LocalDate.now().format(DateTimeFormatter.ofPattern("yyyyMMdd")), generateRandomValueOrder()))
+                        .orderNumber(String.format("%s-%s-%d", ORDER_ABR, LocalDate.now().format(DateTimeFormatter.ofPattern("yyyyMMdd")), generateRandomValueOrder()))
                         .idCompany(company)
                         .creationDate(LocalDateTime.now())
                         .deliveryDate(LocalDate.parse(workOrderDTORequest.getDeliveryDate().toString()))
@@ -135,10 +134,18 @@ public class WorkOrderServiceImpl implements IWorkOrderService {
     }
 
     @Override
-    public OrderListDTOResponse getWorkOrderList(String orderNumber, Long identification, String name, String phone, String attendedBy) {
+    public OrderListDTOResponse getWorkOrderList(String orderStatus, String orderNumber, Long identification, String name, String phone, String attendedBy) {
 
+        List<Object[]> workOrderList;
 
-        return getOrderList();
+        if (!ObjectUtils.isEmpty(orderNumber) || !ObjectUtils.isEmpty(identification) || !ObjectUtils.isEmpty(name)
+                || !ObjectUtils.isEmpty(phone) || !ObjectUtils.isEmpty(attendedBy)) {
+            workOrderList = workOrderRepository.findFilteredWorkOrders(orderStatus, orderNumber, identification, name, phone, attendedBy);
+        } else {
+            workOrderList = workOrderRepository.findOrdersWithServicesByStatus(orderStatus);
+        }
+
+        return getOrderList(workOrderList);
     }
 
     private WorkOrder getOrder(String orderNumber) {
@@ -151,8 +158,7 @@ public class WorkOrderServiceImpl implements IWorkOrderService {
         return workOrder.get();
     }
 
-    private OrderListDTOResponse getOrderList() {
-        List<Object[]> workOrderList = workOrderRepository.findOrdersWithServices();
+    private OrderListDTOResponse getOrderList(List<Object[]> workOrderList) {
 
         // Mapear los resultados de Object[] a una estructura de datos más manejable
         Map<String, List<Object[]>> ordersGroupedByOrderNumber = workOrderList.stream()
@@ -262,7 +268,7 @@ public class WorkOrderServiceImpl implements IWorkOrderService {
             throw new BadRequestException("Se requiere el listado de servicios para la orden de trabajo!!");
         }
 
-        if (generalComment.isEmpty()){
+        if (generalComment.isEmpty()) {
             throw new BadRequestException("Se requiere el comentario general de la orden de trabajo!!");
         }
 

@@ -10,8 +10,9 @@ import java.util.Arrays;
 @Getter
 @RequiredArgsConstructor
 public enum OrderStatusEnum {
-    VALID("VALID","VIGENTE"),
-    CANCELED("CANCELED","CANCELADA");
+    VALID("VALID", "VIGENTE"),
+    FINISHED("FINISHED", "TERMINADA"),
+    CANCELED("CANCELED", "CANCELADA");
 
     final String keyName;
     final String value;
