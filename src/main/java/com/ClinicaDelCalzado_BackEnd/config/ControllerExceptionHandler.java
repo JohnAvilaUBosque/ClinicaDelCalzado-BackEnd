@@ -55,7 +55,7 @@ public class ControllerExceptionHandler {
 
         ApiError apiError =
                 new ApiError(
-                        "internal_error", "Internal server error", HttpStatus.INTERNAL_SERVER_ERROR.value());
+                        "internal_error", "Error interno del servidor. Por favor, inténtelo de nuevo más tarde.", HttpStatus.INTERNAL_SERVER_ERROR.value());
         return ResponseEntity.status(apiError.getStatus()).body(apiError);
     }
 

@@ -25,7 +25,7 @@ public class JWTAuthorizationException implements AuthenticationEntryPoint {
                 "{\"status\": %d,\"error\": \"%s\", \"message\": \"%s\"}",
                 httpStatusUnauthorized.value(),
                 httpStatusUnauthorized.name(),
-                authException.getMessage()
+                "No esta autorizado para realizar esta acción, contacte al administrador principal"
         );
 
         response.getWriter().write(jsonResponse);
