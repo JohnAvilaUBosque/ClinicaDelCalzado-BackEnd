@@ -1,10 +1,9 @@
 package com.ClinicaDelCalzado_BackEnd.controller;
 
 import com.ClinicaDelCalzado_BackEnd.dtos.enums.OrderStatusEnum;
+import com.ClinicaDelCalzado_BackEnd.dtos.request.UpdatePaymentDTORequest;
 import com.ClinicaDelCalzado_BackEnd.dtos.request.WorkOrderDTORequest;
-import com.ClinicaDelCalzado_BackEnd.dtos.response.OrderByIdNumberDTOResponse;
-import com.ClinicaDelCalzado_BackEnd.dtos.response.OrderListDTOResponse;
-import com.ClinicaDelCalzado_BackEnd.dtos.response.WorkOrderDTOResponse;
+import com.ClinicaDelCalzado_BackEnd.dtos.response.*;
 import com.ClinicaDelCalzado_BackEnd.services.IWorkOrderService;
 import org.apache.commons.lang3.ObjectUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -22,14 +21,25 @@ public class OrderController {
 
     @PostMapping("/created")
     public ResponseEntity<WorkOrderDTOResponse> createWorkOrder(@RequestBody WorkOrderDTORequest workOrderDTO) {
-
         WorkOrderDTOResponse responseDTO = workOrderService.createWorkOrder(workOrderDTO);
         return new ResponseEntity<>(responseDTO, HttpStatus.CREATED);
     }
 
+    @PutMapping("/cancel/{orderNumber}")
+    public ResponseEntity<MessageDTOResponse> cancelWorkOrder(@PathVariable String orderNumber, Authentication authentication) {
+        MessageDTOResponse messageDTOResponse = workOrderService.updateStatusWorkOrder(orderNumber);
+        return new ResponseEntity<>(messageDTOResponse, HttpStatus.OK);
+    }
+
+    @PutMapping("/payment/{orderNumber}")
+    public ResponseEntity<MessageDTOResponse> paymentWorkOrder(@PathVariable String orderNumber, @RequestBody UpdatePaymentDTORequest updatePaymentDTORequest, Authentication authentication) {
+        MessageDTOResponse messageDTOResponse = workOrderService.updatePaymentWorkOrder(orderNumber, updatePaymentDTORequest);
+
+        return new ResponseEntity<>(messageDTOResponse, HttpStatus.OK);
+    }
+
     @GetMapping("/{orderNumber}")
     public ResponseEntity<OrderByIdNumberDTOResponse> getWorkOrderByOrderNumber(@PathVariable String orderNumber, Authentication authentication) {
-
         OrderByIdNumberDTOResponse orderByIdNumberDTOResponse = workOrderService.getWorkOrderByOrderNumber(orderNumber);
         return new ResponseEntity<>(orderByIdNumberDTOResponse, HttpStatus.OK);
     }

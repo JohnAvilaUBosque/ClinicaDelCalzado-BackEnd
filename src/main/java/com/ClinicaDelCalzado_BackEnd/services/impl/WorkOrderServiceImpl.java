@@ -2,7 +2,7 @@ package com.ClinicaDelCalzado_BackEnd.services.impl;
 
 import com.ClinicaDelCalzado_BackEnd.dtos.enums.OrderStatusEnum;
 import com.ClinicaDelCalzado_BackEnd.dtos.enums.PaymentStatusEnum;
-import com.ClinicaDelCalzado_BackEnd.dtos.enums.ServicesStatusEnum;
+import com.ClinicaDelCalzado_BackEnd.dtos.request.UpdatePaymentDTORequest;
 import com.ClinicaDelCalzado_BackEnd.dtos.request.WorkOrderDTORequest;
 import com.ClinicaDelCalzado_BackEnd.dtos.response.*;
 import com.ClinicaDelCalzado_BackEnd.dtos.workOrders.*;
@@ -41,7 +41,6 @@ public class WorkOrderServiceImpl implements IWorkOrderService {
 
     private final ICommentService commentService;
 
-    //private Optional<Company> company;
     private final List<OrderErrorDTO> orderErrors = new ArrayList<>();
 
     @Autowired
@@ -84,10 +83,63 @@ public class WorkOrderServiceImpl implements IWorkOrderService {
                         .balance(totalPriceOrder - workOrderDTORequest.getDownPayment())
                         .build());
 
-        commentService.saveCommentOrder(workOrderDTORequest, workOrder);
-        saveServicesWorkOrder(workOrderDTORequest, workOrder);
+        commentService.saveCommentOrder(workOrderDTORequest.getGeneralComment(), workOrder.getOrderNumber());
+        productService.saveServicesWorkOrder(workOrderDTORequest, workOrder);
 
         return new WorkOrderDTOResponse("Orden de trabajo creada exitosamente!", workOrder.getOrderNumber());
+    }
+
+    @Override
+    public MessageDTOResponse updateStatusWorkOrder(String orderNumber) {
+
+        WorkOrder workOrder = validateOrderNumber(orderNumber);
+        workOrder.setOrderStatus(OrderStatusEnum.CANCELED.getKeyName());
+        saveWorkOrder(workOrder);
+        commentService.saveCommentOrder("Orden de trabajo cancelada", workOrder.getOrderNumber());
+
+        return MessageDTOResponse.builder().message("Orden de trabajo cancelada con éxito.").build();
+    }
+
+    @Override
+    public MessageDTOResponse updatePaymentWorkOrder(String orderNumber, UpdatePaymentDTORequest updatePaymentDTORequest) {
+
+        double payment = updatePaymentDTORequest.getPaymentAmount();
+
+        WorkOrder workOrder = validateOrderNumber(orderNumber);
+        if (payment == 0){
+            throw new BadRequestException("El abono no puede ser cero!!");
+        }
+
+        if (workOrder.getPaymentStatus().equals(PaymentStatusEnum.PAID.getKeyName())){
+            throw new BadRequestException("La orden de trabajo ya esta paga!!");
+        }
+
+        if (!workOrder.getOrderStatus().equals(OrderStatusEnum.VALID.getKeyName())){
+            throw new BadRequestException("La orden de trabajo no se encuentra en un estado vigente!!");
+        }
+
+        double totalPriceOrder = workOrder.getTotalValue();
+        double deposit = workOrder.getDeposit();
+        double newDeposit = deposit + payment;
+        double newBalance = totalPriceOrder - newDeposit;
+
+        if (newDeposit > totalPriceOrder) {
+            throw new BadRequestException("El abono supera el saldo total!!");
+        }
+
+        String commentPayment = String.format("Abono de $%.0f realizado exitosamente y cuenta con un saldo pendiente de $%.0f", payment, newBalance);
+        commentService.saveCommentOrder(commentPayment, workOrder.getOrderNumber());
+
+        if (newBalance == 0) {
+            workOrder.setPaymentStatus(PaymentStatusEnum.PAID.getKeyName());
+            commentService.saveCommentOrder("Orden de trabajo pagada", workOrder.getOrderNumber());
+        }
+
+        workOrder.setDeposit(newDeposit);
+        workOrder.setBalance(newBalance);
+        saveWorkOrder(workOrder);
+
+        return MessageDTOResponse.builder().message(commentPayment).build();
     }
 
     @Override
@@ -211,21 +263,6 @@ public class WorkOrderServiceImpl implements IWorkOrderService {
         return orderListDTOResponse;
     }
 
-    private List<ServicesDTO> saveServicesWorkOrder(WorkOrderDTORequest workOrderDTORequest, WorkOrder orderNumber) {
-
-        return workOrderDTORequest.getServices().stream()
-                .map(serviceDTO -> {
-                    ServicesEnt service = ServicesEnt.builder()
-                            .idOrderSer(orderNumber)
-                            .service(serviceDTO.getName())
-                            .unitValue(serviceDTO.getPrice().doubleValue())
-                            .serviceStatus(ServicesStatusEnum.RECEIVED.getKeyName())
-                            .build();
-                    productService.save(service);
-                    return new ServicesDTO(service.getService(), service.getUnitValue().longValue(), service.getServiceStatus());
-                }).collect(Collectors.toList());
-    }
-
     private WorkOrder saveWorkOrder(WorkOrder workOrder) {
         return workOrderRepository.save(workOrder);
     }
@@ -237,6 +274,15 @@ public class WorkOrderServiceImpl implements IWorkOrderService {
     private Integer generateRandomValueOrder() {
         Random random = new Random();
         return RANDOM_MIN + random.nextInt(RANDOM_MAX - RANDOM_MIN + 1);
+    }
+
+    private WorkOrder validateOrderNumber(String orderNumber) {
+        if (orderNumber.isEmpty()) {
+            throw new BadRequestException(String.format("La orden %s no esta registrada!!", orderNumber));
+        }
+
+        return workOrderRepository.findById(orderNumber)
+                .orElseThrow(() -> new NotFoundException(String.format("La orden de trabajo %s no encontrada", orderNumber)));
     }
 
     private void validateRequest(WorkOrderDTORequest workOrderDTORequest) {

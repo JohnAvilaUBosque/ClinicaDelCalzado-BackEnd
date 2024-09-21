@@ -1,7 +1,6 @@
 package com.ClinicaDelCalzado_BackEnd.services.impl;
 
-import com.ClinicaDelCalzado_BackEnd.dtos.request.WorkOrderDTORequest;
-import com.ClinicaDelCalzado_BackEnd.dtos.workOrders.CommentDTO;;
+import com.ClinicaDelCalzado_BackEnd.dtos.workOrders.CommentDTO;
 import com.ClinicaDelCalzado_BackEnd.entity.Comment;
 import com.ClinicaDelCalzado_BackEnd.entity.WorkOrder;
 import com.ClinicaDelCalzado_BackEnd.repository.workOrders.ICommentRepository;
@@ -15,7 +14,7 @@ import java.util.List;
 @Service
 public class CommentServiceImpl implements ICommentService {
 
-    private ICommentRepository commentRepository;
+    private final ICommentRepository commentRepository;
 
     @Autowired
     public CommentServiceImpl(ICommentRepository commentRepository) {
@@ -44,10 +43,10 @@ public class CommentServiceImpl implements ICommentService {
     }
 
     @Override
-    public Comment saveCommentOrder(WorkOrderDTORequest workOrderDTORequest, WorkOrder orderNumber) {
+    public Comment saveCommentOrder(String comment, String orderNumber) {
         return save(Comment.builder()
-                .idOrderCom(WorkOrder.builder().orderNumber(orderNumber.getOrderNumber()).build())
-                .adminComment(workOrderDTORequest.getGeneralComment())
+                .idOrderCom(WorkOrder.builder().orderNumber(orderNumber).build())
+                .adminComment(comment)
                 .build());
     }
 }

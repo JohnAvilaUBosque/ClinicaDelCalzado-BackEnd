@@ -8,7 +8,6 @@ import com.ClinicaDelCalzado_BackEnd.dtos.response.MessageDTOResponse;
 import com.ClinicaDelCalzado_BackEnd.entity.Administrator;
 import com.ClinicaDelCalzado_BackEnd.entity.Answer;
 import com.ClinicaDelCalzado_BackEnd.exceptions.BadRequestException;
-import com.ClinicaDelCalzado_BackEnd.exceptions.UnauthorizedException;
 import com.ClinicaDelCalzado_BackEnd.services.IAdminService;
 import com.ClinicaDelCalzado_BackEnd.services.IAnswerService;
 import com.ClinicaDelCalzado_BackEnd.services.IAuthService;
