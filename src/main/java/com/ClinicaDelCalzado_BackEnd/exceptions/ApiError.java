@@ -5,11 +5,11 @@ package com.ClinicaDelCalzado_BackEnd.exceptions;
  * */
 public class ApiError {
 
+    private Integer status;
+
     private String error;
 
     private String message;
-
-    private Integer status;
 
     /**
      * Creates a new instance, with empty fields.
@@ -19,14 +19,14 @@ public class ApiError {
     /**
      * Creates a new instance, with provided fields.
      *
+     * @param status HTTP Status.
      * @param error error short description.
      * @param message full error message.
-     * @param status HTTP Status.
      */
-    public ApiError(String error, String message, Integer status) {
+    public ApiError( Integer status, String error, String message) {
+        this.status = status;
         this.error = error;
         this.message = message;
-        this.status = status;
     }
 
     /**

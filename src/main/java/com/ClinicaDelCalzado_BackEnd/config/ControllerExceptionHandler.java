@@ -38,7 +38,7 @@ public class ControllerExceptionHandler {
             LOGGER.error("Internal Api error. Status Code: " + statusCode, e);
         }
 
-        ApiError apiError = new ApiError(e.getCode(), e.getDescription(), statusCode);
+        ApiError apiError = new ApiError(statusCode, e.getCode(), e.getDescription());
         return ResponseEntity.status(apiError.getStatus()).body(apiError);
     }
 
@@ -54,20 +54,20 @@ public class ControllerExceptionHandler {
         NewRelic.noticeError(e);
 
         ApiError apiError =
-                new ApiError(
-                        "internal_error", "Error interno del servidor. Por favor, inténtelo de nuevo más tarde.", HttpStatus.INTERNAL_SERVER_ERROR.value());
+                new ApiError(HttpStatus.INTERNAL_SERVER_ERROR.value(), HttpStatus.INTERNAL_SERVER_ERROR.name(),
+                        "Error interno del servidor. Por favor, inténtelo de nuevo más tarde.");
         return ResponseEntity.status(apiError.getStatus()).body(apiError);
     }
 
     @ExceptionHandler(NotFoundException.class)
     public ResponseEntity<?> notFound(NotFoundException e) {
-        ApiError error = new ApiError(HttpStatus.NOT_FOUND.name(), e.getMessage(), HttpStatus.NOT_FOUND.value());
+        ApiError error = new ApiError(HttpStatus.NOT_FOUND.value(), HttpStatus.NOT_FOUND.name(), e.getMessage());
         return new ResponseEntity<>(error, HttpStatus.NOT_FOUND);
     }
 
     @ExceptionHandler(BadCredentialsException.class)
     public ResponseEntity<?> badRequest(BadRequestException e) {
-        ApiError error = new ApiError(HttpStatus.BAD_REQUEST.name(), e.getMessage(), HttpStatus.BAD_REQUEST.value());
+        ApiError error = new ApiError(HttpStatus.BAD_REQUEST.value(), HttpStatus.BAD_REQUEST.name(), e.getMessage());
         return new ResponseEntity<>(error, HttpStatus.BAD_REQUEST);
     }
 }

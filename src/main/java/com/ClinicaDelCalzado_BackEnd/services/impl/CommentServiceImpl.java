@@ -9,6 +9,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.webjars.NotFoundException;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Service
@@ -47,6 +48,7 @@ public class CommentServiceImpl implements ICommentService {
         return save(Comment.builder()
                 .idOrderCom(WorkOrder.builder().orderNumber(orderNumber).build())
                 .adminComment(comment)
+                .creationDateComment(LocalDateTime.now())
                 .build());
     }
 }

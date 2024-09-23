@@ -4,12 +4,14 @@ import com.ClinicaDelCalzado_BackEnd.dtos.enums.OrderStatusEnum;
 import com.ClinicaDelCalzado_BackEnd.dtos.request.UpdatePaymentDTORequest;
 import com.ClinicaDelCalzado_BackEnd.dtos.request.WorkOrderDTORequest;
 import com.ClinicaDelCalzado_BackEnd.dtos.response.*;
+import com.ClinicaDelCalzado_BackEnd.exceptions.UnauthorizedException;
 import com.ClinicaDelCalzado_BackEnd.services.IWorkOrderService;
 import org.apache.commons.lang3.ObjectUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.userdetails.User;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -20,21 +22,26 @@ public class OrderController {
     private IWorkOrderService workOrderService;
 
     @PostMapping("/created")
-    public ResponseEntity<WorkOrderDTOResponse> createWorkOrder(@RequestBody WorkOrderDTORequest workOrderDTO) {
-        WorkOrderDTOResponse responseDTO = workOrderService.createWorkOrder(workOrderDTO);
+    public ResponseEntity<WorkOrderDTOResponse> createWorkOrder(@RequestBody WorkOrderDTORequest workOrderDTO, Authentication authentication) {
+        String userAuth =  getUserAuth(authentication);
+
+        WorkOrderDTOResponse responseDTO = workOrderService.createWorkOrder(workOrderDTO, Long.valueOf(userAuth));
         return new ResponseEntity<>(responseDTO, HttpStatus.CREATED);
     }
 
     @PutMapping("/cancel/{orderNumber}")
     public ResponseEntity<MessageDTOResponse> cancelWorkOrder(@PathVariable String orderNumber, Authentication authentication) {
-        MessageDTOResponse messageDTOResponse = workOrderService.updateStatusWorkOrder(orderNumber);
+        String userAuth =  getUserAuth(authentication);
+
+        MessageDTOResponse messageDTOResponse = workOrderService.updateStatusWorkOrder(orderNumber, Long.valueOf(userAuth));
         return new ResponseEntity<>(messageDTOResponse, HttpStatus.OK);
     }
 
     @PutMapping("/payment/{orderNumber}")
     public ResponseEntity<MessageDTOResponse> paymentWorkOrder(@PathVariable String orderNumber, @RequestBody UpdatePaymentDTORequest updatePaymentDTORequest, Authentication authentication) {
-        MessageDTOResponse messageDTOResponse = workOrderService.updatePaymentWorkOrder(orderNumber, updatePaymentDTORequest);
+        String userAuth =  getUserAuth(authentication);
 
+        MessageDTOResponse messageDTOResponse = workOrderService.updatePaymentWorkOrder(orderNumber, Long.valueOf(userAuth), updatePaymentDTORequest);
         return new ResponseEntity<>(messageDTOResponse, HttpStatus.OK);
     }
 
@@ -57,5 +64,12 @@ public class OrderController {
 
         OrderListDTOResponse orderListDTOResponse = workOrderService.getWorkOrderList(orderStatus, orderNumber, identification, name, phone, attendedBy);
         return new ResponseEntity<>(orderListDTOResponse, HttpStatus.OK);
+    }
+
+    private String getUserAuth(Authentication authentication) {
+        if (ObjectUtils.isEmpty(authentication.getPrincipal())){
+            throw new UnauthorizedException("La sesión ha caducado o no esta autorizado para realizar esta acción");
+        }
+        return ((User) authentication.getPrincipal()).getUsername();
     }
 }

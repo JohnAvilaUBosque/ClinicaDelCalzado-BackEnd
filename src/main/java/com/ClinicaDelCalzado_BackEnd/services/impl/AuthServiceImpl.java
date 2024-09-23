@@ -41,6 +41,14 @@ public class AuthServiceImpl implements IAuthService {
     @Override
     public AuthDTOResponse login(LoginDTO loginDTO) {
 
+        if (ObjectUtils.isEmpty(loginDTO.getIdentification())){
+            throw new BadRequestException("La identificación no puede ser vacia");
+        }
+
+        if (ObjectUtils.isEmpty(loginDTO.getPassword())){
+            throw new BadRequestException("La contraseña no puede ser vacia");
+        }
+
         Authentication authentication = authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(
                 loginDTO.getIdentification(), loginDTO.getPassword()));
 

@@ -14,7 +14,7 @@ spring:
     hibernate:
       ddl-auto: update
   #sql:
-    #init:
-      #data-locations:
-        #- classpath:load_sql/initial_queries.sql
+   # init:
+    #  data-locations:
+     #   - classpath:load_sql/initial_queries.sql
       #mode: always

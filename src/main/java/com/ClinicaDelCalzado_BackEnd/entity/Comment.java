@@ -13,6 +13,8 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.time.LocalDateTime;
+
 @Data
 @Builder
 @AllArgsConstructor
@@ -32,4 +34,8 @@ public class Comment {
 
     @Column(name = "admin_comment")
     private String adminComment;
+
+    @Column(name = "creation_date_comment", columnDefinition = "TIMESTAMP", nullable = false)
+    private LocalDateTime creationDateComment;
+
 }

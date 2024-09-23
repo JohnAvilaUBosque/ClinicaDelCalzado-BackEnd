@@ -9,9 +9,9 @@ import com.ClinicaDelCalzado_BackEnd.dtos.response.WorkOrderDTOResponse;
 
 public interface IWorkOrderService {
 
-    WorkOrderDTOResponse createWorkOrder(WorkOrderDTORequest workOrderDTORequest);
-    MessageDTOResponse updateStatusWorkOrder(String orderNumber);
-    MessageDTOResponse updatePaymentWorkOrder(String orderNumber,  UpdatePaymentDTORequest updatePaymentDTORequest);
+    WorkOrderDTOResponse createWorkOrder(WorkOrderDTORequest workOrderDTORequest, Long userAuth);
+    MessageDTOResponse updateStatusWorkOrder(String orderNumber, Long userAuth);
+    MessageDTOResponse updatePaymentWorkOrder(String orderNumber, Long userAuth,  UpdatePaymentDTORequest updatePaymentDTORequest);
     OrderByIdNumberDTOResponse getWorkOrderByOrderNumber(String orderNumber);
     OrderListDTOResponse getWorkOrderList(String orderStatus, String orderNumber, Long identification, String name, String phone, String attendedBy);
 }

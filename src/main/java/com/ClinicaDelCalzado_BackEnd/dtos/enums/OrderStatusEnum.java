@@ -12,7 +12,7 @@ import java.util.Arrays;
 public enum OrderStatusEnum {
     VALID("VALID", "VIGENTE"),
     FINISHED("FINISHED", "TERMINADA"),
-    CANCELED("CANCELED", "CANCELADA");
+    CANCELED("CANCELED", "ANULADA");
 
     final String keyName;
     final String value;

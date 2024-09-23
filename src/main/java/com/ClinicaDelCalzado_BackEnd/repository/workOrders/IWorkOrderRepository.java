@@ -24,8 +24,8 @@ public interface IWorkOrderRepository extends JpaRepository<WorkOrder, String> {
             "WHERE wo.order_status = :orderStatus " +
             "AND wo.creation_date >= DATE_SUB(NOW(), INTERVAL 3 MONTH) " +
             "GROUP BY wo.order_number, cl.id_client, cl.client_name, cl.cli_phone_number, " +
-            "wo.creation_date, wo.delivery_date, wo.order_status, wo.total_value," +
-            " wo.deposit, wo.balance, wo.payment_status, ad.id_administrator, co.id_company",
+            "wo.creation_date, wo.delivery_date, wo.order_status, wo.total_value, " +
+            "wo.deposit, wo.balance, wo.payment_status, ad.id_administrator, co.id_company",
             nativeQuery = true)
     List<Object[]> findOrdersWithServicesByStatus(@Param("orderStatus") String orderStatus);
 

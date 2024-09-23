@@ -20,6 +20,7 @@ import java.sql.Timestamp;
 import java.text.SimpleDateFormat;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
 import java.util.stream.Collectors;
@@ -28,6 +29,9 @@ import static com.ClinicaDelCalzado_BackEnd.util.Constants.*;
 
 @Service
 public class WorkOrderServiceImpl implements IWorkOrderService {
+
+    // zone from Bogota
+    private static final ZoneId zoneId = ZoneId.of("America/Bogota");
 
     private final IWorkOrderRepository workOrderRepository;
 
@@ -56,17 +60,18 @@ public class WorkOrderServiceImpl implements IWorkOrderService {
     }
 
     @Override
-    public WorkOrderDTOResponse createWorkOrder(WorkOrderDTORequest workOrderDTORequest) {
+    public WorkOrderDTOResponse createWorkOrder(WorkOrderDTORequest workOrderDTORequest, Long userAuth) {
 
         validateRequest(workOrderDTORequest);
 
         Company company = companyService.findCompanyWorkOrder(workOrderDTORequest);
         Client client = clientService.findClientWorkOrder(workOrderDTORequest);
 
-        Administrator attendedBy = adminService.findAdministratorById(workOrderDTORequest.getAttendedById())
+        Administrator attendedBy = adminService.findAdministratorById(userAuth)
                 .orElseThrow(() -> new NotFoundException(String.format("Administrator %s not found", workOrderDTORequest.getAttendedById())));
 
         double totalPriceOrder = totalPrice(workOrderDTORequest.getServices());
+        double newBalance = totalPriceOrder - workOrderDTORequest.getDownPayment();
 
         WorkOrder workOrder = saveWorkOrder(
                 WorkOrder.builder()
@@ -75,25 +80,30 @@ public class WorkOrderServiceImpl implements IWorkOrderService {
                         .creationDate(LocalDateTime.now())
                         .deliveryDate(LocalDate.parse(workOrderDTORequest.getDeliveryDate().toString()))
                         .orderStatus(OrderStatusEnum.VALID.getKeyName())
-                        .paymentStatus(totalPriceOrder == 0 ? PaymentStatusEnum.PAID.getKeyName() : PaymentStatusEnum.PENDING.getKeyName())
+                        .paymentStatus(newBalance == 0 ? PaymentStatusEnum.PAID.getKeyName() : PaymentStatusEnum.PENDING.getKeyName())
                         .attendedBy(attendedBy)
                         .idClient(client)
                         .deposit(workOrderDTORequest.getDownPayment())
                         .totalValue(totalPriceOrder)
-                        .balance(totalPriceOrder - workOrderDTORequest.getDownPayment())
+                        .balance(newBalance)
                         .build());
 
-        commentService.saveCommentOrder(workOrderDTORequest.getGeneralComment(), workOrder.getOrderNumber());
+        if (ObjectUtils.isNotEmpty(workOrderDTORequest.getGeneralComment())) {
+            commentService.saveCommentOrder(workOrderDTORequest.getGeneralComment(), workOrder.getOrderNumber());
+        }
         productService.saveServicesWorkOrder(workOrderDTORequest, workOrder);
 
         return new WorkOrderDTOResponse("Orden de trabajo creada exitosamente!", workOrder.getOrderNumber());
     }
 
     @Override
-    public MessageDTOResponse updateStatusWorkOrder(String orderNumber) {
+    public MessageDTOResponse updateStatusWorkOrder(String orderNumber, Long userAuth) {
 
         WorkOrder workOrder = validateOrderNumber(orderNumber);
         workOrder.setOrderStatus(OrderStatusEnum.CANCELED.getKeyName());
+        workOrder.setModificationDate(LocalDateTime.now());
+        workOrder.setLastModificationBy(userAuth);
+
         saveWorkOrder(workOrder);
         commentService.saveCommentOrder("Orden de trabajo cancelada", workOrder.getOrderNumber());
 
@@ -101,7 +111,7 @@ public class WorkOrderServiceImpl implements IWorkOrderService {
     }
 
     @Override
-    public MessageDTOResponse updatePaymentWorkOrder(String orderNumber, UpdatePaymentDTORequest updatePaymentDTORequest) {
+    public MessageDTOResponse updatePaymentWorkOrder(String orderNumber, Long userAuth, UpdatePaymentDTORequest updatePaymentDTORequest) {
 
         double payment = updatePaymentDTORequest.getPaymentAmount();
 
@@ -289,6 +299,7 @@ public class WorkOrderServiceImpl implements IWorkOrderService {
         String nit = workOrderDTORequest.getCompany().getNit();
         Long attended = workOrderDTORequest.getAttendedById();
         LocalDate deliveryDate = workOrderDTORequest.getDeliveryDate();
+        LocalDate today = LocalDate.now();
         Long idClient = workOrderDTORequest.getClient().getIdentification();
         List<ServicesDTO> services = workOrderDTORequest.getServices();
         String generalComment = workOrderDTORequest.getGeneralComment();
@@ -298,12 +309,12 @@ public class WorkOrderServiceImpl implements IWorkOrderService {
             throw new BadRequestException(String.format("La compañía con nit %s no esta registrada!!", nit));
         }
 
-        if (ObjectUtils.isEmpty(attended)) {
-            throw new BadRequestException("Se requiere identificación del administrador que esta atendiendo!!");
-        }
-
         if (ObjectUtils.isEmpty(deliveryDate)) {
             throw new BadRequestException("Se requiere la fecha de entrega para la orden de trabajo!!");
+        }
+
+        if (deliveryDate.isBefore(today)){
+            throw new BadRequestException("La fecha de entrega para la orden de trabajo no puede ser menor que hoy!!");
         }
 
         if (ObjectUtils.isEmpty(idClient)) {
@@ -312,10 +323,6 @@ public class WorkOrderServiceImpl implements IWorkOrderService {
 
         if (CollectionUtils.isEmpty(services)) {
             throw new BadRequestException("Se requiere el listado de servicios para la orden de trabajo!!");
-        }
-
-        if (generalComment.isEmpty()) {
-            throw new BadRequestException("Se requiere el comentario general de la orden de trabajo!!");
         }
 
         if (ObjectUtils.isEmpty(downPayment)) {

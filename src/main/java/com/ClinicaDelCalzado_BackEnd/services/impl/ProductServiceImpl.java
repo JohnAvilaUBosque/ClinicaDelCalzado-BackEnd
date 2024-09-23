@@ -39,6 +39,7 @@ public class ProductServiceImpl implements IProductService {
 
         return servicesList.stream()
                 .map(serv -> ServicesDTO.builder()
+                        .id(serv.getIdService())
                         .name(serv.getService())
                         .price(serv.getUnitValue().longValue())
                         .serviceStatus(ServicesStatusEnum.getValue(serv.getServiceStatus()))
@@ -58,7 +59,7 @@ public class ProductServiceImpl implements IProductService {
                             .serviceStatus(ServicesStatusEnum.RECEIVED.getKeyName())
                             .build();
                     save(service);
-                    return new ServicesDTO(service.getService(), service.getUnitValue().longValue(), service.getServiceStatus());
+                    return new ServicesDTO(service.getIdService(), service.getService(), service.getUnitValue().longValue(), service.getServiceStatus());
                 }).collect(Collectors.toList());
     }
 }

@@ -12,6 +12,7 @@ import lombok.*;
 @JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
 public class ServicesDTO {
 
+    private Integer id;
     private String name;
     private Long price;
     private String serviceStatus;

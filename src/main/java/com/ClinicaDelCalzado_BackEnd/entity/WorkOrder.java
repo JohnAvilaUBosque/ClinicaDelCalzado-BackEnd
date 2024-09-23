@@ -33,10 +33,13 @@ public class WorkOrder {
     @JoinColumn(name = "id_company")
     private Company idCompany;
 
-    @Column(name = "creation_date", nullable = false)
+    @Column(name = "creation_date", columnDefinition = "TIMESTAMP", nullable = false)
     private LocalDateTime creationDate;
 
-    @Column(name = "delivery_date")
+    @Column(name = "modification_date", columnDefinition = "TIMESTAMP")
+    private LocalDateTime modificationDate;
+
+    @Column(name = "delivery_date", columnDefinition = "DATE")
     private LocalDate deliveryDate;
 
     @Column(name = "order_status", length = 10)
@@ -48,6 +51,9 @@ public class WorkOrder {
     @ManyToOne
     @JoinColumn(name = "attended_by")
     private Administrator attendedBy;
+
+    @Column(name = "last_modification_by")
+    private Long lastModificationBy;
 
     @ManyToOne
     @JoinColumn(name = "id_client")
