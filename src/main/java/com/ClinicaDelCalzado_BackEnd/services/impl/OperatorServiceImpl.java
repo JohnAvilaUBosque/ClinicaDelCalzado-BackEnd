@@ -1,5 +1,6 @@
 package com.ClinicaDelCalzado_BackEnd.services.impl;
 
+import com.ClinicaDelCalzado_BackEnd.dtos.enums.OperatorStatusEnum;
 import com.ClinicaDelCalzado_BackEnd.dtos.operator.OperatorDTO;
 import com.ClinicaDelCalzado_BackEnd.dtos.request.OperatorDTORequest;
 import com.ClinicaDelCalzado_BackEnd.dtos.request.UpdateOperatorDTORequest;
@@ -16,6 +17,7 @@ import org.springframework.stereotype.Service;
 import org.webjars.NotFoundException;
 
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 
 @Service
@@ -42,7 +44,9 @@ public class OperatorServiceImpl implements IOperatorService {
         Operator operator = buildOperator(
                 operatorId,
                 operatorDTORequest.getOperatorName(),
-                operatorDTORequest.getOpePhoneNumber());
+                operatorDTORequest.getOpePhoneNumber(),
+                OperatorStatusEnum.ACTIVE
+        );
 
         saveOperator(operator);
 
@@ -50,8 +54,16 @@ public class OperatorServiceImpl implements IOperatorService {
     }
 
     @Override
-    public OperatorDTOResponse update(Long operatorId, UpdateOperatorDTORequest operatorDTORequest) {
-        return null;
+    public OperatorDTOResponse update(Long operatorId, UpdateOperatorDTORequest operatorDTO) {
+        validateInputData(OperatorDTORequest.builder()
+                .idOperator(operatorId)
+                .build(), false);
+
+        Operator operator = matchDifferencesOpe(validateOperatorIdExists(operatorId), operatorDTO);
+
+        saveOperator(operator);
+
+        return operatorDTOResponse("Operador actualizado exitosamente.", operator);
     }
 
     @Override
@@ -60,7 +72,11 @@ public class OperatorServiceImpl implements IOperatorService {
 
         OperatorListDTOResponse operatorListDTOResponse = new OperatorListDTOResponse();
         operatorListDTOResponse.setOperators(operatorList.stream().map(p ->
-                new OperatorDTO(p.getIdOperator(), p.getOperatorName(), p.getOpePhoneNumber())).toList());
+                new OperatorDTO(p.getIdOperator(),
+                        p.getOperatorName(),
+                        p.getOpePhoneNumber(),
+                        OperatorStatusEnum.getValue(p.getStatusOperator())
+                )).toList());
 
         return operatorListDTOResponse;
     }
@@ -78,7 +94,12 @@ public class OperatorServiceImpl implements IOperatorService {
 
         operatorDTOResponse.setMessage("Detalles del operador recuperados exitosamente.");
         operatorDTOResponse.setOperator(operator.map(p ->
-                new OperatorDTO(p.getIdOperator(), p.getOperatorName(), p.getOpePhoneNumber())).get());
+                new OperatorDTO(
+                        p.getIdOperator(),
+                        p.getOperatorName(),
+                        p.getOpePhoneNumber(),
+                        OperatorStatusEnum.getValue(p.getStatusOperator())
+                )).get());
 
         return operatorDTOResponse;
     }
@@ -98,11 +119,12 @@ public class OperatorServiceImpl implements IOperatorService {
         }
     }
 
-    private Operator buildOperator(Long operatorId, String operatorName, String opePhoneNumber) {
+    private Operator buildOperator(Long operatorId, String operatorName, String opePhoneNumber, OperatorStatusEnum operatorStatusEnum) {
         return Operator.builder()
                 .idOperator(operatorId)
                 .operatorName(operatorName)
                 .opePhoneNumber(opePhoneNumber)
+                .statusOperator(operatorStatusEnum.getKeyName())
                 .build();
     }
 
@@ -138,5 +160,20 @@ public class OperatorServiceImpl implements IOperatorService {
         if (ObjectUtils.isEmpty(operatorDTO.getOpePhoneNumber()) && validateAllFields) {
             throw new BadRequestException("El número de teléfono es un campo obligatorio, no puede ser vacío");
         }
+    }
+
+    private Operator matchDifferencesOpe(Operator currentDataOpe, UpdateOperatorDTORequest newDataOpe) {
+        return buildOperator(
+                currentDataOpe.getIdOperator(),
+                ObjectUtils.isEmpty(newDataOpe.getOperatorName()) || Objects.equals(currentDataOpe.getOperatorName(), newDataOpe.getOperatorName()) ?
+                        currentDataOpe.getOperatorName() :
+                        newDataOpe.getOperatorName(),
+                ObjectUtils.isEmpty(newDataOpe.getOpePhoneNumber()) || Objects.equals(currentDataOpe.getOpePhoneNumber(), newDataOpe.getOpePhoneNumber()) ?
+                        currentDataOpe.getOpePhoneNumber() :
+                        newDataOpe.getOpePhoneNumber(),
+                ObjectUtils.isEmpty(newDataOpe.getOperatorStatus()) || Objects.equals(currentDataOpe.getStatusOperator(), OperatorStatusEnum.getName(newDataOpe.getOperatorStatus())) ?
+                        OperatorStatusEnum.valueOf(currentDataOpe.getStatusOperator()) :
+                        OperatorStatusEnum.valueOf(newDataOpe.getOperatorStatus())
+        );
     }
 }

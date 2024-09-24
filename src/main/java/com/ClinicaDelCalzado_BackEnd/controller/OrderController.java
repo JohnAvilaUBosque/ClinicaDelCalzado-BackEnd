@@ -24,7 +24,7 @@ public class OrderController {
 
     @PostMapping("/created")
     public ResponseEntity<WorkOrderDTOResponse> createWorkOrder(@RequestBody WorkOrderDTORequest workOrderDTO, Authentication authentication) {
-        String userAuth =  getUserAuth(authentication);
+        String userAuth = getUserAuth(authentication);
 
         WorkOrderDTOResponse responseDTO = workOrderService.createWorkOrder(workOrderDTO, Long.valueOf(userAuth));
         return new ResponseEntity<>(responseDTO, HttpStatus.CREATED);
@@ -32,7 +32,7 @@ public class OrderController {
 
     @PutMapping("/cancel/{orderNumber}")
     public ResponseEntity<MessageDTOResponse> cancelWorkOrder(@PathVariable String orderNumber, Authentication authentication) {
-        String userAuth =  getUserAuth(authentication);
+        String userAuth = getUserAuth(authentication);
 
         MessageDTOResponse messageDTOResponse = workOrderService.updateStatusWorkOrder(orderNumber, Long.valueOf(userAuth));
         return new ResponseEntity<>(messageDTOResponse, HttpStatus.OK);
@@ -40,22 +40,22 @@ public class OrderController {
 
     @PutMapping("/payment/{orderNumber}")
     public ResponseEntity<MessageDTOResponse> paymentWorkOrder(@PathVariable String orderNumber, @RequestBody UpdatePaymentDTORequest updatePaymentDTORequest, Authentication authentication) {
-        String userAuth =  getUserAuth(authentication);
+        String userAuth = getUserAuth(authentication);
 
         MessageDTOResponse messageDTOResponse = workOrderService.updatePaymentWorkOrder(orderNumber, Long.valueOf(userAuth), updatePaymentDTORequest);
         return new ResponseEntity<>(messageDTOResponse, HttpStatus.OK);
     }
 
-    @PutMapping("/comment/{orderNumber}")
-    public ResponseEntity<MessageDTOResponse> addCommentWorkOrder(@PathVariable String orderNumber, @RequestBody AddCommentDTORequest addCommentDTORequest, Authentication authentication) {
-        String userAuth =  getUserAuth(authentication);
+    @PutMapping({"/comment/{orderNumber}", "/comment"})
+    public ResponseEntity<MessageDTOResponse> addCommentWorkOrder(@PathVariable(value = "orderNumber", required = false) String orderNumber, @RequestBody AddCommentDTORequest addCommentDTORequest, Authentication authentication) {
+        String userAuth = getUserAuth(authentication);
 
         MessageDTOResponse messageDTOResponse = workOrderService.addCommentWorkOrder(orderNumber, Long.valueOf(userAuth), addCommentDTORequest);
         return new ResponseEntity<>(messageDTOResponse, HttpStatus.OK);
     }
 
     @GetMapping("/{orderNumber}")
-    public ResponseEntity<OrderByIdNumberDTOResponse> getWorkOrderByOrderNumber(@PathVariable String orderNumber, Authentication authentication) {
+    public ResponseEntity<OrderByIdNumberDTOResponse> getWorkOrderByOrderNumber(@PathVariable(value = "orderNumber", required = false) String orderNumber, Authentication authentication) {
         OrderByIdNumberDTOResponse orderByIdNumberDTOResponse = workOrderService.getWorkOrderByOrderNumber(orderNumber);
         return new ResponseEntity<>(orderByIdNumberDTOResponse, HttpStatus.OK);
     }
@@ -76,7 +76,7 @@ public class OrderController {
     }
 
     private String getUserAuth(Authentication authentication) {
-        if (ObjectUtils.isEmpty(authentication.getPrincipal())){
+        if (ObjectUtils.isEmpty(authentication.getPrincipal())) {
             throw new UnauthorizedException("La sesión ha caducado o no esta autorizado para realizar esta acción");
         }
         return ((User) authentication.getPrincipal()).getUsername();

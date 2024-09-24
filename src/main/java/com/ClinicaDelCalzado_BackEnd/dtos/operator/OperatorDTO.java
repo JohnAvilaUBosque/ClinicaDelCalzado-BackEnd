@@ -15,5 +15,6 @@ public class OperatorDTO {
     private Long idOperator;
     private String operatorName;
     private String opePhoneNumber;
+    private String statusOperator;
 
 }

@@ -24,6 +24,9 @@ public class Operator {
     @Column(name = "ope_phone_number", length = 20)
     private String opePhoneNumber;
 
+    @Column(name = "status_operator")
+    private String statusOperator;
+
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "idOperator")
     private List<ServicesEntity> servicesOpeList;
 }

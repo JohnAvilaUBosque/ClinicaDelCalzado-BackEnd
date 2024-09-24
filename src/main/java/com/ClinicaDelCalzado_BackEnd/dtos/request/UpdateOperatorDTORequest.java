@@ -14,4 +14,5 @@ public class UpdateOperatorDTORequest {
 
     private String operatorName;
     private String opePhoneNumber;
+    private String operatorStatus;
 }
