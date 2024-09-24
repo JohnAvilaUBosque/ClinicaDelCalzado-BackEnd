@@ -1,7 +1,6 @@
 package com.ClinicaDelCalzado_BackEnd.repository.workOrders;
 
 import com.ClinicaDelCalzado_BackEnd.entity.Comment;
-import com.ClinicaDelCalzado_BackEnd.entity.ServicesEnt;
 import com.ClinicaDelCalzado_BackEnd.exceptions.RepositoryException;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;

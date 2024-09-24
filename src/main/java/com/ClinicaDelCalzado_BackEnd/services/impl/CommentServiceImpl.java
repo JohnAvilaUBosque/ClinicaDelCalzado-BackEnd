@@ -7,9 +7,9 @@ import com.ClinicaDelCalzado_BackEnd.repository.workOrders.ICommentRepository;
 import com.ClinicaDelCalzado_BackEnd.services.ICommentService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import org.webjars.NotFoundException;
 
 import java.time.LocalDateTime;
+import java.util.Collections;
 import java.util.List;
 
 @Service
@@ -32,7 +32,7 @@ public class CommentServiceImpl implements ICommentService {
         List<Comment> commentList = commentRepository.findCommentByWorkOrder(orderNumber);
 
         if (commentList.isEmpty()) {
-            throw new NotFoundException(String.format("No cuenta con comentarios para la orden %s!!", orderNumber));
+            return Collections.emptyList();
         }
 
         return commentList.stream()

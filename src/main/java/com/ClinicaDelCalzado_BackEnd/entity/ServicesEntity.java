@@ -1,6 +1,5 @@
 package com.ClinicaDelCalzado_BackEnd.entity;
 
-import com.ClinicaDelCalzado_BackEnd.dtos.enums.ServicesStatusEnum;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -20,7 +19,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @Entity
 @Table(name = "service")
-public class ServicesEnt {
+public class ServicesEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -39,4 +38,8 @@ public class ServicesEnt {
 
     @Column(name = "unit_value")
     private Double unitValue;
+
+    @ManyToOne
+    @JoinColumn(name = "id_operator")
+    private Operator idOperator;
 }

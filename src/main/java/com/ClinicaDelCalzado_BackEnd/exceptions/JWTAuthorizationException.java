@@ -18,14 +18,26 @@ public class JWTAuthorizationException implements AuthenticationEntryPoint {
     @Override
     public void commence(HttpServletRequest request, HttpServletResponse response, AuthenticationException authException) throws IOException, ServletException {
 
+        String message = authException.getMessage();
+        Integer status = httpStatusUnauthorized.value();
+        String statusName = httpStatusUnauthorized.name();
+
+        if (message.equalsIgnoreCase("Full authentication is required to access this resource")) {
+            status = HttpStatus.FORBIDDEN.value();
+            statusName = HttpStatus.FORBIDDEN.name();
+            message = "No tiene permiso para realizar esta acción, contacte al administrador principal";
+        } else if (message.equalsIgnoreCase("Bad credentials")) {
+            message = "Credenciales invalidas, intente nuevamente!!";
+        }
+
         response.setContentType("application/json");
         response.setCharacterEncoding("UTF-8");
-        response.setStatus(httpStatusUnauthorized.value());
+        response.setStatus(status);
         String jsonResponse = String.format(
                 "{\"status\": %d,\"error\": \"%s\", \"message\": \"%s\"}",
-                httpStatusUnauthorized.value(),
-                httpStatusUnauthorized.name(),
-                authException.getMessage()
+                status,
+                statusName,
+                message
         );
 
         response.getWriter().write(jsonResponse);

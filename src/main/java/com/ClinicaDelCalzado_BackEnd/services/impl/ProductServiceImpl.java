@@ -3,7 +3,7 @@ package com.ClinicaDelCalzado_BackEnd.services.impl;
 import com.ClinicaDelCalzado_BackEnd.dtos.enums.ServicesStatusEnum;
 import com.ClinicaDelCalzado_BackEnd.dtos.request.WorkOrderDTORequest;
 import com.ClinicaDelCalzado_BackEnd.dtos.workOrders.ServicesDTO;
-import com.ClinicaDelCalzado_BackEnd.entity.ServicesEnt;
+import com.ClinicaDelCalzado_BackEnd.entity.ServicesEntity;
 import com.ClinicaDelCalzado_BackEnd.entity.WorkOrder;
 import com.ClinicaDelCalzado_BackEnd.repository.workOrders.IServicesRepository;
 import com.ClinicaDelCalzado_BackEnd.services.IProductService;
@@ -25,13 +25,13 @@ public class ProductServiceImpl implements IProductService {
     }
 
     @Override
-    public ServicesEnt save(ServicesEnt services) {
+    public ServicesEntity save(ServicesEntity services) {
         return servicesRepository.save(services);
     }
 
     @Override
     public List<ServicesDTO> getServicesOrder(String orderNumber) {
-        List<ServicesEnt> servicesList = servicesRepository.findByWorkOrder(orderNumber);
+        List<ServicesEntity> servicesList = servicesRepository.findByWorkOrder(orderNumber);
 
         if (servicesList.isEmpty()) {
             throw new NotFoundException(String.format("La orden %s no esta registrada!!", orderNumber));
@@ -52,7 +52,7 @@ public class ProductServiceImpl implements IProductService {
 
         return workOrderDTORequest.getServices().stream()
                 .map(serviceDTO -> {
-                    ServicesEnt service = ServicesEnt.builder()
+                    ServicesEntity service = ServicesEntity.builder()
                             .idOrderSer(orderNumber)
                             .service(serviceDTO.getName())
                             .unitValue(serviceDTO.getPrice().doubleValue())

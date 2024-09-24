@@ -113,9 +113,13 @@ public class WorkOrderServiceImpl implements IWorkOrderService {
     @Override
     public MessageDTOResponse updatePaymentWorkOrder(String orderNumber, Long userAuth, UpdatePaymentDTORequest updatePaymentDTORequest) {
 
-        double payment = updatePaymentDTORequest.getPaymentAmount();
+        if (ObjectUtils.isEmpty(updatePaymentDTORequest.getPaymentAmount())) {
+            throw new BadRequestException("El abono no puede estar vacio!!");
+        }
 
+        double payment = updatePaymentDTORequest.getPaymentAmount();
         WorkOrder workOrder = validateOrderNumber(orderNumber);
+
         if (payment == 0){
             throw new BadRequestException("El abono no puede ser cero!!");
         }

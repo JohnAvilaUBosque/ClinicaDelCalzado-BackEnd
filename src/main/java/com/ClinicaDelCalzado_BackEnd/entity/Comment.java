@@ -38,4 +38,8 @@ public class Comment {
     @Column(name = "creation_date_comment", columnDefinition = "TIMESTAMP", nullable = false)
     private LocalDateTime creationDateComment;
 
+    @ManyToOne
+    @JoinColumn(name = "comment_by")
+    private Administrator commentBy;
+
 }

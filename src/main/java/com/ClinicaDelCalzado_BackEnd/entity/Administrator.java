@@ -48,4 +48,7 @@ public class Administrator {
 
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "attendedBy")
     private List<WorkOrder> workOrdersList;
+
+    @OneToMany(cascade = CascadeType.ALL, mappedBy = "commentBy")
+    private List<Comment> commentList;
 }
