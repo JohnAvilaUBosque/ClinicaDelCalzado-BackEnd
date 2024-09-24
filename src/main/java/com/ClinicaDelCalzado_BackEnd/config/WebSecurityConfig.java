@@ -59,6 +59,7 @@ public class WebSecurityConfig {
                         .requestMatchers(HttpMethod.POST,"/api/v1/work-orders/**").permitAll()
                         .requestMatchers(HttpMethod.PUT,"/api/v1/work-orders/cancel/{orderNumber}").hasAnyAuthority(AdminTypeEnum.PRINCIPAL.getKeyName())
                         .requestMatchers(HttpMethod.PUT,"/api/v1/work-orders/payment/{orderNumber}").hasAnyAuthority(AdminTypeEnum.PRINCIPAL.getKeyName(), AdminTypeEnum.SECONDARY.getKeyName())
+                        .requestMatchers(HttpMethod.PUT,"/api/v1/work-orders/comment/{orderNumber}").hasAnyAuthority(AdminTypeEnum.PRINCIPAL.getKeyName(), AdminTypeEnum.SECONDARY.getKeyName())
                         .requestMatchers(HttpMethod.GET, "/api/v1/company/**").permitAll()
                         .requestMatchers(HttpMethod.GET,"/api/v1/work-orders/**").hasAnyAuthority(AdminTypeEnum.PRINCIPAL.getKeyName(), AdminTypeEnum.SECONDARY.getKeyName())
                         .anyRequest().authenticated())

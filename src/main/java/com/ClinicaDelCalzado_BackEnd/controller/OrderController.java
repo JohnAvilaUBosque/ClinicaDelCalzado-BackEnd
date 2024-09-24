@@ -1,6 +1,7 @@
 package com.ClinicaDelCalzado_BackEnd.controller;
 
 import com.ClinicaDelCalzado_BackEnd.dtos.enums.OrderStatusEnum;
+import com.ClinicaDelCalzado_BackEnd.dtos.request.AddCommentDTORequest;
 import com.ClinicaDelCalzado_BackEnd.dtos.request.UpdatePaymentDTORequest;
 import com.ClinicaDelCalzado_BackEnd.dtos.request.WorkOrderDTORequest;
 import com.ClinicaDelCalzado_BackEnd.dtos.response.*;
@@ -42,6 +43,14 @@ public class OrderController {
         String userAuth =  getUserAuth(authentication);
 
         MessageDTOResponse messageDTOResponse = workOrderService.updatePaymentWorkOrder(orderNumber, Long.valueOf(userAuth), updatePaymentDTORequest);
+        return new ResponseEntity<>(messageDTOResponse, HttpStatus.OK);
+    }
+
+    @PutMapping("/comment/{orderNumber}")
+    public ResponseEntity<MessageDTOResponse> addCommentWorkOrder(@PathVariable String orderNumber, @RequestBody AddCommentDTORequest addCommentDTORequest, Authentication authentication) {
+        String userAuth =  getUserAuth(authentication);
+
+        MessageDTOResponse messageDTOResponse = workOrderService.addCommentWorkOrder(orderNumber, Long.valueOf(userAuth), addCommentDTORequest);
         return new ResponseEntity<>(messageDTOResponse, HttpStatus.OK);
     }
 

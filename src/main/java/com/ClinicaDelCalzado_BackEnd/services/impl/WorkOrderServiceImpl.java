@@ -2,6 +2,7 @@ package com.ClinicaDelCalzado_BackEnd.services.impl;
 
 import com.ClinicaDelCalzado_BackEnd.dtos.enums.OrderStatusEnum;
 import com.ClinicaDelCalzado_BackEnd.dtos.enums.PaymentStatusEnum;
+import com.ClinicaDelCalzado_BackEnd.dtos.request.AddCommentDTORequest;
 import com.ClinicaDelCalzado_BackEnd.dtos.request.UpdatePaymentDTORequest;
 import com.ClinicaDelCalzado_BackEnd.dtos.request.WorkOrderDTORequest;
 import com.ClinicaDelCalzado_BackEnd.dtos.response.*;
@@ -89,7 +90,7 @@ public class WorkOrderServiceImpl implements IWorkOrderService {
                         .build());
 
         if (ObjectUtils.isNotEmpty(workOrderDTORequest.getGeneralComment())) {
-            commentService.saveCommentOrder(workOrderDTORequest.getGeneralComment(), workOrder.getOrderNumber());
+            commentService.saveCommentOrder(workOrderDTORequest.getGeneralComment(), workOrder.getOrderNumber(), userAuth);
         }
         productService.saveServicesWorkOrder(workOrderDTORequest, workOrder);
 
@@ -100,12 +101,17 @@ public class WorkOrderServiceImpl implements IWorkOrderService {
     public MessageDTOResponse updateStatusWorkOrder(String orderNumber, Long userAuth) {
 
         WorkOrder workOrder = validateOrderNumber(orderNumber);
+        if (workOrder.getPaymentStatus().equals(PaymentStatusEnum.PAID.getKeyName())) {
+            throw new BadRequestException(String.format("La orden de trabajo no puede ser anulada porque esta en estado %s!!",
+                    PaymentStatusEnum.getValue(workOrder.getPaymentStatus())));
+        }
+
         workOrder.setOrderStatus(OrderStatusEnum.CANCELED.getKeyName());
         workOrder.setModificationDate(LocalDateTime.now());
         workOrder.setLastModificationBy(userAuth);
 
         saveWorkOrder(workOrder);
-        commentService.saveCommentOrder("Orden de trabajo cancelada", workOrder.getOrderNumber());
+        commentService.saveCommentOrder("Orden de trabajo cancelada", workOrder.getOrderNumber(), userAuth);
 
         return MessageDTOResponse.builder().message("Orden de trabajo cancelada con éxito.").build();
     }
@@ -142,11 +148,11 @@ public class WorkOrderServiceImpl implements IWorkOrderService {
         }
 
         String commentPayment = String.format("Abono de $%.0f realizado exitosamente y cuenta con un saldo pendiente de $%.0f", payment, newBalance);
-        commentService.saveCommentOrder(commentPayment, workOrder.getOrderNumber());
+        commentService.saveCommentOrder(commentPayment, workOrder.getOrderNumber(), userAuth);
 
         if (newBalance == 0) {
             workOrder.setPaymentStatus(PaymentStatusEnum.PAID.getKeyName());
-            commentService.saveCommentOrder("Orden de trabajo pagada", workOrder.getOrderNumber());
+            commentService.saveCommentOrder("Orden de trabajo pagada", workOrder.getOrderNumber(), userAuth);
         }
 
         workOrder.setDeposit(newDeposit);
@@ -154,6 +160,19 @@ public class WorkOrderServiceImpl implements IWorkOrderService {
         saveWorkOrder(workOrder);
 
         return MessageDTOResponse.builder().message(commentPayment).build();
+    }
+
+    @Override
+    public MessageDTOResponse addCommentWorkOrder(String orderNumber, Long userAuth, AddCommentDTORequest addCommentDTORequest) {
+
+        WorkOrder workOrder = validateOrderNumber(orderNumber);
+        if (ObjectUtils.isEmpty(addCommentDTORequest.getComment())) {
+            throw new BadRequestException("El comentario no puede ser vacio!!");
+        }
+
+        commentService.saveCommentOrder(addCommentDTORequest.getComment(), workOrder.getOrderNumber(), userAuth);
+
+        return MessageDTOResponse.builder().message("Comentario añadido exitosamente a la orden de trabajo.").build();
     }
 
     @Override
@@ -291,7 +310,7 @@ public class WorkOrderServiceImpl implements IWorkOrderService {
     }
 
     private WorkOrder validateOrderNumber(String orderNumber) {
-        if (orderNumber.isEmpty()) {
+        if (ObjectUtils.isEmpty(orderNumber)) {
             throw new BadRequestException(String.format("La orden %s no esta registrada!!", orderNumber));
         }
 

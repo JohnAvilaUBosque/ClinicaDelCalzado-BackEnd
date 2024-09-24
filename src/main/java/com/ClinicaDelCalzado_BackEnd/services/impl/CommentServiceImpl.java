@@ -1,6 +1,7 @@
 package com.ClinicaDelCalzado_BackEnd.services.impl;
 
 import com.ClinicaDelCalzado_BackEnd.dtos.workOrders.CommentDTO;
+import com.ClinicaDelCalzado_BackEnd.entity.Administrator;
 import com.ClinicaDelCalzado_BackEnd.entity.Comment;
 import com.ClinicaDelCalzado_BackEnd.entity.WorkOrder;
 import com.ClinicaDelCalzado_BackEnd.repository.workOrders.ICommentRepository;
@@ -44,11 +45,12 @@ public class CommentServiceImpl implements ICommentService {
     }
 
     @Override
-    public Comment saveCommentOrder(String comment, String orderNumber) {
+    public Comment saveCommentOrder(String comment, String orderNumber, Long userAuth) {
         return save(Comment.builder()
                 .idOrderCom(WorkOrder.builder().orderNumber(orderNumber).build())
                 .adminComment(comment)
                 .creationDateComment(LocalDateTime.now())
+                .commentBy(Administrator.builder().idAdministrator(userAuth).build())
                 .build());
     }
 }
