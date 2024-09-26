@@ -1,5 +1,6 @@
 package com.ClinicaDelCalzado_BackEnd.services.impl;
 
+import com.ClinicaDelCalzado_BackEnd.dtos.enums.AdminStatusEnum;
 import com.ClinicaDelCalzado_BackEnd.dtos.login.LoginDTO;
 import com.ClinicaDelCalzado_BackEnd.dtos.questions.AnswerDTO;
 import com.ClinicaDelCalzado_BackEnd.dtos.request.PasswordRecoveryDTORequest;
@@ -8,6 +9,7 @@ import com.ClinicaDelCalzado_BackEnd.dtos.response.MessageDTOResponse;
 import com.ClinicaDelCalzado_BackEnd.entity.Administrator;
 import com.ClinicaDelCalzado_BackEnd.entity.Answer;
 import com.ClinicaDelCalzado_BackEnd.exceptions.BadRequestException;
+import com.ClinicaDelCalzado_BackEnd.exceptions.UnauthorizedException;
 import com.ClinicaDelCalzado_BackEnd.services.IAdminService;
 import com.ClinicaDelCalzado_BackEnd.services.IAnswerService;
 import com.ClinicaDelCalzado_BackEnd.services.IAuthService;
@@ -40,6 +42,12 @@ public class AuthServiceImpl implements IAuthService {
 
     @Override
     public AuthDTOResponse login(LoginDTO loginDTO) {
+
+        Administrator administrator = adminService.validateAdminIdExists(loginDTO.getIdentification());
+
+        if (administrator.getAdminStatus().equalsIgnoreCase(AdminStatusEnum.INACTIVE.getKeyName())) {
+            throw new UnauthorizedException("Credenciales invalidas, contacte al administrador principal!");
+        }
 
         if (ObjectUtils.isEmpty(loginDTO.getIdentification())){
             throw new BadRequestException("La identificación no puede ser vacia.");
