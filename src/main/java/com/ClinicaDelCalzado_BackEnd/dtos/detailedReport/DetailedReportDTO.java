@@ -16,12 +16,12 @@ import java.time.LocalDateTime;
 @JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
 public class DetailedReportDTO {
 
-    private LocalDateTime creationDate;
+    private String creationDate;
     private String orderNumber;
     private Double totalServicesValue;
     private Double totalDeposits;
     private Double totalBalance;
-    private Integer servicesReceived;
-    private Integer servicesCompleted;
-    private Integer servicesDispatched;
+    private Long servicesReceived;
+    private Long servicesCompleted;
+    private Long servicesDispatched;
 }

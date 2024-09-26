@@ -7,6 +7,7 @@ import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import java.time.LocalDateTime;
+import java.util.Date;
 import java.util.List;
 
 @Repository
@@ -65,7 +66,7 @@ public interface IWorkOrderRepository extends JpaRepository<WorkOrder, String> {
             "AND (wo.creation_date <= :endDate OR :endDate IS NULL) " +
             "GROUP BY wo.order_number, wo.creation_date, wo.total_value, wo.deposit, wo.balance", nativeQuery = true)
     List<Object[]> findWorkOrdersWithServices(
-            @Param("orderStatus") List<String> orderStatus,
+            @Param("orderStatus") String orderStatus,
             @Param("startDate") LocalDateTime startDate,
             @Param("endDate") LocalDateTime endDate);
 }
