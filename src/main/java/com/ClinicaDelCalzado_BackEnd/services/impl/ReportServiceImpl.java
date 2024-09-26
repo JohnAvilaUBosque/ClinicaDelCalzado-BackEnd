@@ -12,8 +12,6 @@ import org.springframework.stereotype.Service;
 import java.sql.Timestamp;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
-import java.util.Arrays;
-import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -55,9 +53,8 @@ public class ReportServiceImpl implements IReportService {
 
         // Convertir a DetailedReportDTOResponse con conteo de servicios
         detailedReportDTOResponse.setOrders(
-                ordersGroupedByOrderNumber.entrySet().stream()
-                        .map(entry -> {
-                            List<Object[]> groupedOrders = entry.getValue();
+                ordersGroupedByOrderNumber.values().stream()
+                        .map(groupedOrders -> {
 
                             // Obtener la primera orden para extraer los datos comunes
                             Object[] firstOrderRow = groupedOrders.get(0);
