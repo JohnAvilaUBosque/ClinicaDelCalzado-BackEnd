@@ -66,7 +66,7 @@ public interface IWorkOrderRepository extends JpaRepository<WorkOrder, String> {
             "AND (wo.creation_date <= :endDate OR :endDate IS NULL) " +
             "GROUP BY wo.order_number, wo.creation_date, wo.total_value, wo.deposit, wo.balance", nativeQuery = true)
     List<Object[]> findWorkOrdersWithServices(
-            @Param("orderStatus") String orderStatus,
+            @Param("orderStatus") String[] orderStatus,
             @Param("startDate") LocalDateTime startDate,
             @Param("endDate") LocalDateTime endDate);
 }

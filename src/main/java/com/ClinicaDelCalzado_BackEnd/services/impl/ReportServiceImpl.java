@@ -35,7 +35,7 @@ public class ReportServiceImpl implements IReportService {
         String[] orderStatusSplit = orderStatusSeparated.split(",\\s*");
 
         if (!ObjectUtils.isEmpty(orderStatusSplit) || !ObjectUtils.isEmpty(startDate) || !ObjectUtils.isEmpty(endDate)) {
-            List<Object[]> workOrderList = workOrderRepository.findWorkOrdersWithServices(Collections.singletonList(orderStatusSplit).toString(), startDate, endDate);
+            List<Object[]> workOrderList = workOrderRepository.findWorkOrdersWithServices(orderStatusSplit, startDate, endDate);
 
             return getReportOrderList(workOrderList);
         } else {
@@ -80,9 +80,9 @@ public class ReportServiceImpl implements IReportService {
                             return DetailedReportDTO.builder()
                                     .orderNumber(orderNumber)
                                     .creationDate(creationDate.toLocalDateTime().format(DateTimeFormatter.ofPattern("dd-MM-yyyy HH:mm")))
-                                    .totalServicesValue(totalServicesValue)
-                                    .totalDeposits(totalDeposits)
-                                    .totalBalance(totalBalance)
+                                    .totalServicesValue((long) totalServicesValue)
+                                    .totalDeposits((long) totalDeposits)
+                                    .totalBalance((long) totalBalance)
                                     .servicesReceived(servicesReceived)
                                     .servicesCompleted(servicesCompleted)
                                     .servicesDispatched(servicesDispatched)
