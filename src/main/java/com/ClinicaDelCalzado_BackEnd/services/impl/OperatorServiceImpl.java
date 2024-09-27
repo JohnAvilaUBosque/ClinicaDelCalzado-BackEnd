@@ -45,7 +45,7 @@ public class OperatorServiceImpl implements IOperatorService {
                 operatorId,
                 operatorDTORequest.getOperatorName(),
                 operatorDTORequest.getOpePhoneNumber(),
-                OperatorStatusEnum.ACTIVE
+                OperatorStatusEnum.ACTIVE.getValue()
         );
 
         saveOperator(operator);
@@ -119,12 +119,12 @@ public class OperatorServiceImpl implements IOperatorService {
         }
     }
 
-    private Operator buildOperator(Long operatorId, String operatorName, String opePhoneNumber, OperatorStatusEnum operatorStatusEnum) {
+    private Operator buildOperator(Long operatorId, String operatorName, String opePhoneNumber, String operatorStatus) {
         return Operator.builder()
                 .idOperator(operatorId)
                 .operatorName(operatorName)
                 .opePhoneNumber(opePhoneNumber)
-                .statusOperator(operatorStatusEnum.getKeyName())
+                .statusOperator(OperatorStatusEnum.getName(operatorStatus))
                 .build();
     }
 
@@ -135,6 +135,7 @@ public class OperatorServiceImpl implements IOperatorService {
                         .idOperator(operator.getIdOperator())
                         .operatorName(operator.getOperatorName())
                         .opePhoneNumber(operator.getOpePhoneNumber())
+                        .statusOperator(OperatorStatusEnum.getValue(operator.getStatusOperator()))
                         .build())
                 .build();
     }
@@ -172,8 +173,8 @@ public class OperatorServiceImpl implements IOperatorService {
                         currentDataOpe.getOpePhoneNumber() :
                         newDataOpe.getOpePhoneNumber(),
                 ObjectUtils.isEmpty(newDataOpe.getOperatorStatus()) || Objects.equals(currentDataOpe.getStatusOperator(), OperatorStatusEnum.getName(newDataOpe.getOperatorStatus())) ?
-                        OperatorStatusEnum.valueOf(currentDataOpe.getStatusOperator()) :
-                        OperatorStatusEnum.valueOf(newDataOpe.getOperatorStatus())
+                        currentDataOpe.getStatusOperator() :
+                        newDataOpe.getOperatorStatus()
         );
     }
 }

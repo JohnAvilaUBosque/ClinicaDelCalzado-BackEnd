@@ -43,7 +43,7 @@ public class OperatorController {
         return new ResponseEntity<>(responseDTO, HttpStatus.OK);
     }
 
-    @GetMapping("/{Id}")
+    @GetMapping("/{operatorId}")
     public ResponseEntity<OperatorDTOResponse> getOperatorById(@PathVariable Long operatorId) {
 
         OperatorDTOResponse responseDTO = operatorService.findOperatorByIdOp(operatorId);
