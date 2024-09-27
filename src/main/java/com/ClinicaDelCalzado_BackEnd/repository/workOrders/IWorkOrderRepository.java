@@ -41,11 +41,11 @@ public interface IWorkOrderRepository extends JpaRepository<WorkOrder, String> {
             "INNER JOIN administrator ad ON wo.attended_by = ad.id_administrator " +
             "INNER JOIN company co ON wo.id_company = co.id_company " +
             "WHERE wo.order_status = :orderStatus " +
-            "AND ((:orderNumber IS NULL OR wo.order_number = :orderNumber)" +
+            "AND (:orderNumber IS NULL OR wo.order_number LIKE CONCAT('%', :orderNumber, '%')) " +
             "AND (:clientId IS NULL OR cl.id_client = :clientId) " +
-            "AND (:clientName IS NULL OR cl.client_name = :clientName) " +
-            "AND (:cliPhoneNumber IS NULL OR cl.cli_phone_number = :cliPhoneNumber) " +
-            "AND (:adminName IS NULL OR ad.admin_name = :adminName)) " +
+            "AND (:clientName IS NULL OR cl.client_name LIKE CONCAT('%', :clientName, '%')) " +
+            "AND (:cliPhoneNumber IS NULL OR cl.cli_phone_number LIKE CONCAT('%', :cliPhoneNumber, '%')) " +
+            "AND (:adminName IS NULL OR ad.admin_name LIKE CONCAT('%', :adminName, '%')) " +
             "GROUP BY wo.order_number, cl.id_client, cl.client_name, cl.cli_phone_number, " +
             "wo.creation_date, wo.delivery_date, wo.order_status, wo.total_value, " +
             "wo.deposit, wo.balance, wo.payment_status, ad.id_administrator, co.id_company", nativeQuery = true)

@@ -33,11 +33,14 @@ public class ServicesEntity {
     @Column(name = "service")
     private String service;
 
-    @Column(name = "service_status", length = 10)
+    @Column(name = "service_status", length = 15)
     private String serviceStatus;
 
     @Column(name = "unit_value")
     private Double unitValue;
+
+    @Column(name = "pending_unit_value", nullable = false)
+    private Boolean hasPendingUnitValue;
 
     @ManyToOne
     @JoinColumn(name = "id_operator")

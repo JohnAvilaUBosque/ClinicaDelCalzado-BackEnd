@@ -92,7 +92,12 @@ public class WorkOrderServiceImpl implements IWorkOrderService {
         if (ObjectUtils.isNotEmpty(workOrderDTORequest.getGeneralComment())) {
             commentService.saveCommentOrder(workOrderDTORequest.getGeneralComment(), workOrder.getOrderNumber(), userAuth);
         }
-        productService.saveServicesWorkOrder(workOrderDTORequest, workOrder);
+
+        List<ServicesDTO> servicesDTOS = productService.saveServicesWorkOrder(workOrderDTORequest, workOrder);
+        if (servicesDTOS.stream().anyMatch(ServicesDTO::getHasPendingPrice)) {
+            workOrder.setPaymentStatus(PaymentStatusEnum.PENDING.getKeyName());
+            saveWorkOrder(workOrder);
+        }
 
         return new WorkOrderDTOResponse("Orden de trabajo creada exitosamente!", workOrder.getOrderNumber());
     }

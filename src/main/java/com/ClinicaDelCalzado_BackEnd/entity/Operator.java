@@ -24,7 +24,7 @@ public class Operator {
     @Column(name = "ope_phone_number", length = 20)
     private String opePhoneNumber;
 
-    @Column(name = "status_operator")
+    @Column(name = "status_operator", length = 15)
     private String statusOperator;
 
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "idOperator")

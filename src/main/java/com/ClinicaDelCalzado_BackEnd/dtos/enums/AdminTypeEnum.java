@@ -10,7 +10,8 @@ import java.util.Arrays;
 @RequiredArgsConstructor
 public enum AdminTypeEnum {
     PRINCIPAL("PRINCIPAL", "PRINCIPAL"),
-    SECONDARY("SECONDARY", "SECUNDARIO");
+    SECONDARY("SECONDARY", "SECUNDARIO"),
+    ADMINISTRATOR("ADMINISTRATOR", "ADMINISTRADOR");
 
     final String keyName;
     final String value;

@@ -7,6 +7,7 @@ import com.ClinicaDelCalzado_BackEnd.entity.ServicesEntity;
 import com.ClinicaDelCalzado_BackEnd.entity.WorkOrder;
 import com.ClinicaDelCalzado_BackEnd.repository.workOrders.IServicesRepository;
 import com.ClinicaDelCalzado_BackEnd.services.IProductService;
+import org.apache.commons.lang3.ObjectUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.webjars.NotFoundException;
@@ -57,9 +58,12 @@ public class ProductServiceImpl implements IProductService {
                             .service(serviceDTO.getName())
                             .unitValue(serviceDTO.getPrice().doubleValue())
                             .serviceStatus(ServicesStatusEnum.RECEIVED.getKeyName())
+                            .hasPendingUnitValue(!ObjectUtils.isNotEmpty(serviceDTO.getPrice()) || serviceDTO.getPrice() <= 0)
                             .build();
                     save(service);
-                    return new ServicesDTO(service.getIdService(), service.getService(), service.getUnitValue().longValue(), service.getServiceStatus());
+                    return new ServicesDTO(service.getIdService(), service.getService(),
+                            service.getUnitValue().longValue(), service.getServiceStatus(),
+                            service.getHasPendingUnitValue());
                 }).collect(Collectors.toList());
     }
 }

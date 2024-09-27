@@ -42,10 +42,10 @@ public class WorkOrder {
     @Column(name = "delivery_date", columnDefinition = "DATE")
     private LocalDate deliveryDate;
 
-    @Column(name = "order_status", length = 10)
+    @Column(name = "order_status", length = 15)
     private String orderStatus;
 
-    @Column(name = "payment_status", length = 10)
+    @Column(name = "payment_status", length = 15)
     private String paymentStatus;
 
     @ManyToOne

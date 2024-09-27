@@ -37,7 +37,7 @@ public class Administrator {
     @Column(name = "role", length = 50)
     private String role;
 
-    @Column(name = "admin_status", length = 20)
+    @Column(name = "admin_status", length = 15)
     private String adminStatus;
 
     @Column(name = "temporary_pwd", nullable = false)
