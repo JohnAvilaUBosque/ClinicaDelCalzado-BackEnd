@@ -3,6 +3,7 @@ package com.ClinicaDelCalzado_BackEnd.controller;
 import com.ClinicaDelCalzado_BackEnd.dtos.enums.OrderStatusEnum;
 import com.ClinicaDelCalzado_BackEnd.dtos.request.AddCommentDTORequest;
 import com.ClinicaDelCalzado_BackEnd.dtos.request.UpdatePaymentDTORequest;
+import com.ClinicaDelCalzado_BackEnd.dtos.request.UpdateServicesDTORequest;
 import com.ClinicaDelCalzado_BackEnd.dtos.request.WorkOrderDTORequest;
 import com.ClinicaDelCalzado_BackEnd.dtos.response.*;
 import com.ClinicaDelCalzado_BackEnd.exceptions.UnauthorizedException;
@@ -34,7 +35,7 @@ public class OrderController {
     public ResponseEntity<MessageDTOResponse> cancelWorkOrder(@PathVariable String orderNumber, Authentication authentication) {
         String userAuth = getUserAuth(authentication);
 
-        MessageDTOResponse messageDTOResponse = workOrderService.updateStatusWorkOrder(orderNumber, Long.valueOf(userAuth));
+        MessageDTOResponse messageDTOResponse = workOrderService.cancelWorkOrder(orderNumber, Long.valueOf(userAuth));
         return new ResponseEntity<>(messageDTOResponse, HttpStatus.OK);
     }
 
@@ -52,6 +53,16 @@ public class OrderController {
 
         MessageDTOResponse messageDTOResponse = workOrderService.addCommentWorkOrder(orderNumber, Long.valueOf(userAuth), addCommentDTORequest);
         return new ResponseEntity<>(messageDTOResponse, HttpStatus.OK);
+    }
+
+    @PutMapping("/updated/service/{serviceId}")
+    public ResponseEntity<ServicesDTOResponse> updateServiceWorkOrder(@PathVariable Integer serviceId,
+                                                                      @RequestBody UpdateServicesDTORequest servicesDTORequest,
+                                                                      Authentication authentication) {
+        String userAuth = getUserAuth(authentication);
+
+        ServicesDTOResponse responseDTO = workOrderService.updateServicesWorkOrder(serviceId, servicesDTORequest, Long.valueOf(userAuth));
+        return new ResponseEntity<>(responseDTO, HttpStatus.OK);
     }
 
     @GetMapping("/{orderNumber}")

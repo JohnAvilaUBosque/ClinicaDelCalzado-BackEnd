@@ -2,8 +2,10 @@ package com.ClinicaDelCalzado_BackEnd.services.impl;
 
 import com.ClinicaDelCalzado_BackEnd.dtos.enums.OrderStatusEnum;
 import com.ClinicaDelCalzado_BackEnd.dtos.enums.PaymentStatusEnum;
+import com.ClinicaDelCalzado_BackEnd.dtos.enums.ServicesStatusEnum;
 import com.ClinicaDelCalzado_BackEnd.dtos.request.AddCommentDTORequest;
 import com.ClinicaDelCalzado_BackEnd.dtos.request.UpdatePaymentDTORequest;
+import com.ClinicaDelCalzado_BackEnd.dtos.request.UpdateServicesDTORequest;
 import com.ClinicaDelCalzado_BackEnd.dtos.request.WorkOrderDTORequest;
 import com.ClinicaDelCalzado_BackEnd.dtos.response.*;
 import com.ClinicaDelCalzado_BackEnd.dtos.workOrders.*;
@@ -103,7 +105,7 @@ public class WorkOrderServiceImpl implements IWorkOrderService {
     }
 
     @Override
-    public MessageDTOResponse updateStatusWorkOrder(String orderNumber, Long userAuth) {
+    public MessageDTOResponse cancelWorkOrder(String orderNumber, Long userAuth) {
 
         WorkOrder workOrder = validateOrderNumber(orderNumber);
         if (workOrder.getPaymentStatus().equals(PaymentStatusEnum.PAID.getKeyName())) {
@@ -119,6 +121,37 @@ public class WorkOrderServiceImpl implements IWorkOrderService {
         commentService.saveCommentOrder("Orden de trabajo cancelada", workOrder.getOrderNumber(), userAuth);
 
         return MessageDTOResponse.builder().message("Orden de trabajo cancelada con éxito.").build();
+    }
+
+    @Override
+    public ServicesDTOResponse updateServicesWorkOrder(Integer serviceId, UpdateServicesDTORequest servicesDTO, Long auth) {
+
+        ServicesEntity services = productService.update(serviceId, servicesDTO);
+        String orderNumber = services.getIdOrderSer().getOrderNumber();
+        WorkOrder workOrder = validateOrderNumber(orderNumber);
+        List<ServicesDTO> servicesList = productService.getServicesOrder(orderNumber);
+
+        if (ObjectUtils.isNotEmpty(servicesDTO.getPrice()) && servicesList.stream().noneMatch(ServicesDTO::getHasPendingPrice)) {
+            updateValuesWorkOrder(servicesList, workOrder);
+        }
+
+        if (ObjectUtils.isNotEmpty(servicesDTO.getServiceStatus()) &&
+                servicesList.stream().anyMatch(p -> p.getServiceStatus().equals(ServicesStatusEnum.DISPATCHED.getKeyName()))) {
+            updateStatusWorkOrder(workOrder, auth);
+        }
+        return ServicesDTOResponse.builder()
+                .message("Servicios actualizado exitosamente.")
+                .service(ServicesDTOList.builder()
+                        .id(services.getIdService())
+                        .idOrder(services.getIdOrderSer().getOrderNumber())
+                        .name(services.getService())
+                        .price(services.getUnitValue().longValue())
+                        .operator(Optional.ofNullable(services.getIdOperator())
+                                .map(Operator::getOperatorName)
+                                .orElse(""))
+                        .serviceStatus(services.getServiceStatus())
+                        .build())
+                .build();
     }
 
     @Override
@@ -238,6 +271,41 @@ public class WorkOrderServiceImpl implements IWorkOrderService {
         return getOrderList(workOrderList);
     }
 
+    @Override
+    public WorkOrder validateOrderNumber(String orderNumber) {
+        if (ObjectUtils.isEmpty(orderNumber)) {
+            throw new BadRequestException(String.format("La orden %s no esta registrada!!", orderNumber));
+        }
+
+        return workOrderRepository.findById(orderNumber)
+                .orElseThrow(() -> new NotFoundException(String.format("La orden de trabajo %s no encontrada", orderNumber)));
+    }
+
+    private void updateValuesWorkOrder(List<ServicesDTO> servicesDTO, WorkOrder workOrder) {
+        double totalPriceOrder = totalPrice(servicesDTO);
+        double newBalance = totalPriceOrder - workOrder.getDeposit();
+
+        workOrder.setTotalValue(totalPriceOrder);
+        workOrder.setBalance(newBalance);
+
+        if (newBalance == 0) {
+            workOrder.setPaymentStatus(PaymentStatusEnum.PAID.getKeyName());
+            commentService.saveCommentOrder("Orden de trabajo pagada", workOrder.getOrderNumber(), workOrder.getAttendedBy().getIdAdministrator());
+        }
+        saveWorkOrder(workOrder);
+    }
+
+    private void updateStatusWorkOrder(WorkOrder workOrder, Long userAuth) {
+
+        workOrder.setOrderStatus(OrderStatusEnum.FINISHED.getKeyName());
+        workOrder.setModificationDate(LocalDateTime.now());
+        workOrder.setLastModificationBy(userAuth);
+
+        saveWorkOrder(workOrder);
+        commentService.saveCommentOrder("Orden de trabajo finalizada", workOrder.getOrderNumber(), userAuth);
+
+    }
+
     private WorkOrder getOrder(String orderNumber) {
         Optional<WorkOrder> workOrder = workOrderRepository.findById(orderNumber);
 
@@ -312,15 +380,6 @@ public class WorkOrderServiceImpl implements IWorkOrderService {
     private Integer generateRandomValueOrder() {
         Random random = new Random();
         return RANDOM_MIN + random.nextInt(RANDOM_MAX - RANDOM_MIN + 1);
-    }
-
-    private WorkOrder validateOrderNumber(String orderNumber) {
-        if (ObjectUtils.isEmpty(orderNumber)) {
-            throw new BadRequestException(String.format("La orden %s no esta registrada!!", orderNumber));
-        }
-
-        return workOrderRepository.findById(orderNumber)
-                .orElseThrow(() -> new NotFoundException(String.format("La orden de trabajo %s no encontrada", orderNumber)));
     }
 
     private void validateRequest(WorkOrderDTORequest workOrderDTORequest) {

@@ -1,6 +1,5 @@
 package com.ClinicaDelCalzado_BackEnd.controller;
 
-import com.ClinicaDelCalzado_BackEnd.dtos.response.AdminDTOResponse;
 import com.ClinicaDelCalzado_BackEnd.dtos.response.ClientDTOResponse;
 import com.ClinicaDelCalzado_BackEnd.dtos.response.ClientListDTOResponse;
 import com.ClinicaDelCalzado_BackEnd.services.IClientService;
