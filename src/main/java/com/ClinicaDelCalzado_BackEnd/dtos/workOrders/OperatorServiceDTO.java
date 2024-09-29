@@ -10,12 +10,8 @@ import lombok.*;
 @NoArgsConstructor
 @AllArgsConstructor
 @JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
-public class ServicesDTOList {
+public class OperatorServiceDTO {
 
-    private Integer id;
-    private String idOrder;
-    private String name;
-    private Long price;
-    private OperatorServiceDTO operator;
-    private String serviceStatus;
+    private Long idOperator;
+    private String operatorName;
 }

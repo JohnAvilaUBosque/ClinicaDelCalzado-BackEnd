@@ -17,6 +17,6 @@ public interface IProductService {
     ServicesDTOResponse findServicesById(Integer servicesId);
     Optional<ServicesEntity> findServiceById(Integer idService);
     List<ServicesDTO> getServicesOrder(String orderNumber);
-    List<ServicesDTO> saveServicesWorkOrder(WorkOrderDTORequest workOrderDTORequest, WorkOrder orderNumber);
+    List<Boolean> saveServicesWorkOrder(WorkOrderDTORequest workOrderDTORequest, WorkOrder orderNumber);
     ServicesEntity update(Integer serviceId, UpdateServicesDTORequest servicesDTO);
 }

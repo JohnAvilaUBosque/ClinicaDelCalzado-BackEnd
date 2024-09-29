@@ -15,6 +15,7 @@ public class ServicesDTO {
     private Integer id;
     private String name;
     private Long price;
-    private String serviceStatus;
     private Boolean hasPendingPrice;
+    private OperatorServiceDTO operator;
+    private String serviceStatus;
 }

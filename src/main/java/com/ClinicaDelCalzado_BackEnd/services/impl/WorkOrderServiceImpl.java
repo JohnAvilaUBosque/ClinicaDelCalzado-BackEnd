@@ -48,18 +48,19 @@ public class WorkOrderServiceImpl implements IWorkOrderService {
 
     private final ICommentService commentService;
 
-    private final List<OrderErrorDTO> orderErrors = new ArrayList<>();
+    private final IOperatorService operatorService;
 
     @Autowired
     public WorkOrderServiceImpl(IWorkOrderRepository workOrderRepository, ICompanyService companyService,
                                 IClientService clientService, IProductService productService,
-                                IAdminService adminService, ICommentService commentService) {
+                                IAdminService adminService, ICommentService commentService, IOperatorService operatorService) {
         this.workOrderRepository = workOrderRepository;
         this.companyService = companyService;
         this.clientService = clientService;
         this.productService = productService;
         this.adminService = adminService;
         this.commentService = commentService;
+        this.operatorService = operatorService;
     }
 
     @Override
@@ -95,8 +96,8 @@ public class WorkOrderServiceImpl implements IWorkOrderService {
             commentService.saveCommentOrder(workOrderDTORequest.getGeneralComment(), workOrder.getOrderNumber(), userAuth);
         }
 
-        List<ServicesDTO> servicesDTOS = productService.saveServicesWorkOrder(workOrderDTORequest, workOrder);
-        if (servicesDTOS.stream().anyMatch(ServicesDTO::getHasPendingPrice)) {
+        List<Boolean> servicesDTOS = productService.saveServicesWorkOrder(workOrderDTORequest, workOrder);
+        if (servicesDTOS.stream().anyMatch(p -> p.equals(Boolean.TRUE))) {
             workOrder.setPaymentStatus(PaymentStatusEnum.PENDING.getKeyName());
             saveWorkOrder(workOrder);
         }
@@ -146,9 +147,10 @@ public class WorkOrderServiceImpl implements IWorkOrderService {
                         .idOrder(services.getIdOrderSer().getOrderNumber())
                         .name(services.getService())
                         .price(services.getUnitValue().longValue())
-                        .operator(Optional.ofNullable(services.getIdOperator())
-                                .map(Operator::getOperatorName)
-                                .orElse(""))
+                        .operator(servicesList.stream()
+                                .filter(p-> p.getId().equals(services.getIdService()))
+                                .map(ServicesDTO::getOperator)
+                                .findFirst().orElse(OperatorServiceDTO.builder().build()))
                         .serviceStatus(services.getServiceStatus())
                         .build())
                 .build();
@@ -384,12 +386,10 @@ public class WorkOrderServiceImpl implements IWorkOrderService {
 
     private void validateRequest(WorkOrderDTORequest workOrderDTORequest) {
         String nit = workOrderDTORequest.getCompany().getNit();
-        Long attended = workOrderDTORequest.getAttendedById();
         LocalDate deliveryDate = workOrderDTORequest.getDeliveryDate();
         LocalDate today = LocalDate.now();
         Long idClient = workOrderDTORequest.getClient().getIdentification();
         List<ServicesDTO> services = workOrderDTORequest.getServices();
-        String generalComment = workOrderDTORequest.getGeneralComment();
         Double downPayment = workOrderDTORequest.getDownPayment();
 
         if (nit.isEmpty()) {
