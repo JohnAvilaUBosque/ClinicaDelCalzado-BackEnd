@@ -73,7 +73,7 @@ public class WebSecurityConfig {
                         .requestMatchers(HttpMethod.PUT,"/api/v1/work-orders/updated/service/{serviceId}").hasAnyAuthority(AdminTypeEnum.ADMINISTRATOR.getKeyName(), AdminTypeEnum.PRINCIPAL.getKeyName(), AdminTypeEnum.SECONDARY.getKeyName())
                         .requestMatchers(HttpMethod.PUT,"/api/v1/work-orders/cancel/{orderNumber}").hasAnyAuthority(AdminTypeEnum.ADMINISTRATOR.getKeyName(), AdminTypeEnum.PRINCIPAL.getKeyName())
                         // QuestionController
-                        .requestMatchers(HttpMethod.GET,"/api/v1/questions/list").hasAnyAuthority(AdminTypeEnum.ADMINISTRATOR.getKeyName(), AdminTypeEnum.PRINCIPAL.getKeyName(), AdminTypeEnum.SECONDARY.getKeyName())
+                        .requestMatchers(HttpMethod.GET,"/api/v1/questions/list").permitAll()
                         // ReportsController
                         .requestMatchers(HttpMethod.GET,"/api/v1/reports/detailed").hasAnyAuthority(AdminTypeEnum.ADMINISTRATOR.getKeyName(), AdminTypeEnum.PRINCIPAL.getKeyName())
                         // ServicesWorkOrderController

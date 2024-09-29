@@ -22,7 +22,7 @@ public interface IAdminService {
 
     AdminDTOResponse create(AdminDTORequest adminDTO);
 
-    AdminDTOResponse update(Long adminId, UpdateAdminDTORequest adminDTO);
+    AdminDTOResponse update(Long adminId, UpdateAdminDTORequest adminDTO, Long userId);
 
     UpdateAdminPasswordDTOResponse updatePassword(Long adminId, UpdateAdminPasswordDTO adminDTO);
 

@@ -107,6 +107,10 @@ public class ProductServiceImpl implements IProductService {
                             .service(serviceDTO.getName())
                             .unitValue(serviceDTO.getPrice().doubleValue())
                             .serviceStatus(ServicesStatusEnum.RECEIVED.getKeyName())
+                            .idOperator(ObjectUtils.isNotEmpty(serviceDTO.getOperator())
+                                    && ObjectUtils.isNotEmpty(serviceDTO.getOperator().getIdOperator()) ?
+                                    Operator.builder().idOperator(serviceDTO.getOperator().getIdOperator()).build()
+                                    : new Operator())
                             .hasPendingUnitValue(!ObjectUtils.isNotEmpty(serviceDTO.getPrice()) || serviceDTO.getPrice() <= 0)
                             .build();
                     save(service);
@@ -170,14 +174,14 @@ public class ProductServiceImpl implements IProductService {
                 ObjectUtils.isEmpty(newDataSer.getServiceName()) || Objects.equals(currentDataSer.getService(), newDataSer.getServiceName()) ?
                         currentDataSer.getService() : newDataSer.getServiceName(),
                 currentDataSer.getIdOrderSer().getOrderNumber(),
-                ObjectUtils.isEmpty(newDataSer.getOperatorId()) || (ObjectUtils.isNotEmpty(currentDataSer.getIdOperator()) &&  Objects.equals(currentDataSer.getIdOperator().getIdOperator(), newDataSer.getOperatorId())) ?
+                ObjectUtils.isEmpty(newDataSer.getOperatorId()) || (ObjectUtils.isNotEmpty(currentDataSer.getIdOperator()) && Objects.equals(currentDataSer.getIdOperator().getIdOperator(), newDataSer.getOperatorId())) ?
                         currentDataSer.getIdOperator().getIdOperator() : newDataSer.getOperatorId(),
                 ObjectUtils.isEmpty(newDataSer.getPrice()) || Objects.equals(currentDataSer.getUnitValue(), newDataSer.getPrice().doubleValue()) ?
                         currentDataSer.getUnitValue().longValue() : newDataSer.getPrice(),
                 ObjectUtils.isEmpty(newDataSer.getServiceStatus()) || Objects.equals(currentDataSer.getServiceStatus(), ServicesStatusEnum.getName(newDataSer.getServiceStatus())) ?
                         currentDataSer.getServiceStatus() : ServicesStatusEnum.getName(newDataSer.getServiceStatus()),
                 ObjectUtils.isEmpty(newDataSer.getPrice()) ? currentDataSer.getHasPendingUnitValue() : false
-                );
+        );
 
     }
 

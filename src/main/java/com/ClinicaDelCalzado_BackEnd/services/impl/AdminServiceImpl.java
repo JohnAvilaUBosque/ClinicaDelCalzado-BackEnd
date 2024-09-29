@@ -80,9 +80,15 @@ public class AdminServiceImpl implements IAdminService {
         List<Administrator> administratorList = administratorRepository.findAll();
 
         AdminListDTOResponse adminListDTOResponse = new AdminListDTOResponse();
-        adminListDTOResponse.setAdmins(administratorList.stream().map(p ->
-                new AdminDTO(p.getIdAdministrator(), AdminTypeEnum.getValue(p.getRole()), p.getAdminName(),
-                        p.getAdmPhoneNumber(), AdminStatusEnum.getValue(p.getAdminStatus()), p.getHasTemporaryPassword())).toList());
+        adminListDTOResponse.setAdmins(administratorList.stream().map(p -> {
+                    if (!p.getRole().equalsIgnoreCase(AdminTypeEnum.ADMINISTRATOR.name())) {
+                        return new AdminDTO(p.getIdAdministrator(), AdminTypeEnum.getValue(p.getRole()), p.getAdminName(),
+                                p.getAdmPhoneNumber(), AdminStatusEnum.getValue(p.getAdminStatus()), p.getHasTemporaryPassword());
+                    }
+                    return null;
+                })
+                .filter(Objects::nonNull)
+                .toList());
 
         return adminListDTOResponse;
     }
@@ -114,13 +120,13 @@ public class AdminServiceImpl implements IAdminService {
     }
 
     @Override
-    public AdminDTOResponse update(Long adminId, UpdateAdminDTORequest adminDTO) {
+    public AdminDTOResponse update(Long adminId, UpdateAdminDTORequest adminDTO, Long userId) {
 
         validateInputData(AdminDTORequest.builder()
                 .identification(adminId)
                 .build(), false);
 
-        Administrator administrator = matchDifferencesAdmin(validateAdminIdExists(adminId), adminDTO);
+        Administrator administrator = matchDifferencesAdmin(validateAdminIdExists(adminId), adminDTO, userId);
 
         saveAdmin(administrator);
 
@@ -166,7 +172,7 @@ public class AdminServiceImpl implements IAdminService {
         AdminDTOResponse update = update(adminId, UpdateAdminDTORequest.builder()
                 .name(adminDTO.getName())
                 .cellphone(adminDTO.getPhone())
-                .build());
+                .build(), 0L);
 
         if (adminDTO.getSecurityQuestions().isEmpty()) {
             throw new BadRequestException("El listado de preguntas y respuestas no puede ser vacío");
@@ -314,7 +320,12 @@ public class AdminServiceImpl implements IAdminService {
         }
     }
 
-    private Administrator matchDifferencesAdmin(Administrator currentDataAdmin, UpdateAdminDTORequest newDataAdmin) {
+    private Administrator matchDifferencesAdmin(Administrator currentDataAdmin, UpdateAdminDTORequest newDataAdmin, Long userId) {
+
+        if (currentDataAdmin.getIdAdministrator().equals(userId)) {
+            throw new BadRequestException("No se pueden actualizar los datos del mismo usuario autenticado desde el listado, dirijase a editar perfil");
+        }
+
         return buildAdministrator(
                 currentDataAdmin.getIdAdministrator(),
                 ObjectUtils.isEmpty(newDataAdmin.getName()) || Objects.equals(currentDataAdmin.getAdminName(), newDataAdmin.getName()) ?

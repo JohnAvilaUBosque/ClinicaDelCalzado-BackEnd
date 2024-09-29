@@ -8,11 +8,14 @@ import com.ClinicaDelCalzado_BackEnd.dtos.response.AdminDTOResponse;
 import com.ClinicaDelCalzado_BackEnd.dtos.response.AdminListDTOResponse;
 import com.ClinicaDelCalzado_BackEnd.dtos.response.UpdateAdminPasswordDTOResponse;
 import com.ClinicaDelCalzado_BackEnd.dtos.response.UpdateAdminQuestionDTOResponse;
+import com.ClinicaDelCalzado_BackEnd.exceptions.UnauthorizedException;
 import com.ClinicaDelCalzado_BackEnd.services.IAdminService;
+import org.apache.commons.lang3.ObjectUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.userdetails.User;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -33,7 +36,8 @@ public class AdministratorController {
     public ResponseEntity<AdminDTOResponse> updateAdministrator(@PathVariable Long adminId,
                                                                 @RequestBody UpdateAdminDTORequest adminDTORequest, Authentication authentication) {
 
-        AdminDTOResponse responseDTO = adminService.update(adminId, adminDTORequest);
+        Long userId = getUserAuth(authentication);
+        AdminDTOResponse responseDTO = adminService.update(adminId, adminDTORequest, userId);
         return new ResponseEntity<>(responseDTO, HttpStatus.OK);
     }
 
@@ -65,6 +69,13 @@ public class AdministratorController {
 
         UpdateAdminQuestionDTOResponse responseDTO = adminService.updateAnswer(adminId, adminDTORequest);
         return new ResponseEntity<>(responseDTO, HttpStatus.CREATED);
+    }
+
+    private Long getUserAuth(Authentication authentication) {
+        if (ObjectUtils.isEmpty(authentication.getPrincipal())) {
+            throw new UnauthorizedException("La sesión ha caducado o no esta autorizado para realizar esta acción");
+        }
+        return Long.valueOf(((User) authentication.getPrincipal()).getUsername());
     }
 
 }

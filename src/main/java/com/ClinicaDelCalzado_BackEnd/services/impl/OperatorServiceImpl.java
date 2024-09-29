@@ -173,7 +173,7 @@ public class OperatorServiceImpl implements IOperatorService {
                         currentDataOpe.getOpePhoneNumber() :
                         newDataOpe.getOpePhoneNumber(),
                 ObjectUtils.isEmpty(newDataOpe.getOperatorStatus()) || Objects.equals(currentDataOpe.getStatusOperator(), OperatorStatusEnum.getName(newDataOpe.getOperatorStatus())) ?
-                        currentDataOpe.getStatusOperator() :
+                        OperatorStatusEnum.getValue(currentDataOpe.getStatusOperator()) :
                         newDataOpe.getOperatorStatus()
         );
     }

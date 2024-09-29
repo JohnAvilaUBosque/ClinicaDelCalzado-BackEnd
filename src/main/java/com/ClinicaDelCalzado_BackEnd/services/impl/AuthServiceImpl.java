@@ -80,6 +80,10 @@ public class AuthServiceImpl implements IAuthService {
         Administrator administrator = adminService.validateAdminIdExists(adminId);
         List<Answer> currentAnswer = answerService.findAnswerAllByAdminId(adminId);
 
+        if(currentAnswer.isEmpty()) {
+            throw new BadRequestException("No puede recuperar contraseña hasta que configure las preguntas de seguridad");
+        }
+
         boolean allAnswerMatch = currentAnswer.stream().filter(Answer::getStatus).allMatch(answer ->
                 passwordRecoveryDTORequest.getAnswersSecurity().stream().anyMatch(p ->
                         p.getIdQuestion().equals(answer.getSecurityQuestion().getIdSecurityQuestion().longValue()) &&
