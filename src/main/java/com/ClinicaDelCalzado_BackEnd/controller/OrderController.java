@@ -40,7 +40,8 @@ public class OrderController {
     }
 
     @PutMapping("/payment/{orderNumber}")
-    public ResponseEntity<MessageDTOResponse> paymentWorkOrder(@PathVariable String orderNumber, @RequestBody UpdatePaymentDTORequest updatePaymentDTORequest, Authentication authentication) {
+    public ResponseEntity<MessageDTOResponse> paymentWorkOrder(@PathVariable String orderNumber,
+                                                               @RequestBody UpdatePaymentDTORequest updatePaymentDTORequest, Authentication authentication) {
         String userAuth = getUserAuth(authentication);
 
         MessageDTOResponse messageDTOResponse = workOrderService.updatePaymentWorkOrder(orderNumber, Long.valueOf(userAuth), updatePaymentDTORequest);
@@ -48,7 +49,8 @@ public class OrderController {
     }
 
     @PutMapping({"/comment/{orderNumber}", "/comment"})
-    public ResponseEntity<MessageDTOResponse> addCommentWorkOrder(@PathVariable(value = "orderNumber", required = false) String orderNumber, @RequestBody AddCommentDTORequest addCommentDTORequest, Authentication authentication) {
+    public ResponseEntity<MessageDTOResponse> addCommentWorkOrder(@PathVariable(value = "orderNumber", required = false) String orderNumber,
+                                                                  @RequestBody AddCommentDTORequest addCommentDTORequest, Authentication authentication) {
         String userAuth = getUserAuth(authentication);
 
         MessageDTOResponse messageDTOResponse = workOrderService.addCommentWorkOrder(orderNumber, Long.valueOf(userAuth), addCommentDTORequest);
@@ -57,8 +59,7 @@ public class OrderController {
 
     @PutMapping("/updated/service/{serviceId}")
     public ResponseEntity<ServicesDTOResponse> updateServiceWorkOrder(@PathVariable Integer serviceId,
-                                                                      @RequestBody UpdateServicesDTORequest servicesDTORequest,
-                                                                      Authentication authentication) {
+                                                                      @RequestBody UpdateServicesDTORequest servicesDTORequest, Authentication authentication) {
         String userAuth = getUserAuth(authentication);
 
         ServicesDTOResponse responseDTO = workOrderService.updateServicesWorkOrder(serviceId, servicesDTORequest, Long.valueOf(userAuth));

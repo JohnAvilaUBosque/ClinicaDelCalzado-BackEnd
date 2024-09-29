@@ -8,6 +8,7 @@ import com.ClinicaDelCalzado_BackEnd.services.IOperatorService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -21,30 +22,29 @@ public class OperatorController {
     }
 
     @PostMapping("/created")
-    public ResponseEntity<OperatorDTOResponse> createOperator(@RequestBody OperatorDTORequest operatorDTORequest) {
+    public ResponseEntity<OperatorDTOResponse> createOperator(@RequestBody OperatorDTORequest operatorDTORequest, Authentication authentication) {
 
         OperatorDTOResponse responseDTO = operatorService.create(operatorDTORequest);
         return new ResponseEntity<>(responseDTO, HttpStatus.CREATED);
     }
 
     @PutMapping("/updated/{operatorId}")
-    public ResponseEntity<OperatorDTOResponse> updateOperator(
-            @PathVariable Long operatorId,
-            @RequestBody UpdateOperatorDTORequest operatorDTORequest) {
+    public ResponseEntity<OperatorDTOResponse> updateOperator(@PathVariable Long operatorId,
+                                                              @RequestBody UpdateOperatorDTORequest operatorDTORequest, Authentication authentication) {
 
         OperatorDTOResponse responseDTO = operatorService.update(operatorId, operatorDTORequest);
         return new ResponseEntity<>(responseDTO, HttpStatus.OK);
     }
 
     @GetMapping("/list")
-    public ResponseEntity<OperatorListDTOResponse> getAllOperators() {
+    public ResponseEntity<OperatorListDTOResponse> getAllOperators(Authentication authentication) {
 
         OperatorListDTOResponse responseDTO = operatorService.findOperatorAll();
         return new ResponseEntity<>(responseDTO, HttpStatus.OK);
     }
 
     @GetMapping("/{operatorId}")
-    public ResponseEntity<OperatorDTOResponse> getOperatorById(@PathVariable Long operatorId) {
+    public ResponseEntity<OperatorDTOResponse> getOperatorById(@PathVariable Long operatorId, Authentication authentication) {
 
         OperatorDTOResponse responseDTO = operatorService.findOperatorByIdOp(operatorId);
         return new ResponseEntity<>(responseDTO, HttpStatus.OK);

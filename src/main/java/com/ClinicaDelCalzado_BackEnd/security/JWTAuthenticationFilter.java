@@ -45,8 +45,8 @@ public class JWTAuthenticationFilter extends OncePerRequestFilter {
             UserDetails userDetails = customUserDetailsService.loadUserByUsername(userName);
             List<String> userRoles = userDetails.getAuthorities().stream().map(GrantedAuthority::getAuthority).toList();
 
-            if(userRoles.contains(AdminTypeEnum.getValue(String.valueOf(AdminTypeEnum.PRINCIPAL)))
-                    || userRoles.contains(AdminTypeEnum.getValue(String.valueOf(AdminTypeEnum.SECONDARY)))) {
+            if(userRoles.contains(AdminTypeEnum.PRINCIPAL.getKeyName()) || userRoles.contains(AdminTypeEnum.SECONDARY.getKeyName())
+                    || userRoles.contains(AdminTypeEnum.ADMINISTRATOR.getKeyName())) {
 
                 UsernamePasswordAuthenticationToken authenticationToken = new UsernamePasswordAuthenticationToken(userDetails,
                         null, userDetails.getAuthorities());

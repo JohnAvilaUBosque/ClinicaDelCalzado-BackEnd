@@ -23,7 +23,6 @@ import java.sql.Timestamp;
 import java.text.SimpleDateFormat;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
 import java.util.stream.Collectors;
@@ -32,9 +31,6 @@ import static com.ClinicaDelCalzado_BackEnd.util.Constants.*;
 
 @Service
 public class WorkOrderServiceImpl implements IWorkOrderService {
-
-    // zone from Bogota
-    private static final ZoneId zoneId = ZoneId.of("America/Bogota");
 
     private final IWorkOrderRepository workOrderRepository;
 
