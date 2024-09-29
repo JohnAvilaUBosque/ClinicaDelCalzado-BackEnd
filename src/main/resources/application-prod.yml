@@ -14,4 +14,4 @@ spring:
     defer-datasource-initialization: true
     database-platform: org.hibernate.dialect.MySQL8Dialect
     hibernate:
-      ddl-auto: none
+      ddl-auto: update
