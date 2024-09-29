@@ -110,7 +110,7 @@ public class ProductServiceImpl implements IProductService {
                             .idOperator(ObjectUtils.isNotEmpty(serviceDTO.getOperator())
                                     && ObjectUtils.isNotEmpty(serviceDTO.getOperator().getIdOperator()) ?
                                     Operator.builder().idOperator(serviceDTO.getOperator().getIdOperator()).build()
-                                    : new Operator())
+                                    : null)
                             .hasPendingUnitValue(!ObjectUtils.isNotEmpty(serviceDTO.getPrice()) || serviceDTO.getPrice() <= 0)
                             .build();
                     save(service);
