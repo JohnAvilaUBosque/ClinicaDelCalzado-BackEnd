@@ -43,6 +43,11 @@ public class ReportsController {
                     .collect(Collectors.toList());
         }
 
+        if (ObjectUtils.isEmpty(startDate) || ObjectUtils.isEmpty(endDate)) {
+            startDate = LocalDateTime.now().minusMonths(3L);
+            endDate = LocalDateTime.now();
+        }
+
         DetailedReportDTOResponse detailedReportDTOResponse = reportService.getWorkOrderList(orderStatusList, startDate, endDate);
         return new ResponseEntity<>(detailedReportDTOResponse, HttpStatus.OK);
     }

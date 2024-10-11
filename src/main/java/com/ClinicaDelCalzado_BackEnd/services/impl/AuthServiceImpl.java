@@ -46,7 +46,7 @@ public class AuthServiceImpl implements IAuthService {
         Administrator administrator = adminService.validateAdminIdExists(loginDTO.getIdentification());
 
         if (administrator.getAdminStatus().equalsIgnoreCase(AdminStatusEnum.INACTIVE.getKeyName())) {
-            throw new UnauthorizedException("Credenciales invalidas, contacte al administrador principal!");
+            throw new UnauthorizedException("Usuario inactivo, contacte al administrador principal!");
         }
 
         if (ObjectUtils.isEmpty(loginDTO.getIdentification())){

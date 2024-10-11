@@ -241,7 +241,7 @@ public class WorkOrderServiceImpl implements IWorkOrderService {
                 .orderNumber(orderNumber)
                 .company(companyDTO)
                 .attendedBy(attendedBy.map(Administrator::getAdminName).orElse(""))
-                .createDate(workOrder.getCreationDate().format(DateTimeFormatter.ofPattern("dd-MM-yyyy hh:mm")))
+                .createDate(workOrder.getCreationDate().format(DateTimeFormatter.ofPattern("dd-MM-yyyy HH:mm")))
                 .orderStatus(OrderStatusEnum.getValue(workOrder.getOrderStatus()))
                 .deliveryDate(workOrder.getDeliveryDate().format(DateTimeFormatter.ofPattern("dd-MM-yyyy")))
                 .client(clientDTO)
@@ -351,7 +351,7 @@ public class WorkOrderServiceImpl implements IWorkOrderService {
                                             .name(clientName)
                                             .cellphone(clientPhone)
                                             .build())
-                                    .createDate(creationDate.toLocalDateTime().format(DateTimeFormatter.ofPattern("dd-MM-yyyy hh:mm")))
+                                    .createDate(creationDate.toLocalDateTime().format(DateTimeFormatter.ofPattern("dd-MM-yyyy HH:mm")))
                                     .deliveryDate(simpleDateFormat.format(deliveryDate))
                                     .servicesCount(servicesOrderCount) // Cantidad total de servicios
                                     .orderStatus(OrderStatusEnum.getValue(String.valueOf(firstOrderRow[7]))) // order_status (posición 7)
