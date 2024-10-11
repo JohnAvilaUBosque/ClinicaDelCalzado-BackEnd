@@ -381,16 +381,11 @@ public class WorkOrderServiceImpl implements IWorkOrderService {
     }
 
     private void validateRequest(WorkOrderDTORequest workOrderDTORequest) {
-        String nit = workOrderDTORequest.getCompany().getNit();
         LocalDate deliveryDate = workOrderDTORequest.getDeliveryDate();
         LocalDate today = LocalDate.now();
         Long idClient = workOrderDTORequest.getClient().getIdentification();
         List<ServicesDTO> services = workOrderDTORequest.getServices();
         Double downPayment = workOrderDTORequest.getDownPayment();
-
-        if (nit.isEmpty()) {
-            throw new BadRequestException(String.format("La compañía con nit %s no esta registrada!!", nit));
-        }
 
         if (ObjectUtils.isEmpty(deliveryDate)) {
             throw new BadRequestException("Se requiere la fecha de entrega para la orden de trabajo!!");

@@ -5,8 +5,10 @@ import com.ClinicaDelCalzado_BackEnd.dtos.response.CompanyDTOResponse;
 import com.ClinicaDelCalzado_BackEnd.dtos.response.CompanyListDTOResponse;
 import com.ClinicaDelCalzado_BackEnd.dtos.workOrders.CompanyDTO;
 import com.ClinicaDelCalzado_BackEnd.entity.Company;
+import com.ClinicaDelCalzado_BackEnd.exceptions.BadRequestException;
 import com.ClinicaDelCalzado_BackEnd.repository.workOrders.ICompanyRepository;
 import com.ClinicaDelCalzado_BackEnd.services.ICompanyService;
+import org.apache.commons.lang3.ObjectUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.webjars.NotFoundException;
@@ -66,6 +68,13 @@ public class CompanyServiceImpl implements ICompanyService {
 
     @Override
     public Company findCompanyWorkOrder(WorkOrderDTORequest workOrderDTORequest) {
+
+        if (ObjectUtils.isEmpty(workOrderDTORequest.getCompany()) ||
+                ObjectUtils.isEmpty(workOrderDTORequest.getCompany().getNit())) {
+            return companyRepository.findAll().stream().findFirst().
+                    orElseThrow(() -> new BadRequestException("La compañía no esta registrada!!"));
+
+        }
 
         return findCompanyByNit(workOrderDTORequest.getCompany().getNit())
                 .orElseGet(() -> save(
