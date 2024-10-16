@@ -10,7 +10,7 @@ import java.util.Arrays;
 @Getter
 @RequiredArgsConstructor
 public enum ServicesStatusEnum {
-    RECEIVED("RECEIVED","RECIBIDO"),
+    RECEIVED("RECEIVED","EN PROCESO"),
     FINISHED("FINISHED","TERMINADO"),
     DISPATCHED("DISPATCHED","DESPACHADO");
 
