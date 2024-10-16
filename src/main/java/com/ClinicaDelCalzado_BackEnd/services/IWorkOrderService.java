@@ -10,7 +10,7 @@ import com.ClinicaDelCalzado_BackEnd.entity.WorkOrder;
 public interface IWorkOrderService {
 
     WorkOrderDTOResponse createWorkOrder(WorkOrderDTORequest workOrderDTORequest, Long userAuth);
-    MessageDTOResponse cancelWorkOrder(String orderNumber, Long userAuth);
+    MessageDTOResponse cancelWorkOrder(String orderNumber, Long userAuth, AddCommentDTORequest addCommentDTORequest);
     ServicesDTOResponse updateServicesWorkOrder(Integer serviceId, UpdateServicesDTORequest servicesDTO, Long auth);
     MessageDTOResponse updatePaymentWorkOrder(String orderNumber, Long userAuth,  UpdatePaymentDTORequest updatePaymentDTORequest);
     MessageDTOResponse addCommentWorkOrder(String orderNumber, Long userAuth, AddCommentDTORequest addCommentDTORequest);

@@ -32,10 +32,11 @@ public class OrderController {
     }
 
     @PutMapping("/cancel/{orderNumber}")
-    public ResponseEntity<MessageDTOResponse> cancelWorkOrder(@PathVariable String orderNumber, Authentication authentication) {
+    public ResponseEntity<MessageDTOResponse> cancelWorkOrder(@PathVariable String orderNumber,
+                                                              @RequestBody AddCommentDTORequest addCommentDTORequest, Authentication authentication) {
         String userAuth = getUserAuth(authentication);
 
-        MessageDTOResponse messageDTOResponse = workOrderService.cancelWorkOrder(orderNumber, Long.valueOf(userAuth));
+        MessageDTOResponse messageDTOResponse = workOrderService.cancelWorkOrder(orderNumber, Long.valueOf(userAuth), addCommentDTORequest);
         return new ResponseEntity<>(messageDTOResponse, HttpStatus.OK);
     }
 

@@ -102,9 +102,13 @@ public class WorkOrderServiceImpl implements IWorkOrderService {
     }
 
     @Override
-    public MessageDTOResponse cancelWorkOrder(String orderNumber, Long userAuth) {
+    public MessageDTOResponse cancelWorkOrder(String orderNumber, Long userAuth, AddCommentDTORequest addCommentDTORequest) {
 
         WorkOrder workOrder = validateOrderNumber(orderNumber);
+        if (ObjectUtils.isEmpty(addCommentDTORequest.getComment())) {
+            throw new BadRequestException("El comentario no puede ser vacio!!");
+        }
+
         if (workOrder.getPaymentStatus().equals(PaymentStatusEnum.PAID.getKeyName())) {
             throw new BadRequestException(String.format("La orden de trabajo no puede ser anulada porque esta en estado %s!!",
                     PaymentStatusEnum.getValue(workOrder.getPaymentStatus())));
@@ -115,7 +119,8 @@ public class WorkOrderServiceImpl implements IWorkOrderService {
         workOrder.setLastModificationBy(userAuth);
 
         saveWorkOrder(workOrder);
-        commentService.saveCommentOrder("Orden de trabajo cancelada", workOrder.getOrderNumber(), userAuth);
+        commentService.saveCommentOrder(String.format("Orden de trabajo cancelada %s", addCommentDTORequest.getComment()),
+                workOrder.getOrderNumber(), userAuth);
 
         return MessageDTOResponse.builder().message("Orden de trabajo cancelada con éxito.").build();
     }
