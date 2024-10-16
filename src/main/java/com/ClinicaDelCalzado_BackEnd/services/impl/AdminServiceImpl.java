@@ -322,8 +322,16 @@ public class AdminServiceImpl implements IAdminService {
 
     private Administrator matchDifferencesAdmin(Administrator currentDataAdmin, UpdateAdminDTORequest newDataAdmin, Long userId) {
 
+        String password = currentDataAdmin.getPassword();
+        Boolean hasTemporaryPassword = currentDataAdmin.getHasTemporaryPassword();
+
         if (currentDataAdmin.getIdAdministrator().equals(userId)) {
             throw new BadRequestException("No se pueden actualizar los datos del mismo usuario autenticado desde el listado, dirijase a editar perfil");
+        }
+
+        if (ObjectUtils.isNotEmpty(newDataAdmin.getPassword())) {
+            password = passwordEncode(newDataAdmin.getPassword());
+            hasTemporaryPassword = true;
         }
 
         return buildAdministrator(
@@ -340,8 +348,8 @@ public class AdminServiceImpl implements IAdminService {
                 ObjectUtils.isEmpty(newDataAdmin.getAdminType()) || Objects.equals(AdminTypeEnum.getValue(currentDataAdmin.getRole()), newDataAdmin.getAdminType()) ?
                         currentDataAdmin.getRole() :
                         AdminTypeEnum.getName(newDataAdmin.getAdminType()),
-                currentDataAdmin.getPassword(),
-                currentDataAdmin.getHasTemporaryPassword());
+                password,
+                hasTemporaryPassword);
     }
 
     private AnswerDTO createAnswerDTO(AnswerDTO s, List<QuestionDTO> questionDTOList) {
