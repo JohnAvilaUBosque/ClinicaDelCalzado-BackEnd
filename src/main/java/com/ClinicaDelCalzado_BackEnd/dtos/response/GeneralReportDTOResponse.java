@@ -1,6 +1,6 @@
 package com.ClinicaDelCalzado_BackEnd.dtos.response;
 
-import com.ClinicaDelCalzado_BackEnd.dtos.reports.DetailedReportDTO;
+import com.ClinicaDelCalzado_BackEnd.dtos.reports.GeneralReportDTO;
 import com.fasterxml.jackson.databind.PropertyNamingStrategies;
 import com.fasterxml.jackson.databind.annotation.JsonNaming;
 import lombok.AllArgsConstructor;
@@ -15,7 +15,7 @@ import java.util.List;
 @NoArgsConstructor
 @AllArgsConstructor
 @JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
-public class DetailedReportDTOResponse {
+public class GeneralReportDTOResponse {
 
-    private List<DetailedReportDTO> orders;
+    private List<GeneralReportDTO> orders;
 }

@@ -57,13 +57,14 @@ public interface IWorkOrderRepository extends JpaRepository<WorkOrder, String> {
             "wo.deposit AS total_deposits, wo.balance AS total_balance, " +
             "COUNT(CASE WHEN se.service_status = 'RECEIVED' THEN 1 END) AS total_services_received, " +
             "COUNT(CASE WHEN se.service_status = 'FINISHED' THEN 1 END) AS total_services_completed, " +
-            "COUNT(CASE WHEN se.service_status = 'DISPATCHED' THEN 1 END) AS total_services_dispatched " +
+            "COUNT(CASE WHEN se.service_status = 'DISPATCHED' THEN 1 END) AS total_services_dispatched, " +
+            "wo.order_status " +
             "FROM work_order wo " +
             "INNER JOIN service se ON wo.order_number = se.id_order " +
             "WHERE (wo.order_status IN (:orderStatus) OR :orderStatus IS NULL) " +
             "AND (wo.creation_date >= :startDate OR :startDate IS NULL) " +
             "AND (wo.creation_date <= :endDate OR :endDate IS NULL) " +
-            "GROUP BY wo.order_number, wo.creation_date, wo.total_value, wo.deposit, wo.balance", nativeQuery = true)
+            "GROUP BY wo.order_number, wo.creation_date, wo.total_value, wo.deposit, wo.balance, wo.order_status", nativeQuery = true)
     List<Object[]> findWorkOrdersWithServices(
             @Param("orderStatus") String[] orderStatus,
             @Param("startDate") LocalDateTime startDate,

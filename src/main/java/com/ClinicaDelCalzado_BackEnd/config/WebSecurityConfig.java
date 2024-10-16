@@ -76,6 +76,7 @@ public class WebSecurityConfig {
                         .requestMatchers(HttpMethod.GET,"/api/v1/questions/list").permitAll()
                         // ReportsController
                         .requestMatchers(HttpMethod.GET,"/api/v1/reports/detailed").hasAnyAuthority(AdminTypeEnum.ADMINISTRATOR.getKeyName(), AdminTypeEnum.PRINCIPAL.getKeyName())
+                        .requestMatchers(HttpMethod.GET,"/api/v1/reports/general").hasAnyAuthority(AdminTypeEnum.ADMINISTRATOR.getKeyName(), AdminTypeEnum.PRINCIPAL.getKeyName())
                         // ServicesWorkOrderController
                         .requestMatchers(HttpMethod.GET,"/api/v1/services/**").hasAnyAuthority(AdminTypeEnum.ADMINISTRATOR.getKeyName(), AdminTypeEnum.PRINCIPAL.getKeyName(), AdminTypeEnum.SECONDARY.getKeyName())
                         .anyRequest().authenticated())

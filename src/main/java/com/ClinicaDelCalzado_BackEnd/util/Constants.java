@@ -5,4 +5,5 @@ public class Constants {
     public static final String ORDER_ABR = "ORD";
     public static final int RANDOM_MIN = 10000;
     public static final int RANDOM_MAX = 99999;
+    public static final long BEFORE_DATE = 3L;
 }

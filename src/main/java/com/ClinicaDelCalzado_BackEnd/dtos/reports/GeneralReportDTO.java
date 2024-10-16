@@ -1,4 +1,4 @@
-package com.ClinicaDelCalzado_BackEnd.dtos.detailedReport;
+package com.ClinicaDelCalzado_BackEnd.dtos.reports;
 
 import com.fasterxml.jackson.databind.PropertyNamingStrategies;
 import com.fasterxml.jackson.databind.annotation.JsonNaming;
@@ -12,10 +12,9 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 @JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
-public class DetailedReportDTO {
+public class GeneralReportDTO {
 
     private String creationDate;
-    private String orderNumber;
     private Long totalServicesValue;
     private Long totalDeposits;
     private Long totalBalance;

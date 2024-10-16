@@ -1,7 +1,10 @@
 package com.ClinicaDelCalzado_BackEnd.services.impl;
 
-import com.ClinicaDelCalzado_BackEnd.dtos.detailedReport.DetailedReportDTO;
+import com.ClinicaDelCalzado_BackEnd.dtos.enums.OrderStatusEnum;
+import com.ClinicaDelCalzado_BackEnd.dtos.reports.DetailedReportDTO;
+import com.ClinicaDelCalzado_BackEnd.dtos.reports.GeneralReportDTO;
 import com.ClinicaDelCalzado_BackEnd.dtos.response.DetailedReportDTOResponse;
+import com.ClinicaDelCalzado_BackEnd.dtos.response.GeneralReportDTOResponse;
 import com.ClinicaDelCalzado_BackEnd.exceptions.BadRequestException;
 import com.ClinicaDelCalzado_BackEnd.repository.workOrders.IWorkOrderRepository;
 import com.ClinicaDelCalzado_BackEnd.services.IReportService;
@@ -37,7 +40,24 @@ public class ReportServiceImpl implements IReportService {
 
             return getReportOrderList(workOrderList);
         } else {
-            throw new BadRequestException("No se encontro información");
+            throw new BadRequestException("No se encontro información para el reporte detallado");
+        }
+
+    }
+
+    @Override
+    public GeneralReportDTOResponse getWorkOrderListGeneral(List<String> orderStatus, LocalDateTime startDate, LocalDateTime endDate) {
+
+        String orderStatusSeparated = String.join(",", orderStatus);
+        String[] orderStatusSplit = orderStatusSeparated.split(",\\s*");
+
+        if (!ObjectUtils.isEmpty(orderStatusSplit) || !ObjectUtils.isEmpty(startDate) || !ObjectUtils.isEmpty(endDate)) {
+            List<Object[]> workOrderList = workOrderRepository.findWorkOrdersWithServices(orderStatusSplit, startDate, endDate);
+
+            return getReportOrderListGeneral(workOrderList);
+
+        } else {
+            throw new BadRequestException("No se encontro información para el reporte general!");
         }
 
     }
@@ -72,6 +92,7 @@ public class ReportServiceImpl implements IReportService {
                             long servicesReceived = groupedOrders.stream().mapToLong(row -> (long) row[5]).sum(); // services_received (posición 5)
                             long servicesCompleted = groupedOrders.stream().mapToLong(row -> (long) row[6]).sum(); // services_completed (posición 6)
                             long servicesDispatched = groupedOrders.stream().mapToLong(row -> (long) row[7]).sum(); // services_dispatched (posición 7)
+                            String orderStatus = OrderStatusEnum.getValue((String) firstOrderRow[8]);
 
                             // Construir el OrderDTOResponse
                             return DetailedReportDTO.builder()
@@ -83,12 +104,64 @@ public class ReportServiceImpl implements IReportService {
                                     .servicesReceived(servicesReceived)
                                     .servicesCompleted(servicesCompleted)
                                     .servicesDispatched(servicesDispatched)
+                                    .orderStatus(orderStatus)
                                     .build();
                         })
                         .toList()
         );
 
         return detailedReportDTOResponse;
+    }
+
+    private GeneralReportDTOResponse getReportOrderListGeneral(List<Object[]> workOrderList) {
+
+        // Mapear los resultados de Object[] a una estructura de datos más manejable
+        Map<String, List<Object[]>> ordersGroupedByDate = workOrderList.stream()
+                .collect(Collectors.groupingBy(row -> {
+                    Timestamp creationDate = (Timestamp) row[0]; // Obtenemos la fecha de creación (posición 0)
+                    return creationDate.toLocalDateTime().format(DateTimeFormatter.ofPattern("dd-MM-yyyy")); // Formato "dd-MM-yyyy"
+                }));
+
+        // Crear la respuesta
+        GeneralReportDTOResponse generalReportDTOResponse = new GeneralReportDTOResponse();
+
+        // Convertir a DetailedReportDTOResponse con conteo de servicios
+        generalReportDTOResponse.setOrders(
+                ordersGroupedByDate.values().stream()
+                        .map(groupedOrders -> {
+
+                            // Obtener la primera orden para extraer los datos comunes
+                            Object[] firstOrderRow = groupedOrders.get(0);
+
+                            // Extraer datos comunes desde la primera fila del grupo
+                            Timestamp creationDate = (Timestamp) firstOrderRow[0];  // creation_date (posición 0)
+
+                            // Sumar totales por cada orden
+                            double totalServicesValue = groupedOrders.stream().mapToDouble(row -> (Double) row[2]).sum(); // total_value (posición 2)
+                            double totalDeposits = groupedOrders.stream().mapToDouble(row -> (Double) row[3]).sum(); // deposit (posición 3)
+                            double totalBalance = groupedOrders.stream().mapToDouble(row -> (Double) row[4]).sum(); // balance (posición 4)
+
+                            // Contar servicios en cada estado
+                            long servicesReceived = groupedOrders.stream().mapToLong(row -> (long) row[5]).sum(); // services_received (posición 5)
+                            long servicesCompleted = groupedOrders.stream().mapToLong(row -> (long) row[6]).sum(); // services_completed (posición 6)
+                            long servicesDispatched = groupedOrders.stream().mapToLong(row -> (long) row[7]).sum(); // services_dispatched (posición 7)
+
+                            // Construir el OrderDTOResponse
+                            return GeneralReportDTO.builder()
+                                    .creationDate(creationDate.toLocalDateTime().format(DateTimeFormatter.ofPattern("dd-MM-yyyy")))
+                                    .totalServicesValue((long) totalServicesValue)
+                                    .totalDeposits((long) totalDeposits)
+                                    .totalBalance((long) totalBalance)
+                                    .servicesReceived(servicesReceived)
+                                    .servicesCompleted(servicesCompleted)
+                                    .servicesDispatched(servicesDispatched)
+                                    .build();
+                        })
+                        .toList()
+        );
+
+        return generalReportDTOResponse;
+
     }
 
 }
