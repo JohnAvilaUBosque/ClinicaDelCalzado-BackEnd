@@ -26,6 +26,7 @@ import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
 import java.util.stream.Collectors;
+import java.util.stream.LongStream;
 
 import static com.ClinicaDelCalzado_BackEnd.util.Constants.*;
 
@@ -63,6 +64,7 @@ public class WorkOrderServiceImpl implements IWorkOrderService {
     public WorkOrderDTOResponse createWorkOrder(WorkOrderDTORequest workOrderDTORequest, Long userAuth) {
 
         validateRequest(workOrderDTORequest);
+        validateOperators(workOrderDTORequest.getServices());
 
         Company company = companyService.findCompanyWorkOrder(workOrderDTORequest);
         Client client = clientService.findClientWorkOrder(workOrderDTORequest);
@@ -410,6 +412,18 @@ public class WorkOrderServiceImpl implements IWorkOrderService {
 
         if (ObjectUtils.isEmpty(downPayment)) {
             throw new BadRequestException("Se requiere el abono del cliente!!");
+        }
+    }
+
+    private void validateOperators(List<ServicesDTO> services){
+        if(!services.isEmpty() && services.stream().anyMatch(servicesDTO -> Objects.nonNull(servicesDTO.getOperator())
+                && Objects.nonNull(servicesDTO.getOperator().getIdOperator()))) {
+            long[] operators = services.stream()
+                    .filter(s -> ObjectUtils.isNotEmpty(s.getOperator()) && ObjectUtils.isNotEmpty(s.getOperator().getIdOperator()))
+                    .flatMapToLong(s -> LongStream.of(s.getOperator().getIdOperator())).toArray();
+            if(operatorService.findOperatorsById(operators) != operators.length) {
+                throw new BadRequestException("Hay operadores que no existen por lo que no se puede crear la orden de servicio");
+            }
         }
     }
 }

@@ -1,6 +1,7 @@
 package com.ClinicaDelCalzado_BackEnd.services.impl;
 
-import com.ClinicaDelCalzado_BackEnd.dtos.enums.OperatorStatusEnum;
+import
+        com.ClinicaDelCalzado_BackEnd.dtos.enums.OperatorStatusEnum;
 import com.ClinicaDelCalzado_BackEnd.dtos.operator.OperatorDTO;
 import com.ClinicaDelCalzado_BackEnd.dtos.request.OperatorDTORequest;
 import com.ClinicaDelCalzado_BackEnd.dtos.request.UpdateOperatorDTORequest;
@@ -107,6 +108,11 @@ public class OperatorServiceImpl implements IOperatorService {
     @Override
     public Optional<Operator> findOperatorById(Long operatorId) {
         return operatorRepository.findById(operatorId);
+    }
+
+    @Override
+    public Integer findOperatorsById(long[] operators) {
+        return operatorRepository.findOperatorsCount(operators);
     }
 
     private void saveOperator(Operator operator) {

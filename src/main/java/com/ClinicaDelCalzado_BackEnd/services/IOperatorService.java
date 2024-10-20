@@ -21,4 +21,6 @@ public interface IOperatorService {
     Optional<Operator> findOperatorById(Long operatorId);
 
     Operator validateOperatorIdExists(Long id);
+
+    Integer findOperatorsById(long[] operators);
 }
