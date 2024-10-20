@@ -12,6 +12,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Getter
@@ -23,6 +24,8 @@ public class WorkOrderDTORequest {
 
     private CompanyDTO company;
     private Long attendedById;
+    @JsonFormat (shape = JsonFormat.Shape.STRING, pattern = "dd-MM-yyyy HH:mm")
+    private LocalDateTime createDate;
     @JsonFormat (shape = JsonFormat.Shape.STRING, pattern = "dd-MM-yyyy")
     private LocalDate deliveryDate;
     private ClientDTO client;

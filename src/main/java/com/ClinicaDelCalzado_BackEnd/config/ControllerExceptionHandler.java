@@ -3,6 +3,7 @@ package com.ClinicaDelCalzado_BackEnd.config;
 import com.ClinicaDelCalzado_BackEnd.exceptions.ApiError;
 import com.ClinicaDelCalzado_BackEnd.exceptions.ApiException;
 import com.ClinicaDelCalzado_BackEnd.exceptions.BadRequestException;
+import com.fasterxml.jackson.databind.exc.InvalidFormatException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
@@ -12,6 +13,8 @@ import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
 import org.webjars.NotFoundException;
+
+import java.time.format.DateTimeParseException;
 
 /**
  * Basic handling for exceptions.
@@ -68,7 +71,7 @@ public class ControllerExceptionHandler {
         return new ResponseEntity<>(error, HttpStatus.BAD_REQUEST);
     }
 
-    @ExceptionHandler(MethodArgumentTypeMismatchException.class)
+    @ExceptionHandler({MethodArgumentTypeMismatchException.class, DateTimeParseException.class, InvalidFormatException.class})
     public ResponseEntity<?> methodArgumentTypeMismatchException(MethodArgumentTypeMismatchException e) {
         ApiError error = new ApiError(HttpStatus.BAD_REQUEST.value(), HttpStatus.BAD_REQUEST.name(), e.getMessage());
         return new ResponseEntity<>(error, HttpStatus.BAD_REQUEST);

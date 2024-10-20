@@ -1,5 +1,6 @@
 package com.ClinicaDelCalzado_BackEnd.services.impl;
 
+import com.ClinicaDelCalzado_BackEnd.dtos.enums.AdminTypeEnum;
 import com.ClinicaDelCalzado_BackEnd.dtos.enums.OrderStatusEnum;
 import com.ClinicaDelCalzado_BackEnd.dtos.enums.PaymentStatusEnum;
 import com.ClinicaDelCalzado_BackEnd.dtos.enums.ServicesStatusEnum;
@@ -11,6 +12,7 @@ import com.ClinicaDelCalzado_BackEnd.dtos.response.*;
 import com.ClinicaDelCalzado_BackEnd.dtos.workOrders.*;
 import com.ClinicaDelCalzado_BackEnd.entity.*;
 import com.ClinicaDelCalzado_BackEnd.exceptions.BadRequestException;
+import com.ClinicaDelCalzado_BackEnd.exceptions.ForbiddenException;
 import com.ClinicaDelCalzado_BackEnd.repository.workOrders.IWorkOrderRepository;
 import com.ClinicaDelCalzado_BackEnd.services.*;
 import org.apache.commons.lang3.ObjectUtils;
@@ -61,15 +63,22 @@ public class WorkOrderServiceImpl implements IWorkOrderService {
     }
 
     @Override
-    public WorkOrderDTOResponse createWorkOrder(WorkOrderDTORequest workOrderDTORequest, Long userAuth) {
+    public WorkOrderDTOResponse createWorkOrder(WorkOrderDTORequest workOrderDTORequest, Long userAuth, List<String> userAuthorities) {
+
+        if(ObjectUtils.isNotEmpty(workOrderDTORequest.getAttendedById())
+                && userAuthorities.stream().noneMatch(user -> user.equals(AdminTypeEnum.PRINCIPAL.getKeyName()))) {
+            throw new ForbiddenException("No tiene permiso para realizar esta acción, contacte al administrador principal");
+        }
 
         validateRequest(workOrderDTORequest);
         validateOperators(workOrderDTORequest.getServices());
 
         Company company = companyService.findCompanyWorkOrder(workOrderDTORequest);
         Client client = clientService.findClientWorkOrder(workOrderDTORequest);
+        Long adminId = ObjectUtils.isNotEmpty(workOrderDTORequest.getAttendedById()) ? workOrderDTORequest.getAttendedById() : userAuth;
+        LocalDateTime dateNow = ObjectUtils.isNotEmpty(workOrderDTORequest.getCreateDate()) ? workOrderDTORequest.getCreateDate() : LocalDateTime.now();
 
-        Administrator attendedBy = adminService.findAdministratorById(userAuth)
+        Administrator attendedBy = adminService.findAdministratorById(adminId)
                 .orElseThrow(() -> new NotFoundException(String.format("Administrator %s not found", workOrderDTORequest.getAttendedById())));
 
         double totalPriceOrder = totalPrice(workOrderDTORequest.getServices());
@@ -79,7 +88,7 @@ public class WorkOrderServiceImpl implements IWorkOrderService {
                 WorkOrder.builder()
                         .orderNumber(String.format("%s-%s-%d", ORDER_ABR, LocalDate.now().format(DateTimeFormatter.ofPattern("yyyyMMdd")), generateRandomValueOrder()))
                         .idCompany(company)
-                        .creationDate(LocalDateTime.now())
+                        .creationDate(dateNow)
                         .deliveryDate(LocalDate.parse(workOrderDTORequest.getDeliveryDate().toString()))
                         .orderStatus(OrderStatusEnum.VALID.getKeyName())
                         .paymentStatus(newBalance == 0 ? PaymentStatusEnum.PAID.getKeyName() : PaymentStatusEnum.PENDING.getKeyName())

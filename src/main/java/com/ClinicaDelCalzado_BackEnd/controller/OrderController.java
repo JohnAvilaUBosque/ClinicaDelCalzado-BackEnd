@@ -13,8 +13,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 @RestController
 @RequestMapping("/api/v1/work-orders")
@@ -26,12 +29,15 @@ public class OrderController {
     @PostMapping("/created")
     public ResponseEntity<WorkOrderDTOResponse> createWorkOrder(@RequestBody WorkOrderDTORequest workOrderDTO, Authentication authentication) {
         String userAuth = getUserAuth(authentication);
+        List<String> userAuthorities = authentication.getAuthorities().stream().map(GrantedAuthority::getAuthority).toList();
 
-        WorkOrderDTOResponse responseDTO = workOrderService.createWorkOrder(workOrderDTO, Long.valueOf(userAuth));
+        WorkOrderDTOResponse responseDTO = workOrderService.createWorkOrder(workOrderDTO, Long.valueOf(userAuth), userAuthorities);
         return new ResponseEntity<>(responseDTO, HttpStatus.CREATED);
     }
 
     @PutMapping("/cancel/{orderNumber}")
+
+
     public ResponseEntity<MessageDTOResponse> cancelWorkOrder(@PathVariable String orderNumber,
                                                               @RequestBody AddCommentDTORequest addCommentDTORequest, Authentication authentication) {
         String userAuth = getUserAuth(authentication);
