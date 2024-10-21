@@ -10,6 +10,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.Collections;
 import java.util.List;
 
@@ -40,6 +41,8 @@ public class CommentServiceImpl implements ICommentService {
                 .map(comment -> CommentDTO.builder()
                         .idComment(comment.getIdComment())
                         .comment(comment.getAdminComment())
+                        .commentBy(comment.getCommentBy().getAdminName())
+                        .creationDate(comment.getCreationDateComment().format(DateTimeFormatter.ofPattern("dd-MM-yyyy HH:mm")))
                         .build())
                 .toList();
     }

@@ -16,4 +16,6 @@ public class CommentDTO {
 
     private Integer idComment;
     private String comment;
+    private String commentBy;
+    private String creationDate;
 }
