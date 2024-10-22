@@ -1,11 +1,11 @@
-Falta incluir el logo (logo.png)
-
 # CLÍNICA DEL CALZADO
+![Logo.png](Logo.png)
+
 # Proyecto Backend
 
 El objetivo de este proyecto final es implementar un aplicativo web para automatizar la gestión de las órdenes de trabajo de la Clínica del Calzado, mediante un método de autenticación seguro, administración de usuarios, gestión de las órdenes de trabajo, así como la generación de informes generales y detallados, con el fin de mejorar la eficiencia operativa de los administradores y garantizar precisión en los informes.
 
-### Tecnologías utilizadas:
+# Tecnologías utilizadas:
 <p align="left">
   <a href="https://git-scm.com/" target="_blank" rel="noreferrer">
     <img src="https://www.vectorlogo.zone/logos/git-scm/git-scm-icon.svg" alt="Git" width="40" height="40"/>
@@ -31,43 +31,24 @@ El objetivo de este proyecto final es implementar un aplicativo web para automat
 
 </p>
 
-### Miembros del Equipo:
+# Miembros del Equipo:
 - Yury Ximena Alvarez Morantes 
 - John Alejandro Avila Diaz
 - Marielena Barrios Reinoso
 
 
-### Diagrama ER
-Falta incluir el diagramas 
+# Diagrama ER
+![MER_BD_Shoes_Clinic.png](MER_BD_Shoes_Clinic.png)
 
-### JWT security
+# Ejecutar localmente
 
-Para acceder a cada endpoint es necesario primero validar el usuario.
+Si desea ejecutae la aplicación desde su IDE de desarrollo, debe configurar estas variables de entorno
+- SCOPE=local (SCOPE=prod para solicitudes a producción).
+- DB_USER=${DB_USER} (Se debe cambiar el valor ${DB_USER} por el usuario para acceder a la base de datos).
+- DB_PASS=${DB_PASS} (Se debe cambiar el valor ${DB_USER} por la contraseña para acceder a la base de datos.
+- DB_HOST=${DB_HOST} (Se debe cambiar el valor ${DB_USER} por el nombre de host que sirve como repositorio de la base de datos.
+- SCHEMA_NAME=${SCHEMA_NAME} (Se debe cambiar el valor ${DB_USER} por el nombre del esquema de la base de datos. <br/><br/>
 
-Admin Principal puede ingresar a todos los endpoint
-Admin Secundario puede ingresar al endpoint de crear orden de trabajo, XX, XX
-
-### Endpoints:
-
-Requerimiento 1: El usuario puede acceder al aplicativo web con una identificación de usuario y una clave proporcionadas por el administrador del sistema.
-
-- POST /api/v1/login
-
-Requerimiento 2:
-
-- GET 
-- GET 
-
-Requerimiento 3:
-
-
-Requerimiento 4:
-
-
-Requerimiento 5:
-
-
-Requerimiento 6:
-
+  ![Run_Debug_Configurations.png](Run_Debug_Configurations.png)
 
 # java-clínica-del-calzado-backend
