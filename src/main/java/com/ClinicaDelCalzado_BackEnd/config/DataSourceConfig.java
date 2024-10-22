@@ -13,7 +13,7 @@ import javax.sql.DataSource;
 @Configuration
 public class DataSourceConfig {
 
-    private static final String DATA_SOURCE_URL = "jdbc:mysql://%s/%s?allowPublicKeyRetrieval=true&useSSL=false&serverTimezone=UTC&characterEncoding=UTF-8";
+    private static final String DATA_SOURCE_URL = "jdbc:mysql://%s/%s?allowPublicKeyRetrieval=true&useSSL=%s&serverTimezone=UTC&characterEncoding=UTF-8";
 
     @SneakyThrows
     @Bean
@@ -24,7 +24,7 @@ public class DataSourceConfig {
                                     final @Value("${spring.datasource.db}") String db,
                                     final @Value("${spring.datasource.username}") String user,
                                     final @Value("${spring.datasource.password}") String password) {
-        return buildDataSource(driver, jdbcUrl, db, user, password);
+        return buildDataSource(driver, jdbcUrl, db, user, password, true);
     }
 
     @SneakyThrows
@@ -36,13 +36,13 @@ public class DataSourceConfig {
                                          final @Value("${spring.datasource.db}") String db,
                                          final @Value("${spring.datasource.username}") String user,
                                          final @Value("${spring.datasource.password}") String password) {
-        return buildDataSource(driver, jdbcUrl, db, user, password);
+        return buildDataSource(driver, jdbcUrl, db, user, password, false);
     }
 
-    private DataSource buildDataSource(String driver, String jdbcUrl, String db, String user, String password){
+    private DataSource buildDataSource(String driver, String jdbcUrl, String db, String user, String password, Boolean useSSL){
         return DataSourceBuilder.create()
                 .driverClassName(driver)
-                .url(String.format(DATA_SOURCE_URL, jdbcUrl, db))
+                .url(String.format(DATA_SOURCE_URL, jdbcUrl, db, useSSL))
                 .username(user)
                 .password(password)
                 .build();
