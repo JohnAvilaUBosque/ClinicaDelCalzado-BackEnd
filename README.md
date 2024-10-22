@@ -44,11 +44,11 @@ El objetivo de este proyecto final es implementar un aplicativo web para automat
 
 Si desea ejecutae la aplicación desde su IDE de desarrollo, debe configurar estas variables de entorno
 - SCOPE=local (SCOPE=prod para solicitudes a producción).
-- DB_USER=${DB_USER} (Se debe cambiar el valor ${DB_USER} por el usuario para acceder a la base de datos).
-- DB_PASS=${DB_PASS} (Se debe cambiar el valor ${DB_USER} por la contraseña para acceder a la base de datos.
-- DB_HOST=${DB_HOST} (Se debe cambiar el valor ${DB_USER} por el nombre de host que sirve como repositorio de la base de datos.
-- SCHEMA_NAME=${SCHEMA_NAME} (Se debe cambiar el valor ${DB_USER} por el nombre del esquema de la base de datos. <br/><br/>
+- DB_USER=${DB_USER} (Se debe cambiar por el usuario para acceder a la base de datos).
+- DB_PASS=${DB_PASS} (Se debe cambiar por la contraseña para acceder a la base de datos).
+- DB_HOST=${DB_HOST} (Se debe cambiar por el nombre de host que sirve como repositorio de la base de datos).
+- SCHEMA_NAME=${SCHEMA_NAME} (Se debe cambiar por el nombre del esquema de la base de datos). <br/><br/>
 
   ![Run_Debug_Configurations.png](Run_Debug_Configurations.png)
 
-# java-clínica-del-calzado-backend
+©Copyright java-clínica-del-calzado-backend - 2024
