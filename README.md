@@ -1,11 +1,11 @@
 # CLÍNICA DEL CALZADO
 ![Logo.png](Logo.png)
 
-# Proyecto Backend
+# Backend Project
 
-El objetivo de este proyecto es implementar un aplicativo web para automatizar la gestión de las órdenes de trabajo de la Clínica del Calzado, mediante un método de autenticación seguro, administración de usuarios, gestión de las órdenes de trabajo, así como la generación de informes generales y detallados, con el fin de mejorar la eficiencia operativa de los administradores y garantizar precisión en los informes.
+This project's objective is to implement a web application to automate the management of work orders for the Clínica del Calzado. This includes a secure authentication method, user management, work order handling, and generating general and detailed reports. The goal is to improve administrators' operational efficiency and ensure the accuracy of the reports.
 
-# Tecnologías utilizadas:
+# Technology:
 <p align="left">
   <a href="https://git-scm.com/" target="_blank" rel="noreferrer">
     <img src="https://www.vectorlogo.zone/logos/git-scm/git-scm-icon.svg" alt="Git" width="40" height="40"/>
@@ -31,23 +31,23 @@ El objetivo de este proyecto es implementar un aplicativo web para automatizar l
 
 </p>
 
-# Miembros del Equipo:
+# Team Members:
 - Yury Ximena Alvarez Morantes 
 - John Alejandro Avila Diaz
 - Marielena Barrios Reinoso
 
 
-# Diagrama ER
+# ER Diagram
 ![MER_BD_Shoes_Clinic.png](MER_BD_Shoes_Clinic.png)
 
-# Ejecutar localmente
+# Run Locally
 
-Si desea ejecutae la aplicación desde su IDE de desarrollo, debe configurar estas variables de entorno
-- SCOPE=local (SCOPE=prod para solicitudes a producción).
-- DB_USER=${DB_USER} (Se debe cambiar por el usuario para acceder a la base de datos).
-- DB_PASS=${DB_PASS} (Se debe cambiar por la contraseña para acceder a la base de datos).
-- DB_HOST=${DB_HOST} (Se debe cambiar por el nombre de host que sirve como repositorio de la base de datos).
-- SCHEMA_NAME=${SCHEMA_NAME} (Se debe cambiar por el nombre del esquema de la base de datos). <br/><br/>
+To run the application from your development IDE, you need to configure these environment variables.
+- SCOPE=local (SCOPE=prod for production requests).
+- DB_USER=${DB_USER} (Should be replaced with the user to access the database).
+- DB_PASS=${DB_PASS} (Should be replaced with the password to access the database).
+- DB_HOST=${DB_HOST} (Should be replaced with the hostname serving as the database repository).
+- SCHEMA_NAME=${SCHEMA_NAME} (Should be replaced with the database schema name). <br/><br/>
 
   ![Run_Debug_Configurations.png](Run_Debug_Configurations.png)
 
