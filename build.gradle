@@ -55,8 +55,8 @@ dependencies {
 	// <!-- Test dependencies for all projects -->
 	testImplementation 'org.springframework.boot:spring-boot-starter-test'
 	testImplementation 'org.mockito:mockito-junit-jupiter:5.9.0'
-	testImplementation 'org.mockito:mockito-core:2.1.0'
-	testImplementation 'org.junit.jupiter:junit-jupiter-api:5.8.1'
+	testImplementation 'org.mockito:mockito-core:2.13.0'
+	testImplementation 'org.junit.jupiter:junit-jupiter-api:5.11.0'
 	testImplementation 'org.springframework.security:spring-security-test'
 	testImplementation 'uk.org.webcompere:system-stubs-jupiter:2.0.1'
 	testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
