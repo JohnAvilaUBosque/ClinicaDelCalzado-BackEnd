@@ -44,7 +44,7 @@ public class ClientServiceImpl implements IClientService {
         Optional<Client> client = findClientByIdClient(idClient);
 
         if (client.isEmpty()) {
-            throw new NotFoundException(String.format("La identificación %s del administrador no existe", idClient));
+            throw new NotFoundException(String.format("La identificación %s del cliente no existe", idClient));
         }
 
         clientDTOResponse.setMessage("Detalles del cliente recuperados exitosamente.");
