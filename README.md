@@ -3,7 +3,7 @@
 
 # Proyecto Backend
 
-El objetivo de este proyecto final es implementar un aplicativo web para automatizar la gestión de las órdenes de trabajo de la Clínica del Calzado, mediante un método de autenticación seguro, administración de usuarios, gestión de las órdenes de trabajo, así como la generación de informes generales y detallados, con el fin de mejorar la eficiencia operativa de los administradores y garantizar precisión en los informes.
+El objetivo de este proyecto es implementar un aplicativo web para automatizar la gestión de las órdenes de trabajo de la Clínica del Calzado, mediante un método de autenticación seguro, administración de usuarios, gestión de las órdenes de trabajo, así como la generación de informes generales y detallados, con el fin de mejorar la eficiencia operativa de los administradores y garantizar precisión en los informes.
 
 # Tecnologías utilizadas:
 <p align="left">
