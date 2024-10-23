@@ -11,7 +11,7 @@ import java.util.Arrays;
 @RequiredArgsConstructor
 public enum OrderStatusEnum {
     VALID("VALID", "VIGENTE"),
-    FINISHED("FINISHED", "TERMINADA"),
+    FINISHED("FINISHED", "FINALIZADA"),
     CANCELED("CANCELED", "ANULADA");
 
     final String keyName;
