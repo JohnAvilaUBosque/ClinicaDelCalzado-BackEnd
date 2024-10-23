@@ -16,7 +16,7 @@ public interface IWorkOrderRepository extends JpaRepository<WorkOrder, String> {
             "wo.creation_date, wo.delivery_date, " +
             "COUNT(se.id_order) AS services, " +
             "wo.order_status, wo.total_value, wo.deposit, wo.balance, wo.payment_status, " +
-            "ad.id_administrator AS attended_by, co.id_company " +
+            "ad.admin_name AS attended_by, co.id_company " +
             "FROM work_order wo " +
             "INNER JOIN client cl ON wo.id_client = cl.id_client " +
             "INNER JOIN service se ON wo.order_number = se.id_order " +
@@ -34,7 +34,7 @@ public interface IWorkOrderRepository extends JpaRepository<WorkOrder, String> {
             "wo.creation_date, wo.delivery_date, " +
             "COUNT(se.id_order) AS services, " +
             "wo.order_status, wo.total_value, wo.deposit, wo.balance, wo.payment_status, " +
-            "ad.id_administrator AS attended_by, co.id_company " +
+            "ad.admin_name AS attended_by, co.id_company " +
             "FROM work_order wo " +
             "INNER JOIN client cl ON wo.id_client = cl.id_client " +
             "INNER JOIN service se ON wo.order_number = se.id_order " +

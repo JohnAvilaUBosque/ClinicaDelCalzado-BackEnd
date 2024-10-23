@@ -356,6 +356,7 @@ public class WorkOrderServiceImpl implements IWorkOrderService {
                             Timestamp creationDate = (Timestamp) firstOrderRow[4]; // creation_date (posición 4)
                             Date deliveryDate = (Date) firstOrderRow[5]; // delivery_date (posición 5)
                             long servicesOrderCount = (long) firstOrderRow[6]; // services_count (posición 6)
+                            String adminName = (String) firstOrderRow[12]; // attended_by (posición 12)
 
                             SimpleDateFormat simpleDateFormat = new SimpleDateFormat("dd-MM-yyyy");
 
@@ -367,6 +368,7 @@ public class WorkOrderServiceImpl implements IWorkOrderService {
                                             .name(clientName)
                                             .cellphone(clientPhone)
                                             .build())
+                                    .attendedBy(adminName)
                                     .createDate(creationDate.toLocalDateTime().format(DateTimeFormatter.ofPattern("dd-MM-yyyy HH:mm")))
                                     .deliveryDate(simpleDateFormat.format(deliveryDate))
                                     .servicesCount(servicesOrderCount) // Cantidad total de servicios

@@ -15,6 +15,7 @@ public class OrderDTOResponse {
 
     private String orderNumber;
     private ClientDTO client;
+    private String attendedBy;
     private String createDate;
     private String deliveryDate;
     private Long servicesCount;
