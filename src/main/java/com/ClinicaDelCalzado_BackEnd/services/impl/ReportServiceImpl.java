@@ -15,6 +15,7 @@ import org.springframework.stereotype.Service;
 import java.sql.Timestamp;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -97,7 +98,7 @@ public class ReportServiceImpl implements IReportService {
                             // Construir el OrderDTOResponse
                             return DetailedReportDTO.builder()
                                     .orderNumber(orderNumber)
-                                    .creationDate(creationDate.toLocalDateTime().format(DateTimeFormatter.ofPattern("dd-MM-yyyy HH:mm")))
+                                    .creationDate(creationDate.toLocalDateTime())
                                     .totalServicesValue((long) totalServicesValue)
                                     .totalDeposits((long) totalDeposits)
                                     .totalBalance((long) totalBalance)
@@ -107,6 +108,7 @@ public class ReportServiceImpl implements IReportService {
                                     .orderStatus(orderStatus)
                                     .build();
                         })
+                        .sorted(Comparator.comparing(DetailedReportDTO::getCreationDate))
                         .toList()
         );
 
@@ -148,7 +150,7 @@ public class ReportServiceImpl implements IReportService {
 
                             // Construir el OrderDTOResponse
                             return GeneralReportDTO.builder()
-                                    .creationDate(creationDate.toLocalDateTime().format(DateTimeFormatter.ofPattern("dd-MM-yyyy")))
+                                    .creationDate(creationDate)
                                     .totalServicesValue((long) totalServicesValue)
                                     .totalDeposits((long) totalDeposits)
                                     .totalBalance((long) totalBalance)
@@ -157,6 +159,7 @@ public class ReportServiceImpl implements IReportService {
                                     .servicesDispatched(servicesDispatched)
                                     .build();
                         })
+                        .sorted(Comparator.comparing(GeneralReportDTO::getCreationDate))
                         .toList()
         );
 

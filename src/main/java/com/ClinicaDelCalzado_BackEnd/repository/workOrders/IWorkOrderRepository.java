@@ -26,7 +26,8 @@ public interface IWorkOrderRepository extends JpaRepository<WorkOrder, String> {
             "AND wo.creation_date >= DATE_SUB(NOW(), INTERVAL 3 MONTH) " +
             "GROUP BY wo.order_number, cl.id_client, cl.client_name, cl.cli_phone_number, " +
             "wo.creation_date, wo.delivery_date, wo.order_status, wo.total_value, " +
-            "wo.deposit, wo.balance, wo.payment_status, ad.id_administrator, co.id_company",
+            "wo.deposit, wo.balance, wo.payment_status, ad.id_administrator, co.id_company " +
+            "ORDER BY wo.creation_date asc",
             nativeQuery = true)
     List<Object[]> findOrdersWithServicesByStatus(@Param("orderStatus") String orderStatus);
 
@@ -48,7 +49,9 @@ public interface IWorkOrderRepository extends JpaRepository<WorkOrder, String> {
             "AND (:adminName IS NULL OR ad.admin_name LIKE CONCAT('%', :adminName, '%')) " +
             "GROUP BY wo.order_number, cl.id_client, cl.client_name, cl.cli_phone_number, " +
             "wo.creation_date, wo.delivery_date, wo.order_status, wo.total_value, " +
-            "wo.deposit, wo.balance, wo.payment_status, ad.id_administrator, co.id_company", nativeQuery = true)
+            "wo.deposit, wo.balance, wo.payment_status, ad.id_administrator, co.id_company " +
+            "ORDER BY wo.creation_date asc",
+            nativeQuery = true)
     List<Object[]> findFilteredWorkOrders(@Param("orderStatus") String orderStatus, @Param("orderNumber") String orderNumber, @Param("clientId") Long clientId,
                                           @Param("clientName") String clientName, @Param("cliPhoneNumber") String cliPhoneNumber, @Param("adminName") String adminName);
 
@@ -64,7 +67,8 @@ public interface IWorkOrderRepository extends JpaRepository<WorkOrder, String> {
             "WHERE (wo.order_status IN (:orderStatus) OR :orderStatus IS NULL) " +
             "AND (wo.creation_date >= :startDate OR :startDate IS NULL) " +
             "AND (wo.creation_date <= :endDate OR :endDate IS NULL) " +
-            "GROUP BY wo.order_number, wo.creation_date, wo.total_value, wo.deposit, wo.balance, wo.order_status", nativeQuery = true)
+            "GROUP BY wo.order_number, wo.creation_date, wo.total_value, wo.deposit, wo.balance, wo.order_status " +
+            "ORDER BY (UNIX_TIMESTAMP(wo.creation_date)) desc", nativeQuery = true)
     List<Object[]> findWorkOrdersWithServices(
             @Param("orderStatus") String[] orderStatus,
             @Param("startDate") LocalDateTime startDate,

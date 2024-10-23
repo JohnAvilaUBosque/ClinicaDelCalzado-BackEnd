@@ -4,6 +4,7 @@ import com.ClinicaDelCalzado_BackEnd.dtos.enums.AdminTypeEnum;
 import com.ClinicaDelCalzado_BackEnd.dtos.enums.OrderStatusEnum;
 import com.ClinicaDelCalzado_BackEnd.dtos.enums.PaymentStatusEnum;
 import com.ClinicaDelCalzado_BackEnd.dtos.enums.ServicesStatusEnum;
+import com.ClinicaDelCalzado_BackEnd.dtos.reports.DetailedReportDTO;
 import com.ClinicaDelCalzado_BackEnd.dtos.request.AddCommentDTORequest;
 import com.ClinicaDelCalzado_BackEnd.dtos.request.UpdatePaymentDTORequest;
 import com.ClinicaDelCalzado_BackEnd.dtos.request.UpdateServicesDTORequest;
@@ -370,7 +371,7 @@ public class WorkOrderServiceImpl implements IWorkOrderService {
                                             .build())
                                     .attendedBy(adminName)
                                     .createDate(creationDate.toLocalDateTime().format(DateTimeFormatter.ofPattern("dd-MM-yyyy HH:mm")))
-                                    .deliveryDate(simpleDateFormat.format(deliveryDate))
+                                    .deliveryDate(deliveryDate)
                                     .servicesCount(servicesOrderCount) // Cantidad total de servicios
                                     .orderStatus(OrderStatusEnum.getValue(String.valueOf(firstOrderRow[7]))) // order_status (posición 7)
                                     .totalValue(((Double) firstOrderRow[8]).longValue()) // total_value (posición 8)
@@ -379,6 +380,7 @@ public class WorkOrderServiceImpl implements IWorkOrderService {
                                     .paymentStatus(PaymentStatusEnum.getValue(String.valueOf(firstOrderRow[11])))  // payment_status (posición 11)
                                     .build();
                         })
+                        .sorted(Comparator.comparing(OrderDTOResponse::getDeliveryDate))
                         .toList()
         );
 
