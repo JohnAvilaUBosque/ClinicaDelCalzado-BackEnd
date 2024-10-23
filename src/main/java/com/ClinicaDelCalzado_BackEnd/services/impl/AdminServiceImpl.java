@@ -29,6 +29,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.webjars.NotFoundException;
 
+import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
@@ -174,51 +175,62 @@ public class AdminServiceImpl implements IAdminService {
                 .cellphone(adminDTO.getPhone())
                 .build(), 0L);
 
-        if (adminDTO.getSecurityQuestions().isEmpty()) {
-            throw new BadRequestException("El listado de preguntas y respuestas no puede ser vacío");
-        }
-
-        if (adminDTO.getSecurityQuestions().stream().map(AnswerDTO::getIdQuestion).distinct().count() == 1) {
-            throw new BadRequestException("Hay preguntas que se repiten por lo que debe seleccionar diferentes tipos de preguntas");
-        }
-
+        List<AnswerDTO> securityQuestions = Collections.emptyList();
         List<Answer> currentAnswer = answerService.findAnswerAllByAdminId(adminId);
-
-        //Actualizar todos los estados a false
-        if (!currentAnswer.isEmpty()) {
-            currentAnswer.forEach(
-                    p -> {
-                        answerService.saveAnswer(Answer.builder()
-                                .idAnswers(p.getIdAnswers())
-                                .securityQuestion(SecurityQuestion.builder().idSecurityQuestion(p.getSecurityQuestion().getIdSecurityQuestion()).build())
-                                .answer(p.getAnswer())
-                                .idAdministrator(Administrator.builder().idAdministrator(adminId).build())
-                                .status(false)
-                                .build());
-                    }
-            );
-        }
-
-        adminDTO.getSecurityQuestions().forEach(p -> {
-                    Answer newAnswer = new Answer();
-                    currentAnswer.stream()
-                            .filter(answer ->
-                                    answer.getSecurityQuestion().getIdSecurityQuestion().longValue() == p.getIdQuestion())
-                            .map(Answer::getIdAnswers)
-                            .forEach(newAnswer::setIdAnswers);
-                    newAnswer.setSecurityQuestion(SecurityQuestion.builder().idSecurityQuestion(p.getIdQuestion().intValue()).build());
-                    newAnswer.setAnswer(p.getAnswer());
-                    newAnswer.setIdAdministrator(Administrator.builder().idAdministrator(adminId).build());
-                    newAnswer.setStatus(true);
-                    answerService.saveAnswer(newAnswer);
-                }
-        );
-
         List<QuestionDTO> questionDTOList = questionService.findAllQuestions().getQuestions();
 
-        List<AnswerDTO> securityQuestions = adminDTO.getSecurityQuestions().stream()
-                .map(s -> createAnswerDTO(s, questionDTOList))
-                .toList();
+        if (ObjectUtils.isNotEmpty(adminDTO.getSecurityQuestions())) {
+
+            if (adminDTO.getSecurityQuestions().stream().map(AnswerDTO::getIdQuestion).distinct().count() == 1) {
+                throw new BadRequestException("Hay preguntas que se repiten por lo que debe seleccionar diferentes tipos de preguntas");
+            }
+
+            //Actualizar todos los estados a false
+            if (!currentAnswer.isEmpty()) {
+                currentAnswer.forEach(
+                        p -> {
+                            answerService.saveAnswer(Answer.builder()
+                                    .idAnswers(p.getIdAnswers())
+                                    .securityQuestion(SecurityQuestion.builder().idSecurityQuestion(p.getSecurityQuestion().getIdSecurityQuestion()).build())
+                                    .answer(p.getAnswer())
+                                    .idAdministrator(Administrator.builder().idAdministrator(adminId).build())
+                                    .status(false)
+                                    .build());
+                        }
+                );
+            }
+
+            adminDTO.getSecurityQuestions().forEach(p -> {
+                        Answer newAnswer = new Answer();
+                        currentAnswer.stream()
+                                .filter(answer ->
+                                        answer.getSecurityQuestion().getIdSecurityQuestion().longValue() == p.getIdQuestion())
+                                .map(Answer::getIdAnswers)
+                                .forEach(newAnswer::setIdAnswers);
+                        newAnswer.setSecurityQuestion(SecurityQuestion.builder().idSecurityQuestion(p.getIdQuestion().intValue()).build());
+                        newAnswer.setAnswer(p.getAnswer());
+                        newAnswer.setIdAdministrator(Administrator.builder().idAdministrator(adminId).build());
+                        newAnswer.setStatus(true);
+                        answerService.saveAnswer(newAnswer);
+                    }
+            );
+
+            securityQuestions = adminDTO.getSecurityQuestions().stream()
+                    .map(s -> createAnswerDTO(s, questionDTOList))
+                    .toList();
+        }
+
+        if (securityQuestions.isEmpty() && !currentAnswer.isEmpty()) {
+            securityQuestions = currentAnswer.stream()
+                    .filter(answer -> answer.getStatus().equals(true))
+                    .map(s -> createAnswerDTO(
+                            AnswerDTO.builder()
+                                    .idQuestion(s.getSecurityQuestion().getIdSecurityQuestion().longValue())
+                                    .answer(s.getAnswer())
+                                    .build(),
+                            questionDTOList))
+                    .toList();
+        }
 
         return UpdateAdminQuestionDTOResponse.builder()
                 .message("Información personal editada exitosamente.")
