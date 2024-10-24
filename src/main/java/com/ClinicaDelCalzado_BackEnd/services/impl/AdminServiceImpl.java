@@ -182,7 +182,7 @@ public class AdminServiceImpl implements IAdminService {
         if (ObjectUtils.isNotEmpty(adminDTO.getSecurityQuestions()) &&
                 adminDTO.getSecurityQuestions().stream().noneMatch(answerDTO -> answerDTO.getIdQuestion() == 0)) {
 
-            if (adminDTO.getSecurityQuestions().stream().map(AnswerDTO::getIdQuestion).distinct().count() == 1) {
+            if (adminDTO.getSecurityQuestions().stream().map(AnswerDTO::getIdQuestion).distinct().count() != adminDTO.getSecurityQuestions().stream().count()) {
                 throw new BadRequestException("Hay preguntas que se repiten por lo que debe seleccionar diferentes tipos de preguntas");
             }
 
