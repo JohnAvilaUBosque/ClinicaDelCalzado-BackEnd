@@ -13,7 +13,7 @@ import lombok.*;
 public class UpdateServicesDTORequest {
 
     private Long operatorId;
-    private String serviceName;
+    private String name;
     private Long price;
     private String serviceStatus;
 }

@@ -18,7 +18,7 @@ import java.util.List;
 public class UpdateAdminQuestionDTO {
 
     private String name;
-    private String phone;
+    private String cellPhone;
     private List<AnswerDTO> securityQuestions;
 
 }

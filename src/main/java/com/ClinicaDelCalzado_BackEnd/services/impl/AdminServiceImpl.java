@@ -172,7 +172,7 @@ public class AdminServiceImpl implements IAdminService {
 
         AdminDTOResponse update = update(adminId, UpdateAdminDTORequest.builder()
                 .name(adminDTO.getName())
-                .cellphone(adminDTO.getPhone())
+                .cellphone(adminDTO.getCellPhone())
                 .build(), 0L);
 
         List<AnswerDTO> securityQuestions = Collections.emptyList();
@@ -237,7 +237,7 @@ public class AdminServiceImpl implements IAdminService {
                 .message("Información personal editada exitosamente.")
                 .admin(UpdateAdminQuestionDTO.builder()
                         .name(update.getAdmin().getName())
-                        .phone(update.getAdmin().getCellphone())
+                        .cellPhone(update.getAdmin().getCellphone())
                         .securityQuestions(securityQuestions)
                         .build())
                 .build();
@@ -355,9 +355,9 @@ public class AdminServiceImpl implements IAdminService {
                 ObjectUtils.isEmpty(newDataAdmin.getCellphone()) || Objects.equals(currentDataAdmin.getAdmPhoneNumber(), newDataAdmin.getCellphone()) ?
                         currentDataAdmin.getAdmPhoneNumber() :
                         newDataAdmin.getCellphone(),
-                ObjectUtils.isEmpty(newDataAdmin.getAdminStatus()) || Objects.equals(AdminStatusEnum.getValue(currentDataAdmin.getAdminStatus()), newDataAdmin.getAdminStatus()) ?
+                ObjectUtils.isEmpty(newDataAdmin.getStatus()) || Objects.equals(AdminStatusEnum.getValue(currentDataAdmin.getAdminStatus()), newDataAdmin.getStatus()) ?
                         currentDataAdmin.getAdminStatus() :
-                        AdminStatusEnum.getName(newDataAdmin.getAdminStatus()),
+                        AdminStatusEnum.getName(newDataAdmin.getStatus()),
                 ObjectUtils.isEmpty(newDataAdmin.getAdminType()) || Objects.equals(AdminTypeEnum.getValue(currentDataAdmin.getRole()), newDataAdmin.getAdminType()) ?
                         currentDataAdmin.getRole() :
                         AdminTypeEnum.getName(newDataAdmin.getAdminType()),

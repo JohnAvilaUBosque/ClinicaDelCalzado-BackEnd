@@ -11,10 +11,9 @@ import lombok.NoArgsConstructor;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-@JsonNaming(PropertyNamingStrategy.SnakeCaseStrategy.class)
 public class ClientDTO {
 
     private Long identification;
-    private String clientName;
-    private String clientPhone;
+    private String name;
+    private String cellphone;
 }

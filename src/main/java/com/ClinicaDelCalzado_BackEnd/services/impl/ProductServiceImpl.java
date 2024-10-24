@@ -173,8 +173,8 @@ public class ProductServiceImpl implements IProductService {
     private ServicesEntity matchDifferencesSer(ServicesEntity currentDataSer, UpdateServicesDTORequest newDataSer) {
         return buildService(
                 currentDataSer.getIdService(),
-                ObjectUtils.isEmpty(newDataSer.getServiceName()) || Objects.equals(currentDataSer.getService(), newDataSer.getServiceName()) ?
-                        currentDataSer.getService() : newDataSer.getServiceName(),
+                ObjectUtils.isEmpty(newDataSer.getName()) || Objects.equals(currentDataSer.getService(), newDataSer.getName()) ?
+                        currentDataSer.getService() : newDataSer.getName(),
                 currentDataSer.getIdOrderSer().getOrderNumber(),
                 ObjectUtils.isEmpty(newDataSer.getOperatorId()) || (ObjectUtils.isNotEmpty(currentDataSer.getIdOperator()) && Objects.equals(currentDataSer.getIdOperator().getIdOperator(), newDataSer.getOperatorId())) ?
                         currentDataSer.getIdOperator().getIdOperator() : newDataSer.getOperatorId(),

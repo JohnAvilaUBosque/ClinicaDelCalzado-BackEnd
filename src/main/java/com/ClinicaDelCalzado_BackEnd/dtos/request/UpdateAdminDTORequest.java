@@ -16,6 +16,6 @@ public class UpdateAdminDTORequest {
     private Long identification;
     private String name;
     private String cellphone;
-    private String adminStatus;
+    private String status;
     private String password;
 }
