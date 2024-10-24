@@ -4,7 +4,6 @@ import com.ClinicaDelCalzado_BackEnd.dtos.enums.AdminTypeEnum;
 import com.ClinicaDelCalzado_BackEnd.dtos.enums.OrderStatusEnum;
 import com.ClinicaDelCalzado_BackEnd.dtos.enums.PaymentStatusEnum;
 import com.ClinicaDelCalzado_BackEnd.dtos.enums.ServicesStatusEnum;
-import com.ClinicaDelCalzado_BackEnd.dtos.reports.DetailedReportDTO;
 import com.ClinicaDelCalzado_BackEnd.dtos.request.AddCommentDTORequest;
 import com.ClinicaDelCalzado_BackEnd.dtos.request.UpdatePaymentDTORequest;
 import com.ClinicaDelCalzado_BackEnd.dtos.request.UpdateServicesDTORequest;
