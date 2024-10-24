@@ -106,7 +106,7 @@ public class ProductServiceImpl implements IProductService {
                     ServicesEntity service = ServicesEntity.builder()
                             .idOrderSer(orderNumber)
                             .service(serviceDTO.getName())
-                            .unitValue(serviceDTO.getPrice().doubleValue())
+                            .unitValue(ObjectUtils.isNotEmpty(serviceDTO.getPrice()) ? serviceDTO.getPrice().doubleValue() : 0L)
                             .serviceStatus(ServicesStatusEnum.RECEIVED.getKeyName())
                             .idOperator(ObjectUtils.isNotEmpty(serviceDTO.getOperator())
                                     && ObjectUtils.isNotEmpty(serviceDTO.getOperator().getIdOperator()) ?

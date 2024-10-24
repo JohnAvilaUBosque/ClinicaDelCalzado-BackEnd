@@ -50,9 +50,7 @@ public class WorkOrderServiceImpl implements IWorkOrderService {
     private final IOperatorService operatorService;
 
     @Autowired
-    public WorkOrderServiceImpl(IWorkOrderRepository workOrderRepository, ICompanyService companyService,
-                                IClientService clientService, IProductService productService,
-                                IAdminService adminService, ICommentService commentService, IOperatorService operatorService) {
+    public WorkOrderServiceImpl(IWorkOrderRepository workOrderRepository, ICompanyService companyService, IClientService clientService, IProductService productService, IAdminService adminService, ICommentService commentService, IOperatorService operatorService) {
         this.workOrderRepository = workOrderRepository;
         this.companyService = companyService;
         this.clientService = clientService;
@@ -65,8 +63,7 @@ public class WorkOrderServiceImpl implements IWorkOrderService {
     @Override
     public WorkOrderDTOResponse createWorkOrder(WorkOrderDTORequest workOrderDTORequest, Long userAuth, List<String> userAuthorities) {
 
-        if (ObjectUtils.isNotEmpty(workOrderDTORequest.getAttendedById())
-                && userAuthorities.stream().noneMatch(user -> user.equals(AdminTypeEnum.PRINCIPAL.getKeyName()))) {
+        if (ObjectUtils.isNotEmpty(workOrderDTORequest.getAttendedById()) && userAuthorities.stream().noneMatch(user -> user.equals(AdminTypeEnum.PRINCIPAL.getKeyName()))) {
             throw new ForbiddenException("No tiene permiso para realizar esta acción, contacte al administrador principal");
         }
 
@@ -78,26 +75,16 @@ public class WorkOrderServiceImpl implements IWorkOrderService {
         Long adminId = ObjectUtils.isNotEmpty(workOrderDTORequest.getAttendedById()) ? workOrderDTORequest.getAttendedById() : userAuth;
         LocalDateTime dateNow = ObjectUtils.isNotEmpty(workOrderDTORequest.getCreateDate()) ? workOrderDTORequest.getCreateDate() : LocalDateTime.now();
 
-        Administrator attendedBy = adminService.findAdministratorById(adminId)
-                .orElseThrow(() -> new NotFoundException(String.format("Administrator %s not found", workOrderDTORequest.getAttendedById())));
+        Administrator attendedBy = adminService.findAdministratorById(adminId).orElseThrow(() -> new NotFoundException(String.format("Administrator %s not found", workOrderDTORequest.getAttendedById())));
 
         double totalPriceOrder = totalPrice(workOrderDTORequest.getServices());
         double newBalance = totalPriceOrder - workOrderDTORequest.getDownPayment();
 
-        WorkOrder workOrder = saveWorkOrder(
-                WorkOrder.builder()
-                        .orderNumber(String.format("%s-%s-%d", ORDER_ABR, LocalDate.now().format(DateTimeFormatter.ofPattern("yyyyMMdd")), generateRandomValueOrder()))
-                        .idCompany(company)
-                        .creationDate(dateNow)
-                        .deliveryDate(LocalDate.parse(workOrderDTORequest.getDeliveryDate().toString()))
-                        .orderStatus(OrderStatusEnum.VALID.getKeyName())
-                        .paymentStatus(newBalance == 0 ? PaymentStatusEnum.PAID.getKeyName() : PaymentStatusEnum.PENDING.getKeyName())
-                        .attendedBy(attendedBy)
-                        .idClient(client)
-                        .deposit(workOrderDTORequest.getDownPayment())
-                        .totalValue(totalPriceOrder)
-                        .balance(newBalance)
-                        .build());
+        if (newBalance < 0) {
+            throw new BadRequestException(String.format("El valor del balance no puede ser menor a cero cuando se resta el total: %s con el deposito: %s", totalPriceOrder, workOrderDTORequest.getDownPayment()));
+        }
+
+        WorkOrder workOrder = saveWorkOrder(WorkOrder.builder().orderNumber(String.format("%s-%s-%d", ORDER_ABR, LocalDate.now().format(DateTimeFormatter.ofPattern("yyyyMMdd")), generateRandomValueOrder())).idCompany(company).creationDate(dateNow).deliveryDate(LocalDate.parse(workOrderDTORequest.getDeliveryDate().toString())).orderStatus(OrderStatusEnum.VALID.getKeyName()).paymentStatus(newBalance == 0 ? PaymentStatusEnum.PAID.getKeyName() : PaymentStatusEnum.PENDING.getKeyName()).attendedBy(attendedBy).idClient(client).deposit(workOrderDTORequest.getDownPayment()).totalValue(totalPriceOrder).balance(newBalance).build());
 
         if (ObjectUtils.isNotEmpty(workOrderDTORequest.getGeneralComment())) {
             commentService.saveCommentOrder(workOrderDTORequest.getGeneralComment(), workOrder.getOrderNumber(), userAuth);
@@ -121,8 +108,7 @@ public class WorkOrderServiceImpl implements IWorkOrderService {
         }
 
         if (workOrder.getPaymentStatus().equals(PaymentStatusEnum.PAID.getKeyName())) {
-            throw new BadRequestException(String.format("La orden de trabajo no puede ser anulada porque esta en estado %s!!",
-                    PaymentStatusEnum.getValue(workOrder.getPaymentStatus())));
+            throw new BadRequestException(String.format("La orden de trabajo no puede ser anulada porque esta en estado %s!!", PaymentStatusEnum.getValue(workOrder.getPaymentStatus())));
         }
 
         workOrder.setOrderStatus(OrderStatusEnum.CANCELED.getKeyName());
@@ -130,8 +116,7 @@ public class WorkOrderServiceImpl implements IWorkOrderService {
         workOrder.setLastModificationBy(userAuth);
 
         saveWorkOrder(workOrder);
-        commentService.saveCommentOrder(String.format("Orden de trabajo cancelada %s", addCommentDTORequest.getComment()),
-                workOrder.getOrderNumber(), userAuth);
+        commentService.saveCommentOrder(String.format("Orden de trabajo cancelada %s", addCommentDTORequest.getComment()), workOrder.getOrderNumber(), userAuth);
 
         return MessageDTOResponse.builder().message("Orden de trabajo cancelada con éxito.").build();
     }
@@ -148,25 +133,21 @@ public class WorkOrderServiceImpl implements IWorkOrderService {
             workOrder = updateValuesWorkOrder(servicesList, workOrder);
         }
 
-        if (ObjectUtils.isNotEmpty(servicesList) &&
-                servicesList.stream().allMatch(p -> p.getServiceStatus().equals(ServicesStatusEnum.DISPATCHED.getValue())) &&
-                workOrder.getPaymentStatus().equals(PaymentStatusEnum.PAID.getKeyName())) {
+        if (ObjectUtils.isNotEmpty(servicesList) && servicesList.stream().allMatch(p -> p.getServiceStatus().equals(ServicesStatusEnum.DISPATCHED.getValue())) && workOrder.getPaymentStatus().equals(PaymentStatusEnum.PAID.getKeyName())) {
             updateStatusWorkOrder(workOrder, auth);
         }
-        return ServicesDTOResponse.builder()
-                .message("Servicio actualizado exitosamente.")
+        return ServicesDTOResponse.builder().message("Servicio actualizado exitosamente.")
                 .service(ServicesDTOList.builder()
                         .id(services.getIdService())
                         .idOrder(services.getIdOrderSer().getOrderNumber())
                         .name(services.getService())
                         .price(services.getUnitValue().longValue())
+                        .hasPendingPrice(services.getHasPendingUnitValue())
                         .operator(servicesList.stream()
-                                .filter(p -> p.getId().equals(services.getIdService()))
-                                .map(ServicesDTO::getOperator)
-                                .findFirst().orElse(OperatorServiceDTO.builder().build()))
+                                .filter(p -> p.getId().equals(services.getIdService())).map(ServicesDTO::getOperator).findFirst()
+                                .orElse(OperatorServiceDTO.builder().build()))
                         .serviceStatus(services.getServiceStatus())
-                        .build())
-                .build();
+                        .build()).build();
     }
 
     @Override
@@ -212,9 +193,7 @@ public class WorkOrderServiceImpl implements IWorkOrderService {
         workOrder.setBalance(newBalance);
 
         List<ServicesDTO> servicesList = productService.getServicesOrder(orderNumber);
-        if (ObjectUtils.isNotEmpty(servicesList) &&
-                servicesList.stream().allMatch(p -> p.getServiceStatus().equals(ServicesStatusEnum.DISPATCHED.getValue())) &&
-                workOrder.getPaymentStatus().equals(PaymentStatusEnum.PAID.getKeyName())) {
+        if (ObjectUtils.isNotEmpty(servicesList) && servicesList.stream().allMatch(p -> p.getServiceStatus().equals(ServicesStatusEnum.DISPATCHED.getValue())) && workOrder.getPaymentStatus().equals(PaymentStatusEnum.PAID.getKeyName())) {
             updateStatusWorkOrder(workOrder, userAuth);
         } else {
             saveWorkOrder(workOrder);
@@ -246,37 +225,11 @@ public class WorkOrderServiceImpl implements IWorkOrderService {
         List<ServicesDTO> servicesDTOList = productService.getServicesOrder(orderNumber);
         List<CommentDTO> commentDTOList = commentService.getCommentOrder(orderNumber);
 
-        CompanyDTO companyDTO = company.map(value -> CompanyDTO
-                .builder()
-                .name(value.getName())
-                .nit(value.getNit())
-                .address(value.getAddress())
-                .phones(Collections.singletonList(value.getPhones()))
-                .build()).orElse(null);
+        CompanyDTO companyDTO = company.map(value -> CompanyDTO.builder().name(value.getName()).nit(value.getNit()).address(value.getAddress()).phones(Collections.singletonList(value.getPhones())).build()).orElse(null);
 
-        ClientDTO clientDTO = client.map(value -> ClientDTO
-                .builder()
-                .identification(value.getIdClient())
-                .name(value.getClientName())
-                .cellphone(value.getCliPhoneNumber())
-                .build()).orElse(null);
+        ClientDTO clientDTO = client.map(value -> ClientDTO.builder().identification(value.getIdClient()).name(value.getClientName()).cellphone(value.getCliPhoneNumber()).build()).orElse(null);
 
-        return OrderByIdNumberDTOResponse
-                .builder()
-                .orderNumber(orderNumber)
-                .company(companyDTO)
-                .attendedBy(attendedBy.map(Administrator::getAdminName).orElse(""))
-                .createDate(workOrder.getCreationDate().format(DateTimeFormatter.ofPattern("dd-MM-yyyy HH:mm")))
-                .orderStatus(OrderStatusEnum.getValue(workOrder.getOrderStatus()))
-                .deliveryDate(workOrder.getDeliveryDate().format(DateTimeFormatter.ofPattern("dd-MM-yyyy")))
-                .client(clientDTO)
-                .services(servicesDTOList)
-                .comments(commentDTOList)
-                .downPayment(workOrder.getDeposit().longValue())
-                .totalValue(workOrder.getTotalValue().longValue())
-                .balance(workOrder.getBalance().longValue())
-                .paymentStatus(PaymentStatusEnum.getValue(workOrder.getPaymentStatus()))
-                .build();
+        return OrderByIdNumberDTOResponse.builder().orderNumber(orderNumber).company(companyDTO).attendedBy(attendedBy.map(Administrator::getAdminName).orElse("")).createDate(workOrder.getCreationDate().format(DateTimeFormatter.ofPattern("dd-MM-yyyy HH:mm"))).orderStatus(OrderStatusEnum.getValue(workOrder.getOrderStatus())).deliveryDate(workOrder.getDeliveryDate().format(DateTimeFormatter.ofPattern("dd-MM-yyyy"))).client(clientDTO).services(servicesDTOList).comments(commentDTOList).downPayment(workOrder.getDeposit().longValue()).totalValue(workOrder.getTotalValue().longValue()).balance(workOrder.getBalance().longValue()).paymentStatus(PaymentStatusEnum.getValue(workOrder.getPaymentStatus())).build();
     }
 
     @Override
@@ -284,8 +237,7 @@ public class WorkOrderServiceImpl implements IWorkOrderService {
 
         List<Object[]> workOrderList;
 
-        if (!ObjectUtils.isEmpty(orderNumber) || !ObjectUtils.isEmpty(identification) || !ObjectUtils.isEmpty(name)
-                || !ObjectUtils.isEmpty(phone) || !ObjectUtils.isEmpty(attendedBy)) {
+        if (!ObjectUtils.isEmpty(orderNumber) || !ObjectUtils.isEmpty(identification) || !ObjectUtils.isEmpty(name) || !ObjectUtils.isEmpty(phone) || !ObjectUtils.isEmpty(attendedBy)) {
             workOrderList = workOrderRepository.findFilteredWorkOrders(orderStatus, orderNumber, identification, name, phone, attendedBy);
         } else {
             workOrderList = workOrderRepository.findOrdersWithServicesByStatus(orderStatus);
@@ -300,8 +252,7 @@ public class WorkOrderServiceImpl implements IWorkOrderService {
             throw new BadRequestException(String.format("La orden %s no esta registrada!!", orderNumber));
         }
 
-        return workOrderRepository.findById(orderNumber)
-                .orElseThrow(() -> new NotFoundException(String.format("La orden de trabajo %s no encontrada", orderNumber)));
+        return workOrderRepository.findById(orderNumber).orElseThrow(() -> new NotFoundException(String.format("La orden de trabajo %s no encontrada", orderNumber)));
     }
 
     private WorkOrder updateValuesWorkOrder(List<ServicesDTO> servicesDTO, WorkOrder workOrder) {
@@ -342,55 +293,39 @@ public class WorkOrderServiceImpl implements IWorkOrderService {
     private OrderListDTOResponse getOrderList(List<Object[]> workOrderList) {
 
         // Mapear los resultados de Object[] a una estructura de datos más manejable
-        Map<String, List<Object[]>> ordersGroupedByOrderNumber = workOrderList.stream()
-                .collect(Collectors.groupingBy(row -> (String) row[0]));  // Agrupa por orderNumber (posición 0)
+        Map<String, List<Object[]>> ordersGroupedByOrderNumber = workOrderList.stream().collect(Collectors.groupingBy(row -> (String) row[0]));  // Agrupa por orderNumber (posición 0)
 
         // Crear la respuesta
         OrderListDTOResponse orderListDTOResponse = new OrderListDTOResponse();
 
         // Convertir a OrderDTOResponse con conteo de servicios
-        orderListDTOResponse.setOrders(
-                ordersGroupedByOrderNumber.entrySet().stream()
-                        .map(entry -> {
-                            String orderNumber = entry.getKey();
-                            List<Object[]> groupedOrders = entry.getValue();
+        orderListDTOResponse.setOrders(ordersGroupedByOrderNumber.entrySet().stream().map(entry -> {
+            String orderNumber = entry.getKey();
+            List<Object[]> groupedOrders = entry.getValue();
 
-                            // Obtener la primera orden para extraer los datos comunes
-                            Object[] firstOrderRow = groupedOrders.get(0);
+            // Obtener la primera orden para extraer los datos comunes
+            Object[] firstOrderRow = groupedOrders.get(0);
 
-                            // Extraer datos comunes desde la primera fila del grupo
-                            Long idClient = (Long) firstOrderRow[1];  // id_client (posición 1)
-                            String clientName = (String) firstOrderRow[2]; // client_name (posición 2)
-                            String clientPhone = (String) firstOrderRow[3]; // cli_phone_number (posición 3)
-                            Timestamp creationDate = (Timestamp) firstOrderRow[4]; // creation_date (posición 4)
-                            Date deliveryDate = (Date) firstOrderRow[5]; // delivery_date (posición 5)
-                            long servicesOrderCount = (long) firstOrderRow[6]; // services_count (posición 6)
-                            String adminName = (String) firstOrderRow[12]; // attended_by (posición 12)
+            // Extraer datos comunes desde la primera fila del grupo
+            Long idClient = (Long) firstOrderRow[1];  // id_client (posición 1)
+            String clientName = (String) firstOrderRow[2]; // client_name (posición 2)
+            String clientPhone = (String) firstOrderRow[3]; // cli_phone_number (posición 3)
+            Timestamp creationDate = (Timestamp) firstOrderRow[4]; // creation_date (posición 4)
+            Date deliveryDate = (Date) firstOrderRow[5]; // delivery_date (posición 5)
+            long servicesOrderCount = (long) firstOrderRow[6]; // services_count (posición 6)
+            String adminName = (String) firstOrderRow[12]; // attended_by (posición 12)
 
-                            SimpleDateFormat simpleDateFormat = new SimpleDateFormat("dd-MM-yyyy");
+            SimpleDateFormat simpleDateFormat = new SimpleDateFormat("dd-MM-yyyy");
 
-                            // Construir el OrderDTOResponse
-                            return OrderDTOResponse.builder()
-                                    .orderNumber(orderNumber)
-                                    .client(ClientDTO.builder()
-                                            .identification(idClient)
-                                            .name(clientName)
-                                            .cellphone(clientPhone)
-                                            .build())
-                                    .attendedBy(adminName)
-                                    .createDate(creationDate.toLocalDateTime().format(DateTimeFormatter.ofPattern("dd-MM-yyyy HH:mm")))
-                                    .deliveryDate(deliveryDate)
-                                    .servicesCount(servicesOrderCount) // Cantidad total de servicios
-                                    .orderStatus(OrderStatusEnum.getValue(String.valueOf(firstOrderRow[7]))) // order_status (posición 7)
-                                    .totalValue(((Double) firstOrderRow[8]).longValue()) // total_value (posición 8)
-                                    .downPayment(((Double) firstOrderRow[9]).longValue()) // deposit (posición 9)
-                                    .balance(((Double) firstOrderRow[10]).longValue())  // balance (posición 10)
-                                    .paymentStatus(PaymentStatusEnum.getValue(String.valueOf(firstOrderRow[11])))  // payment_status (posición 11)
-                                    .build();
-                        })
-                        .sorted(Comparator.comparing(OrderDTOResponse::getDeliveryDate))
-                        .toList()
-        );
+            // Construir el OrderDTOResponse
+            return OrderDTOResponse.builder().orderNumber(orderNumber).client(ClientDTO.builder().identification(idClient).name(clientName).cellphone(clientPhone).build()).attendedBy(adminName).createDate(creationDate.toLocalDateTime().format(DateTimeFormatter.ofPattern("dd-MM-yyyy HH:mm"))).deliveryDate(deliveryDate).servicesCount(servicesOrderCount) // Cantidad total de servicios
+                    .orderStatus(OrderStatusEnum.getValue(String.valueOf(firstOrderRow[7]))) // order_status (posición 7)
+                    .totalValue(((Double) firstOrderRow[8]).longValue()) // total_value (posición 8)
+                    .downPayment(((Double) firstOrderRow[9]).longValue()) // deposit (posición 9)
+                    .balance(((Double) firstOrderRow[10]).longValue())  // balance (posición 10)
+                    .paymentStatus(PaymentStatusEnum.getValue(String.valueOf(firstOrderRow[11])))  // payment_status (posición 11)
+                    .build();
+        }).sorted(Comparator.comparing(OrderDTOResponse::getDeliveryDate)).toList());
 
         return orderListDTOResponse;
     }
@@ -400,7 +335,7 @@ public class WorkOrderServiceImpl implements IWorkOrderService {
     }
 
     private Double totalPrice(List<ServicesDTO> servicesDTO) {
-        return servicesDTO.stream().mapToDouble(ServicesDTO::getPrice).sum();
+        return servicesDTO.stream().filter(s -> ObjectUtils.isNotEmpty(s.getPrice())).mapToDouble(ServicesDTO::getPrice).sum();
     }
 
     private Integer generateRandomValueOrder() {
@@ -437,11 +372,8 @@ public class WorkOrderServiceImpl implements IWorkOrderService {
     }
 
     private void validateOperators(List<ServicesDTO> services) {
-        if (!services.isEmpty() && services.stream().anyMatch(servicesDTO -> Objects.nonNull(servicesDTO.getOperator())
-                && Objects.nonNull(servicesDTO.getOperator().getIdOperator()))) {
-            long[] operators = services.stream()
-                    .filter(s -> ObjectUtils.isNotEmpty(s.getOperator()) && ObjectUtils.isNotEmpty(s.getOperator().getIdOperator()))
-                    .flatMapToLong(s -> LongStream.of(s.getOperator().getIdOperator())).toArray();
+        if (!services.isEmpty() && services.stream().anyMatch(servicesDTO -> Objects.nonNull(servicesDTO.getOperator()) && Objects.nonNull(servicesDTO.getOperator().getIdOperator()))) {
+            long[] operators = services.stream().filter(s -> ObjectUtils.isNotEmpty(s.getOperator()) && ObjectUtils.isNotEmpty(s.getOperator().getIdOperator())).flatMapToLong(s -> LongStream.of(s.getOperator().getIdOperator())).toArray();
             if (operatorService.findOperatorsById(operators) != operators.length) {
                 throw new BadRequestException("Hay operadores que no existen por lo que no se puede crear la orden de servicio");
             }
