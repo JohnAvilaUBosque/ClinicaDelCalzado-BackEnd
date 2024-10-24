@@ -100,7 +100,10 @@ public class WebSecurityConfig {
                 registry.addMapping("/api/v1/**")
                         .allowedMethods("HEAD", "GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS")
                         .allowedOrigins("https://clinica-del-calzado.netlify.app");
-                ;
+                registry.addMapping("/api/v1/reports/**")
+                        .allowedMethods("GET")
+                        .allowedHeaders("Access-Control-Allow-Headers", "Access-Control-Allow-Origin", "Access-Control-Request-Method", "Access-Control-Request-Headers", "Origin", "Cache-Control", "Content-Type", "Authorization")
+                        .allowedOrigins("https://clinica-del-calzado.netlify.app");
             }
         };
     }
