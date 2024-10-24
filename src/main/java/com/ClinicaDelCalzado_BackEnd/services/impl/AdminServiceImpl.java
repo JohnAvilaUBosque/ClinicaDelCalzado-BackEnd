@@ -179,7 +179,8 @@ public class AdminServiceImpl implements IAdminService {
         List<Answer> currentAnswer = answerService.findAnswerAllByAdminId(adminId);
         List<QuestionDTO> questionDTOList = questionService.findAllQuestions().getQuestions();
 
-        if (ObjectUtils.isNotEmpty(adminDTO.getSecurityQuestions())) {
+        if (ObjectUtils.isNotEmpty(adminDTO.getSecurityQuestions()) &&
+                adminDTO.getSecurityQuestions().stream().noneMatch(answerDTO -> answerDTO.getIdQuestion() == 0)) {
 
             if (adminDTO.getSecurityQuestions().stream().map(AnswerDTO::getIdQuestion).distinct().count() == 1) {
                 throw new BadRequestException("Hay preguntas que se repiten por lo que debe seleccionar diferentes tipos de preguntas");
