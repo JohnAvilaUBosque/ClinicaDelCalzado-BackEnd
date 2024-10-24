@@ -66,7 +66,7 @@ public class WorkOrderServiceImpl implements IWorkOrderService {
     @Override
     public WorkOrderDTOResponse createWorkOrder(WorkOrderDTORequest workOrderDTORequest, Long userAuth, List<String> userAuthorities) {
 
-        if(ObjectUtils.isNotEmpty(workOrderDTORequest.getAttendedById())
+        if (ObjectUtils.isNotEmpty(workOrderDTORequest.getAttendedById())
                 && userAuthorities.stream().noneMatch(user -> user.equals(AdminTypeEnum.PRINCIPAL.getKeyName()))) {
             throw new ForbiddenException("No tiene permiso para realizar esta acción, contacte al administrador principal");
         }
@@ -146,22 +146,23 @@ public class WorkOrderServiceImpl implements IWorkOrderService {
         List<ServicesDTO> servicesList = productService.getServicesOrder(orderNumber);
 
         if (ObjectUtils.isNotEmpty(servicesDTO.getPrice()) && servicesList.stream().noneMatch(ServicesDTO::getHasPendingPrice)) {
-            updateValuesWorkOrder(servicesList, workOrder);
+            workOrder = updateValuesWorkOrder(servicesList, workOrder);
         }
 
-        if (ObjectUtils.isNotEmpty(servicesDTO.getServiceStatus()) &&
-                servicesList.stream().anyMatch(p -> p.getServiceStatus().equals(ServicesStatusEnum.DISPATCHED.getKeyName()))) {
+        if (ObjectUtils.isNotEmpty(servicesList) &&
+                servicesList.stream().allMatch(p -> p.getServiceStatus().equals(ServicesStatusEnum.DISPATCHED.getValue())) &&
+                workOrder.getPaymentStatus().equals(PaymentStatusEnum.PAID.getKeyName())) {
             updateStatusWorkOrder(workOrder, auth);
         }
         return ServicesDTOResponse.builder()
-                .message("Servicios actualizado exitosamente.")
+                .message("Servicio actualizado exitosamente.")
                 .service(ServicesDTOList.builder()
                         .id(services.getIdService())
                         .idOrder(services.getIdOrderSer().getOrderNumber())
                         .name(services.getService())
                         .price(services.getUnitValue().longValue())
                         .operator(servicesList.stream()
-                                .filter(p-> p.getId().equals(services.getIdService()))
+                                .filter(p -> p.getId().equals(services.getIdService()))
                                 .map(ServicesDTO::getOperator)
                                 .findFirst().orElse(OperatorServiceDTO.builder().build()))
                         .serviceStatus(services.getServiceStatus())
@@ -179,15 +180,15 @@ public class WorkOrderServiceImpl implements IWorkOrderService {
         double payment = updatePaymentDTORequest.getPaymentAmount();
         WorkOrder workOrder = validateOrderNumber(orderNumber);
 
-        if (payment == 0){
+        if (payment == 0) {
             throw new BadRequestException("El abono no puede ser cero!!");
         }
 
-        if (workOrder.getPaymentStatus().equals(PaymentStatusEnum.PAID.getKeyName())){
+        if (workOrder.getPaymentStatus().equals(PaymentStatusEnum.PAID.getKeyName())) {
             throw new BadRequestException("La orden de trabajo ya esta paga!!");
         }
 
-        if (!workOrder.getOrderStatus().equals(OrderStatusEnum.VALID.getKeyName())){
+        if (!workOrder.getOrderStatus().equals(OrderStatusEnum.VALID.getKeyName())) {
             throw new BadRequestException("La orden de trabajo no se encuentra en un estado vigente!!");
         }
 
@@ -210,7 +211,15 @@ public class WorkOrderServiceImpl implements IWorkOrderService {
 
         workOrder.setDeposit(newDeposit);
         workOrder.setBalance(newBalance);
-        saveWorkOrder(workOrder);
+
+        List<ServicesDTO> servicesList = productService.getServicesOrder(orderNumber);
+        if (ObjectUtils.isNotEmpty(servicesList) &&
+                servicesList.stream().allMatch(p -> p.getServiceStatus().equals(ServicesStatusEnum.DISPATCHED.getValue())) &&
+                workOrder.getPaymentStatus().equals(PaymentStatusEnum.PAID.getKeyName())) {
+            updateStatusWorkOrder(workOrder, userAuth);
+        } else {
+            saveWorkOrder(workOrder);
+        }
 
         return MessageDTOResponse.builder().message(commentPayment).build();
     }
@@ -296,7 +305,7 @@ public class WorkOrderServiceImpl implements IWorkOrderService {
                 .orElseThrow(() -> new NotFoundException(String.format("La orden de trabajo %s no encontrada", orderNumber)));
     }
 
-    private void updateValuesWorkOrder(List<ServicesDTO> servicesDTO, WorkOrder workOrder) {
+    private WorkOrder updateValuesWorkOrder(List<ServicesDTO> servicesDTO, WorkOrder workOrder) {
         double totalPriceOrder = totalPrice(servicesDTO);
         double newBalance = totalPriceOrder - workOrder.getDeposit();
 
@@ -307,7 +316,7 @@ public class WorkOrderServiceImpl implements IWorkOrderService {
             workOrder.setPaymentStatus(PaymentStatusEnum.PAID.getKeyName());
             commentService.saveCommentOrder("Orden de trabajo pagada", workOrder.getOrderNumber(), workOrder.getAttendedBy().getIdAdministrator());
         }
-        saveWorkOrder(workOrder);
+        return saveWorkOrder(workOrder);
     }
 
     private void updateStatusWorkOrder(WorkOrder workOrder, Long userAuth) {
@@ -411,7 +420,7 @@ public class WorkOrderServiceImpl implements IWorkOrderService {
             throw new BadRequestException("Se requiere la fecha de entrega para la orden de trabajo!!");
         }
 
-        if (deliveryDate.isBefore(today)){
+        if (deliveryDate.isBefore(today)) {
             throw new BadRequestException("La fecha de entrega para la orden de trabajo no puede ser menor que hoy!!");
         }
 
@@ -428,13 +437,13 @@ public class WorkOrderServiceImpl implements IWorkOrderService {
         }
     }
 
-    private void validateOperators(List<ServicesDTO> services){
-        if(!services.isEmpty() && services.stream().anyMatch(servicesDTO -> Objects.nonNull(servicesDTO.getOperator())
+    private void validateOperators(List<ServicesDTO> services) {
+        if (!services.isEmpty() && services.stream().anyMatch(servicesDTO -> Objects.nonNull(servicesDTO.getOperator())
                 && Objects.nonNull(servicesDTO.getOperator().getIdOperator()))) {
             long[] operators = services.stream()
                     .filter(s -> ObjectUtils.isNotEmpty(s.getOperator()) && ObjectUtils.isNotEmpty(s.getOperator().getIdOperator()))
                     .flatMapToLong(s -> LongStream.of(s.getOperator().getIdOperator())).toArray();
-            if(operatorService.findOperatorsById(operators) != operators.length) {
+            if (operatorService.findOperatorsById(operators) != operators.length) {
                 throw new BadRequestException("Hay operadores que no existen por lo que no se puede crear la orden de servicio");
             }
         }
