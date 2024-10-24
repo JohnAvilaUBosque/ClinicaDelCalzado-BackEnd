@@ -50,37 +50,37 @@ public class WebSecurityConfig {
     SecurityFilterChain filterChain(HttpSecurity httpSecurity) throws Exception {
         httpSecurity.csrf(AbstractHttpConfigurer::disable)
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers(HttpMethod.GET,"/ping").permitAll()
+                        .requestMatchers(HttpMethod.GET, "/ping").permitAll()
                         // AuthController
-                        .requestMatchers(HttpMethod.POST,"/api/v1/auth/**").permitAll()
+                        .requestMatchers(HttpMethod.POST, "/api/v1/auth/**").permitAll()
                         // AdministratorController
-                        .requestMatchers(HttpMethod.GET,"/api/v1/admins/**").hasAnyAuthority(AdminTypeEnum.ADMINISTRATOR.getKeyName(), AdminTypeEnum.PRINCIPAL.getValue())
-                        .requestMatchers(HttpMethod.POST,"/api/v1/admins/created").hasAnyAuthority(AdminTypeEnum.ADMINISTRATOR.getKeyName(), AdminTypeEnum.PRINCIPAL.getKeyName())
-                        .requestMatchers(HttpMethod.PUT,"/api/v1/admins/updated/{adminId}").hasAnyAuthority(AdminTypeEnum.ADMINISTRATOR.getKeyName(), AdminTypeEnum.PRINCIPAL.getKeyName())
-                        .requestMatchers(HttpMethod.PUT,"/api/v1/admins/password/**").hasAnyAuthority(AdminTypeEnum.ADMINISTRATOR.getKeyName(), AdminTypeEnum.PRINCIPAL.getKeyName(), AdminTypeEnum.SECONDARY.getKeyName())
-                        .requestMatchers(HttpMethod.PUT,"/api/v1/admins/edit-personal-information/{adminId}").hasAnyAuthority(AdminTypeEnum.ADMINISTRATOR.getKeyName(), AdminTypeEnum.PRINCIPAL.getKeyName(), AdminTypeEnum.SECONDARY.getKeyName())
+                        .requestMatchers(HttpMethod.GET, "/api/v1/admins/**").hasAnyAuthority(AdminTypeEnum.ADMINISTRATOR.getKeyName(), AdminTypeEnum.PRINCIPAL.getValue(), AdminTypeEnum.SECONDARY.getKeyName())
+                        .requestMatchers(HttpMethod.POST, "/api/v1/admins/created").hasAnyAuthority(AdminTypeEnum.ADMINISTRATOR.getKeyName(), AdminTypeEnum.PRINCIPAL.getKeyName())
+                        .requestMatchers(HttpMethod.PUT, "/api/v1/admins/updated/{adminId}").hasAnyAuthority(AdminTypeEnum.ADMINISTRATOR.getKeyName(), AdminTypeEnum.PRINCIPAL.getKeyName())
+                        .requestMatchers(HttpMethod.PUT, "/api/v1/admins/password/**").hasAnyAuthority(AdminTypeEnum.ADMINISTRATOR.getKeyName(), AdminTypeEnum.PRINCIPAL.getKeyName(), AdminTypeEnum.SECONDARY.getKeyName())
+                        .requestMatchers(HttpMethod.PUT, "/api/v1/admins/edit-personal-information/{adminId}").hasAnyAuthority(AdminTypeEnum.ADMINISTRATOR.getKeyName(), AdminTypeEnum.PRINCIPAL.getKeyName(), AdminTypeEnum.SECONDARY.getKeyName())
                         // ClientController
-                        .requestMatchers(HttpMethod.GET,"/api/v1/client/**").hasAnyAuthority(AdminTypeEnum.ADMINISTRATOR.getKeyName(), AdminTypeEnum.PRINCIPAL.getValue(), AdminTypeEnum.SECONDARY.getKeyName())
+                        .requestMatchers(HttpMethod.GET, "/api/v1/client/**").hasAnyAuthority(AdminTypeEnum.ADMINISTRATOR.getKeyName(), AdminTypeEnum.PRINCIPAL.getValue(), AdminTypeEnum.SECONDARY.getKeyName())
                         // CompanyController
                         .requestMatchers(HttpMethod.GET, "/api/v1/company/**").hasAnyAuthority(AdminTypeEnum.ADMINISTRATOR.getKeyName(), AdminTypeEnum.PRINCIPAL.getKeyName(), AdminTypeEnum.SECONDARY.getKeyName())
                         // OperatorController
-                        .requestMatchers(HttpMethod.GET,"/api/v1/operator/**").hasAnyAuthority(AdminTypeEnum.ADMINISTRATOR.getKeyName(), AdminTypeEnum.PRINCIPAL.getValue())
-                        .requestMatchers(HttpMethod.POST,"/api/v1/operator/created").hasAnyAuthority(AdminTypeEnum.ADMINISTRATOR.getKeyName(), AdminTypeEnum.PRINCIPAL.getKeyName())
-                        .requestMatchers(HttpMethod.PUT,"/api/v1/operator/updated/{operatorId}").hasAnyAuthority(AdminTypeEnum.ADMINISTRATOR.getKeyName(), AdminTypeEnum.PRINCIPAL.getKeyName())
+                        .requestMatchers(HttpMethod.GET, "/api/v1/operator/**").hasAnyAuthority(AdminTypeEnum.ADMINISTRATOR.getKeyName(), AdminTypeEnum.PRINCIPAL.getValue())
+                        .requestMatchers(HttpMethod.POST, "/api/v1/operator/created").hasAnyAuthority(AdminTypeEnum.ADMINISTRATOR.getKeyName(), AdminTypeEnum.PRINCIPAL.getKeyName())
+                        .requestMatchers(HttpMethod.PUT, "/api/v1/operator/updated/{operatorId}").hasAnyAuthority(AdminTypeEnum.ADMINISTRATOR.getKeyName(), AdminTypeEnum.PRINCIPAL.getKeyName())
                         // OrderController
-                        .requestMatchers(HttpMethod.GET,"/api/v1/work-orders/**").hasAnyAuthority(AdminTypeEnum.ADMINISTRATOR.getKeyName(), AdminTypeEnum.PRINCIPAL.getKeyName(), AdminTypeEnum.SECONDARY.getKeyName())
-                        .requestMatchers(HttpMethod.POST,"/api/v1/work-orders/created").hasAnyAuthority(AdminTypeEnum.ADMINISTRATOR.getKeyName(), AdminTypeEnum.PRINCIPAL.getKeyName(), AdminTypeEnum.SECONDARY.getKeyName())
-                        .requestMatchers(HttpMethod.PUT,"/api/v1/work-orders/payment/{orderNumber}").hasAnyAuthority(AdminTypeEnum.ADMINISTRATOR.getKeyName(), AdminTypeEnum.PRINCIPAL.getKeyName(), AdminTypeEnum.SECONDARY.getKeyName())
-                        .requestMatchers(HttpMethod.PUT,"/api/v1/work-orders/comment/**").hasAnyAuthority(AdminTypeEnum.ADMINISTRATOR.getKeyName(), AdminTypeEnum.PRINCIPAL.getKeyName(), AdminTypeEnum.SECONDARY.getKeyName())
-                        .requestMatchers(HttpMethod.PUT,"/api/v1/work-orders/updated/service/{serviceId}").hasAnyAuthority(AdminTypeEnum.ADMINISTRATOR.getKeyName(), AdminTypeEnum.PRINCIPAL.getKeyName(), AdminTypeEnum.SECONDARY.getKeyName())
-                        .requestMatchers(HttpMethod.PUT,"/api/v1/work-orders/cancel/{orderNumber}").hasAnyAuthority(AdminTypeEnum.ADMINISTRATOR.getKeyName(), AdminTypeEnum.PRINCIPAL.getKeyName())
+                        .requestMatchers(HttpMethod.GET, "/api/v1/work-orders/**").hasAnyAuthority(AdminTypeEnum.ADMINISTRATOR.getKeyName(), AdminTypeEnum.PRINCIPAL.getKeyName(), AdminTypeEnum.SECONDARY.getKeyName())
+                        .requestMatchers(HttpMethod.POST, "/api/v1/work-orders/created").hasAnyAuthority(AdminTypeEnum.ADMINISTRATOR.getKeyName(), AdminTypeEnum.PRINCIPAL.getKeyName(), AdminTypeEnum.SECONDARY.getKeyName())
+                        .requestMatchers(HttpMethod.PUT, "/api/v1/work-orders/payment/{orderNumber}").hasAnyAuthority(AdminTypeEnum.ADMINISTRATOR.getKeyName(), AdminTypeEnum.PRINCIPAL.getKeyName(), AdminTypeEnum.SECONDARY.getKeyName())
+                        .requestMatchers(HttpMethod.PUT, "/api/v1/work-orders/comment/**").hasAnyAuthority(AdminTypeEnum.ADMINISTRATOR.getKeyName(), AdminTypeEnum.PRINCIPAL.getKeyName(), AdminTypeEnum.SECONDARY.getKeyName())
+                        .requestMatchers(HttpMethod.PUT, "/api/v1/work-orders/updated/service/{serviceId}").hasAnyAuthority(AdminTypeEnum.ADMINISTRATOR.getKeyName(), AdminTypeEnum.PRINCIPAL.getKeyName(), AdminTypeEnum.SECONDARY.getKeyName())
+                        .requestMatchers(HttpMethod.PUT, "/api/v1/work-orders/cancel/{orderNumber}").hasAnyAuthority(AdminTypeEnum.ADMINISTRATOR.getKeyName(), AdminTypeEnum.PRINCIPAL.getKeyName())
                         // QuestionController
-                        .requestMatchers(HttpMethod.GET,"/api/v1/questions/list").permitAll()
+                        .requestMatchers(HttpMethod.GET, "/api/v1/questions/list").permitAll()
                         // ReportsController
-                        .requestMatchers(HttpMethod.GET,"/api/v1/reports/detailed").hasAnyAuthority(AdminTypeEnum.ADMINISTRATOR.getKeyName(), AdminTypeEnum.PRINCIPAL.getKeyName())
-                        .requestMatchers(HttpMethod.GET,"/api/v1/reports/general").hasAnyAuthority(AdminTypeEnum.ADMINISTRATOR.getKeyName(), AdminTypeEnum.PRINCIPAL.getKeyName())
+                        .requestMatchers(HttpMethod.GET, "/api/v1/reports/detailed").hasAnyAuthority(AdminTypeEnum.ADMINISTRATOR.getKeyName(), AdminTypeEnum.PRINCIPAL.getKeyName())
+                        .requestMatchers(HttpMethod.GET, "/api/v1/reports/general").hasAnyAuthority(AdminTypeEnum.ADMINISTRATOR.getKeyName(), AdminTypeEnum.PRINCIPAL.getKeyName())
                         // ServicesWorkOrderController
-                        .requestMatchers(HttpMethod.GET,"/api/v1/services/**").hasAnyAuthority(AdminTypeEnum.ADMINISTRATOR.getKeyName(), AdminTypeEnum.PRINCIPAL.getKeyName(), AdminTypeEnum.SECONDARY.getKeyName())
+                        .requestMatchers(HttpMethod.GET, "/api/v1/services/**").hasAnyAuthority(AdminTypeEnum.ADMINISTRATOR.getKeyName(), AdminTypeEnum.PRINCIPAL.getKeyName(), AdminTypeEnum.SECONDARY.getKeyName())
                         .anyRequest().authenticated())
                 .httpBasic(AbstractHttpConfigurer::disable);
 
