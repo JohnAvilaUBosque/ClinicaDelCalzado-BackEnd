@@ -97,7 +97,27 @@ public class WebSecurityConfig {
         return new WebMvcConfigurer() {
             @Override
             public void addCorsMappings(CorsRegistry registry) {
-                registry.addMapping("/api/v1/**").allowedOrigins("https://clinica-del-calzado.netlify.app");
+                registry.addMapping("/api/v1/auth/**").allowedOrigins("https://clinica-del-calzado.netlify.app");
+                registry.addMapping("/api/v1/admins/**").allowedOrigins("https://clinica-del-calzado.netlify.app");
+                registry.addMapping("/api/v1/admins/created").allowedOrigins("https://clinica-del-calzado.netlify.app");
+                registry.addMapping("/api/v1/admins/updated/{adminId}").allowedOrigins("https://clinica-del-calzado.netlify.app");
+                registry.addMapping("/api/v1/admins/password/**").allowedOrigins("https://clinica-del-calzado.netlify.app");
+                registry.addMapping("/api/v1/admins/edit-personal-information/{adminId}").allowedOrigins("https://clinica-del-calzado.netlify.app");
+                registry.addMapping("/api/v1/client/**").allowedOrigins("https://clinica-del-calzado.netlify.app");
+                registry.addMapping("/api/v1/company/**").allowedOrigins("https://clinica-del-calzado.netlify.app");
+                registry.addMapping("/api/v1/operator/**").allowedOrigins("https://clinica-del-calzado.netlify.app");
+                registry.addMapping("/api/v1/operator/created").allowedOrigins("https://clinica-del-calzado.netlify.app");
+                registry.addMapping("/api/v1/operator/updated/{operatorId}").allowedOrigins("https://clinica-del-calzado.netlify.app");
+                registry.addMapping("/api/v1/work-orders/**").allowedOrigins("https://clinica-del-calzado.netlify.app");
+                registry.addMapping("/api/v1/work-orders/created").allowedOrigins("https://clinica-del-calzado.netlify.app");
+                registry.addMapping("/api/v1/work-orders/payment/{orderNumber}").allowedOrigins("https://clinica-del-calzado.netlify.app");
+                registry.addMapping("/api/v1/work-orders/comment/**").allowedOrigins("https://clinica-del-calzado.netlify.app");
+                registry.addMapping("/api/v1/work-orders/updated/service/{serviceId}").allowedOrigins("https://clinica-del-calzado.netlify.app");
+                registry.addMapping("/api/v1/work-orders/cancel/{orderNumber}").allowedOrigins("https://clinica-del-calzado.netlify.app");
+                registry.addMapping("/api/v1/questions/list").allowedOrigins("https://clinica-del-calzado.netlify.app");
+                registry.addMapping("/api/v1/reports/detailed").allowedOrigins("https://clinica-del-calzado.netlify.app");
+                registry.addMapping("/api/v1/reports/general").allowedOrigins("https://clinica-del-calzado.netlify.app");
+                registry.addMapping("/api/v1/services/**").allowedOrigins("https://clinica-del-calzado.netlify.app");
             }
         };
     }
