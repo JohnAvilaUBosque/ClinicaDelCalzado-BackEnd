@@ -116,9 +116,9 @@ public class WorkOrderServiceImpl implements IWorkOrderService {
         workOrder.setLastModificationBy(userAuth);
 
         saveWorkOrder(workOrder);
-        commentService.saveCommentOrder(String.format("Orden de trabajo cancelada %s", addCommentDTORequest.getComment()), workOrder.getOrderNumber(), userAuth);
+        commentService.saveCommentOrder(String.format("Orden de trabajo anulada %s", addCommentDTORequest.getComment()), workOrder.getOrderNumber(), userAuth);
 
-        return MessageDTOResponse.builder().message("Orden de trabajo cancelada con éxito.").build();
+        return MessageDTOResponse.builder().message("Orden de trabajo anulada con éxito.").build();
     }
 
     @Override
