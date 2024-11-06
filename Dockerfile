@@ -5,7 +5,7 @@ FROM openjdk:17-slim
 WORKDIR /app
 
 # Copiar el archivo jar del proyecto al directorio /app en el contenedor
-COPY build/libs/ClinicaDelCalzado-BackEnd-0.1.0-SNAPSHOT.jar /app/ClinicaDelCalzado-BackEnd.jar
+COPY build/libs/ClinicaDelCalzado-BackEnd-0.1.1-SNAPSHOT.jar /app/ClinicaDelCalzado-BackEnd.jar
 
 # Exponer el puerto que usa la aplicación
 EXPOSE 3000

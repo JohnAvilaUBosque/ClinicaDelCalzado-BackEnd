@@ -11,7 +11,7 @@ import java.util.List;
 
 public interface IWorkOrderService {
 
-    WorkOrderDTOResponse createWorkOrder(WorkOrderDTORequest workOrderDTORequest, Long userAuth, List<String> userAuthorities);
+    WorkOrderDTOResponse createWorkOrder(WorkOrderDTORequest workOrderDTORequest, Long userAuth);
     MessageDTOResponse cancelWorkOrder(String orderNumber, Long userAuth, AddCommentDTORequest addCommentDTORequest);
     ServicesDTOResponse updateServicesWorkOrder(Integer serviceId, UpdateServicesDTORequest servicesDTO, Long auth);
     MessageDTOResponse updatePaymentWorkOrder(String orderNumber, Long userAuth,  UpdatePaymentDTORequest updatePaymentDTORequest);

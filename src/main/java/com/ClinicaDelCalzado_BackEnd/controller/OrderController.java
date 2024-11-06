@@ -29,9 +29,8 @@ public class OrderController {
     @PostMapping("/created")
     public ResponseEntity<WorkOrderDTOResponse> createWorkOrder(@RequestBody WorkOrderDTORequest workOrderDTO, Authentication authentication) {
         String userAuth = getUserAuth(authentication);
-        List<String> userAuthorities = authentication.getAuthorities().stream().map(GrantedAuthority::getAuthority).toList();
-
-        WorkOrderDTOResponse responseDTO = workOrderService.createWorkOrder(workOrderDTO, Long.valueOf(userAuth), userAuthorities);
+        
+        WorkOrderDTOResponse responseDTO = workOrderService.createWorkOrder(workOrderDTO, Long.valueOf(userAuth));
         return new ResponseEntity<>(responseDTO, HttpStatus.CREATED);
     }
 

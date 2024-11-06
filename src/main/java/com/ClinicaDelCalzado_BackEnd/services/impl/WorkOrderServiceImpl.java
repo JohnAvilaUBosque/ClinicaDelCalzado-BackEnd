@@ -61,12 +61,7 @@ public class WorkOrderServiceImpl implements IWorkOrderService {
     }
 
     @Override
-    public WorkOrderDTOResponse createWorkOrder(WorkOrderDTORequest workOrderDTORequest, Long userAuth, List<String> userAuthorities) {
-
-        if (ObjectUtils.isNotEmpty(workOrderDTORequest.getAttendedById()) && userAuthorities.stream().noneMatch(user -> user.equals(AdminTypeEnum.PRINCIPAL.getKeyName()))) {
-            throw new ForbiddenException("No tiene permiso para realizar esta acción, contacte al administrador principal");
-        }
-
+    public WorkOrderDTOResponse createWorkOrder(WorkOrderDTORequest workOrderDTORequest, Long userAuth) {
         validateRequest(workOrderDTORequest);
         validateOperators(workOrderDTORequest.getServices());
 
